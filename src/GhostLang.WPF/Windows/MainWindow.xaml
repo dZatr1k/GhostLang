@@ -7,102 +7,95 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" /> <RowDefinition Height="Auto" /> </Grid.RowDefinitions>
+            <RowDefinition Height="*" /> <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="300" /> <ColumnDefinition Width="5" /> <ColumnDefinition Width="1*" MinWidth="250" /> </Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="300" /> <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="1*" MinWidth="250" />
+            </Grid.ColumnDefinitions>
 
-            <DockPanel Grid.Column="0">
-                <TextBlock DockPanel.Dock="Top" Text="Результат перевода:" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /> 
+        
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <TextBox Text="{Binding TranslatedText, Mode=OneWay}"
-                             IsReadOnly="True"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             FontSize="14"
-                             VerticalAlignment="Stretch"
-                             HorizontalAlignment="Stretch"
-                             FontFamily="Segoe UI"/>
-                </ScrollViewer>
-            </DockPanel>
+                <DockPanel Grid.Row="0">
+                    <TextBlock DockPanel.Dock="Top" Text="Результат перевода:" FontSize="16" FontWeight="Bold"
+                               Margin="0,0,0,5" />
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="LightGray"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBox Text="{Binding TranslatedText, Mode=OneWay}"
+                                 IsReadOnly="True"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 FontSize="14"
+                                 VerticalAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 FontFamily="Segoe UI" />
+                    </ScrollViewer>
+                </DockPanel>
+
+                <DockPanel Grid.Row="1">
+                    <TextBlock DockPanel.Dock="Top" Text="Скриншоты:" FontSize="14" FontWeight="Bold" Margin="0,10,0,5" />
+
+                    <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="1" Margin="3">
+                        <Image Source="{Binding LastCapturedImage}"
+                               Stretch="Uniform" />
+                    </Border>
+                </DockPanel>
+            </Grid>
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          Background="LightGray" />
 
             <DockPanel Grid.Column="2" Margin="10,0,0,0">
-                
+
                 <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                    <TextBlock Text="Управление:" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
-                    
+                    <TextBlock Text="Кнопочки:" FontSize="16" FontWeight="Bold" Margin="0,0,0,5" />
+
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button Command="{Binding StartCommand}" 
-                                Content="Старт" 
-                                Padding="15,8" 
-                                Margin="0,0,5,0" 
-                                Background="#FF4CAF50" 
-                                Foreground="White" 
-                                FontWeight="Bold"/>
-                        
-                        <Button Command="{Binding StopCommand}" 
-                                Content="Стоп" 
-                                Padding="15,8" 
-                                Margin="5,0,5,0" 
-                                Background="#FFF44336" 
-                                Foreground="White" 
-                                FontWeight="Bold"/>
-                        
-                        <Button Command="{Binding OpenSettingsCommand}" 
-                                Content="Настройки" 
+                        <Button Command="{Binding StartCommand}"
+                                Content="Старт"
+                                Padding="15,8"
+                                Margin="0,0,5,0"
+                                Background="#FF4CAF50"
+                                Foreground="White"
+                                FontWeight="Bold" />
+
+                        <Button Command="{Binding StopCommand}"
+                                Content="Стоп"
+                                Padding="15,8"
+                                Margin="5,0,5,0"
+                                Background="#FFF44336"
+                                Foreground="White"
+                                FontWeight="Bold" />
+
+                        <Button Command="{Binding OpenSettingsCommand}"
+                                Content="Настройки"
                                 ToolTip="Настройки"
-                                Padding="10,8" 
+                                Padding="10,8"
                                 Margin="10,0,0,0" />
                     </StackPanel>
-                </StackPanel>
-                
-                <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                    <TextBlock Text="Управление:" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
-    
-                    <Button Command="{Binding SelectAreaCommand}" 
-                            Content="Выбрать область" 
-                            Padding="15,8" 
+
+                    <Button Command="{Binding SelectAreaCommand}"
+                            Content="Выбрать область"
+                            Padding="15,8"
                             Margin="0,0,0,10" />
-            
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    </StackPanel>
                 </StackPanel>
 
-                <TextBlock DockPanel.Dock="Bottom" Text="Скриншоты:" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
-
-                <ScrollViewer DockPanel.Dock="Bottom" Height="100" 
-                              HorizontalScrollBarVisibility="Visible" 
-                              VerticalScrollBarVisibility="Disabled">
-    
-                    <ItemsControl ItemsSource="{Binding CapturedImages}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-        
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="Gray" BorderThickness="1" Margin="3">
-                                    <Image Source="{Binding}" Height="90" />
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
             </DockPanel>
 
         </Grid>
-        
+
         <StatusBar Grid.Row="1">
             <StatusBarItem>
-                <TextBlock Text="{Binding StatusText}" Margin="5,0"/>
+                <TextBlock Text="{Binding StatusText}" Margin="5,0" />
             </StatusBarItem>
         </StatusBar>
-        
+
     </Grid>
 </Window>

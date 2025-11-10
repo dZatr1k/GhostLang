@@ -38,6 +38,13 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         get => _translatedText;
         set => SetField(ref _translatedText, value);
     }
+    
+    private BitmapSource? _lastCapturedImage;
+    public BitmapSource? LastCapturedImage
+    {
+        get => _lastCapturedImage;
+        set => SetField(ref _lastCapturedImage, value);
+    }
 
     private bool _isProcessRunning = false;
     public bool IsProcessRunning
@@ -58,7 +65,6 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
     public ICommand StopCommand { get; }
     public ICommand OpenSettingsCommand { get; }
     
-    public ObservableCollection<BitmapSource> CapturedImages { get; } = new();
 
     public MainWindowViewModel(
         IServiceProvider serviceProvider, 
@@ -110,15 +116,16 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         var selectionWindow = _serviceProvider.GetRequiredService<SelectionWindow>();
         if (selectionWindow.ShowDialog() == true)
         {
-            _settingsViewModel.SelectedArea = selectionWindow.SelectedArea;
-            
+            var selectedArea = selectionWindow.SelectedArea;
+            _settingsViewModel.SelectedArea = selectedArea;
             _overlayWindow?.Close();
-
             _overlayWindow = _serviceProvider.GetRequiredService<CaptureOverlayWindow>();
-            _overlayWindow.Left = _settingsViewModel.SelectedArea.Left;
-            _overlayWindow.Top = _settingsViewModel.SelectedArea.Top;
-            _overlayWindow.Width = _settingsViewModel.SelectedArea.Width;
-            _overlayWindow.Height = _settingsViewModel.SelectedArea.Height;
+            var toolbarHeight = 0; 
+            _overlayWindow.Left = selectedArea.Left;
+            _overlayWindow.Width = selectedArea.Width;
+            _overlayWindow.Top = selectedArea.Top - toolbarHeight; 
+        
+            _overlayWindow.Height = selectedArea.Height + toolbarHeight; 
             _overlayWindow.Show();
         }
     }
@@ -160,7 +167,6 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
 
     private async Task UpdateTranslation()
     {
-
         try
         {
             if (_translationContext is null || RectHelper.IsEmpty(_settingsViewModel.SelectedArea))
@@ -170,12 +176,8 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
             using Bitmap screenshot = _translationContext.ScreenCaptureService.CaptureScreenArea(RectHelper.ToDrawingRectangle(_settingsViewModel.SelectedArea));
 
             var wpfImage = BitmapHelper.ConvertToBitmapSource(screenshot);
-            CapturedImages.Add(wpfImage);
-                
-            if (CapturedImages.Count > 10)
-            {
-                CapturedImages.RemoveAt(0);
-            }
+            
+            LastCapturedImage = wpfImage;
             
             TranslatedText = await _translationContext.TranslationUseCase.Translate(screenshot, _cancellationTokenSource.Token);
         }

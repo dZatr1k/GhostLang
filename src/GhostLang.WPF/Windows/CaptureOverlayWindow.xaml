@@ -10,14 +10,18 @@
         ShowInTaskbar="False">
     
     <Grid>
-        <Border BorderBrush="Red" BorderThickness="2" Background="#10FF0000" />
+        <DockPanel LastChildFill="True">
+            <DockPanel DockPanel.Dock="Top" Height="30" 
+                       Background="#80FFFFFF"
+                       MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
+            
+                <StackPanel Orientation="Horizontal" Margin="5,0">
+                    <Button Content="Клик" Margin="2" ToolTip="Кнопка 1" Width="25"/>
+                    <Button Content="Клик" Margin="2" ToolTip="Кнопка 2" Width="25"/>
+                </StackPanel>
+            </DockPanel>
         
-        <DockPanel VerticalAlignment="Top" Height="30" 
-                   Background="#80FFFFFF" LastChildFill="False">
-            <StackPanel Orientation="Horizontal" Margin="5,0">
-                <Button Content="Клик" Margin="2" ToolTip="Кнопка 1"/>
-                <Button Content="Клик" Margin="2" ToolTip="Кнопка 2"/>
-            </StackPanel>
+            <Border BorderBrush="Green" BorderThickness="2" Background="Transparent" />
         </DockPanel>
     </Grid>
 </Window>

@@ -7,6 +7,6 @@ public class OcrService : IOcrService
 {
     public Task<string> RecognizeTextAsync(Bitmap screenshot, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult("Recognized text from image.");
+        return Task.FromResult("Fake Recognized text from image.");
     }
 }

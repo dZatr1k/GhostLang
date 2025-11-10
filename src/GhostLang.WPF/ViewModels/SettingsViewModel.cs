@@ -4,7 +4,7 @@ namespace GhostLang.WPF.ViewModels;
 
 public class SettingsViewModel : ViewModelBase
 {
-    private int _timerIntervalMilliseconds = 1000;
+    private int _timerIntervalMilliseconds = 50;
     private Rect _selectedArea;
 
     public int TimerIntervalMilliseconds

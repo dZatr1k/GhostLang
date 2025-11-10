@@ -12,9 +12,9 @@
         MouseLeftButtonUp="Window_MouseLeftButtonUp">
     <Canvas x:Name="SelectionCanvas">
         <Border x:Name="SelectionBorder"
-                BorderBrush="Red"
+                BorderBrush="Green"
                 BorderThickness="2"
-                Background="#40FF0000"
+                Background="#2043A047"
                 Visibility="Collapsed" />
     </Canvas>
 </Window>
