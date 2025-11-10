@@ -16,6 +16,7 @@ public partial class CaptureOverlayWindow
         
         LocationChanged += OnLocationChanged;
     }
+    
     private void Toolbar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ButtonState == MouseButtonState.Pressed)
@@ -38,5 +39,14 @@ public partial class CaptureOverlayWindow
     {
         LocationChanged -= OnLocationChanged;
         base.OnClosed(e);
+    }
+    
+    public void InitializePositionAndSize(Rect area)
+    {
+        _settingsViewModel.SelectedArea = area;
+        Left = _settingsViewModel.SelectedArea.X;
+        Top = _settingsViewModel.SelectedArea.Y - ToolbarHeight;
+        Width = _settingsViewModel.SelectedArea.Width;
+        Height = _settingsViewModel.SelectedArea.Height + ToolbarHeight;
     }
 }

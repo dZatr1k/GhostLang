@@ -54,7 +54,11 @@ public partial class SelectionWindow
         var width = Math.Abs(_startPoint.X - endPoint.X);
         var height = Math.Abs(_startPoint.Y - endPoint.Y);
 
-        SelectedArea = new Rect(x, y, width, height);
+        var relativeTopLeft = new Point(x, y);
+            
+        var screenTopLeft = PointToScreen(relativeTopLeft);
+
+        SelectedArea = new Rect(screenTopLeft.X, screenTopLeft.Y, width, height);
 
         DialogResult = SelectedArea is { Width: > 10, Height: > 10 };
         

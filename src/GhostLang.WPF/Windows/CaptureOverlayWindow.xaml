@@ -15,13 +15,13 @@
                        Background="#80FFFFFF"
                        MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
             
-                <StackPanel Orientation="Horizontal" Margin="5,0">
-                    <Button Content="Клик" Margin="2" ToolTip="Кнопка 1" Width="25"/>
-                    <Button Content="Клик" Margin="2" ToolTip="Кнопка 2" Width="25"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0">
+                    <Button Content="Выйти" Margin="3" ToolTip="Кнопка 1" Width="50"/>
+                    <Button Content="Нажать" Margin="3" ToolTip="Кнопка 2" Width="50"/>
                 </StackPanel>
             </DockPanel>
         
-            <Border BorderBrush="Green" BorderThickness="2" Background="Transparent" />
+            <Border BorderBrush="Green" BorderThickness="1" Background="Transparent" />
         </DockPanel>
     </Grid>
 </Window>

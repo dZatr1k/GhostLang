@@ -117,15 +117,9 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         if (selectionWindow.ShowDialog() == true)
         {
             var selectedArea = selectionWindow.SelectedArea;
-            _settingsViewModel.SelectedArea = selectedArea;
             _overlayWindow?.Close();
             _overlayWindow = _serviceProvider.GetRequiredService<CaptureOverlayWindow>();
-            var toolbarHeight = 0; 
-            _overlayWindow.Left = selectedArea.Left;
-            _overlayWindow.Width = selectedArea.Width;
-            _overlayWindow.Top = selectedArea.Top - toolbarHeight; 
-        
-            _overlayWindow.Height = selectedArea.Height + toolbarHeight; 
+            _overlayWindow.InitializePositionAndSize(selectedArea);
             _overlayWindow.Show();
         }
     }
