@@ -118,13 +118,10 @@ public partial class CaptureOverlayWindow
         }
     }
 
-    // 9. НОВЫЙ метод для отправки команды
     private void ResizeWindow(ResizeDirection direction)
     {
         if (_hwndSource == null) return;
 
-        // 0xF000 - это SC_SIZE, 
-        // к нему добавляется направление (1..8)
         SendMessage(_hwndSource.Handle, WM_SYSCOMMAND, 0xF000 + (int)direction, IntPtr.Zero);
     }
 
