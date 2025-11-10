@@ -6,22 +6,35 @@
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        ResizeMode="NoResize"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        ResizeMode="CanResize">
     
-    <Grid>
-        <DockPanel LastChildFill="True">
-            <DockPanel DockPanel.Dock="Top" Height="30" 
-                       Background="#80FFFFFF"
-                       MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
-            
-                <StackPanel Orientation="Horizontal" Margin="0,0">
-                    <Button Content="Выйти" Margin="3" ToolTip="Кнопка 1" Width="50"/>
-                    <Button Content="Нажать" Margin="3" ToolTip="Кнопка 2" Width="50"/>
-                </StackPanel>
-            </DockPanel>
+    <DockPanel LastChildFill="True">
         
-            <Border BorderBrush="Green" BorderThickness="1" Background="Transparent" />
+        <DockPanel DockPanel.Dock="Top" Height="30" 
+                   Background="#80FFFFFF"
+                   MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
+            
+            <StackPanel Orientation="Horizontal" Margin="0,0">
+                <Button Content="Выйти" Margin="3" ToolTip="Кнопка 1" Width="50"/>
+                <Button Content="Нажать" Margin="3" ToolTip="Кнопка 2" Width="50"/>
+            </StackPanel>
         </DockPanel>
-    </Grid>
+        
+        
+        <Grid>
+            <Border BorderBrush="Green" BorderThickness="2" Background="Transparent" />
+
+            <Rectangle Name="ResizeTop" Height="6" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNS" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            <Rectangle Name="ResizeBottom" Height="6" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNS" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            <Rectangle Name="ResizeLeft" Width="6" HorizontalAlignment="Left" Fill="Transparent" Cursor="SizeWE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            <Rectangle Name="ResizeRight" Width="6" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            
+            <Rectangle Name="ResizeTopLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNWSE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            <Rectangle Name="ResizeTopRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNESW" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            <Rectangle Name="ResizeBottomLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNESW" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            <Rectangle Name="ResizeBottomRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNWSE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+        </Grid>
+        
+    </DockPanel>
 </Window>
