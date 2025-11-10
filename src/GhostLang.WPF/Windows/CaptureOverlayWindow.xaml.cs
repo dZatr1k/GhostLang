@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using GhostLang.WPF.ViewModels;
 
 namespace GhostLang.WPF.Windows;
@@ -11,6 +12,8 @@ public partial class CaptureOverlayWindow
 {
     private readonly SettingsViewModel _settingsViewModel;
     private const double ToolbarHeight = 30;
+    
+    private readonly DispatcherTimer _updateDebounceTimer;
 
     private HwndSource? _hwndSource;
 
@@ -18,10 +21,15 @@ public partial class CaptureOverlayWindow
     {
         _settingsViewModel = settingsViewModel;
         InitializeComponent();
-
-        LocationChanged += OnLocationChanged;
         
-        SizeChanged += OnSizeChanged;
+        LocationChanged += OnOverlayMovedOrResized;
+        SizeChanged += OnOverlayMovedOrResized;
+            
+        _updateDebounceTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(100)
+        };
+        _updateDebounceTimer.Tick += OnDebounceTimerTick;
     }
     
     private void Toolbar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -31,14 +39,10 @@ public partial class CaptureOverlayWindow
             DragMove();
         }
     }
-
-    private void OnLocationChanged(object? sender, EventArgs e)
+    
+    private void OnDebounceTimerTick(object? sender, EventArgs e)
     {
-        UpdateSelectedArea();
-    }
-
-    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-    {
+        _updateDebounceTimer.Stop();
         UpdateSelectedArea();
     }
 
@@ -51,11 +55,21 @@ public partial class CaptureOverlayWindow
             Height - ToolbarHeight
         );
     }
+    
+    private void OnOverlayMovedOrResized(object? sender, EventArgs e)
+    {
+        _updateDebounceTimer.Stop();
+        _updateDebounceTimer.Start();
+    }
 
     protected override void OnClosed(EventArgs e)
     {
-        LocationChanged -= OnLocationChanged;
-        SizeChanged -= OnSizeChanged;
+        LocationChanged -= OnOverlayMovedOrResized;
+        SizeChanged -= OnOverlayMovedOrResized;
+
+        _updateDebounceTimer.Tick -= OnDebounceTimerTick;
+        _updateDebounceTimer.Stop();
+            
         base.OnClosed(e);
     }
 

@@ -1,11 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using GhostLang.Application.Interfaces;
-using GhostLang.Application.Models;
 using GhostLang.WPF.Commands;
 using GhostLang.WPF.DI;
 using GhostLang.WPF.Helpers;
@@ -24,6 +21,7 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
     private CancellationTokenSource _cancellationTokenSource;
     private readonly DispatcherTimer _timer;
     private ITranslationContext? _translationContext;
+    private bool _isUpdating = false;
     
     private string _statusText = "Остановлено";
     public string StatusText
@@ -94,8 +92,43 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         {
             Interval = TimeSpan.FromMilliseconds(_settingsViewModel.TimerIntervalMilliseconds)
         };
-        _timer.Tick += async (_, _) => await UpdateTranslation();
+
+        _timer.Tick += Timer_Tick;
+        
         _settingsViewModel.PropertyChanged += OnSettingsChanged;
+    }
+    
+    private async void Timer_Tick(object? sender, EventArgs e)
+    {
+        if (_isUpdating) 
+            return;
+
+        if (_translationContext is null || _settingsViewModel.SelectedArea.IsEmpty)
+            return;
+            
+        if (_cancellationTokenSource.IsCancellationRequested) return;
+
+        _isUpdating = true;
+        try
+        {
+            var (image, text) = await Task.Run(() => UpdateTranslation(_cancellationTokenSource.Token));
+
+            LastCapturedImage = image;
+            TranslatedText = text;
+        }
+        catch (OperationCanceledException)
+        {
+            StatusText = "Остановка...";
+        }
+        catch (Exception ex)
+        {
+            StopTranslation();
+            StatusText = $"Ошибка: {ex.Message}";
+        }
+        finally
+        {
+            _isUpdating = false;
+        }
     }
     
     private void OnSettingsChanged(object? sender, PropertyChangedEventArgs e)
@@ -129,8 +162,8 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         var settingsWindow = _serviceProvider.GetRequiredService<SettingsWindow>();
         settingsWindow.ShowDialog();
     }
-    
-    public void StartTranslation()
+
+    private void StartTranslation()
     {
         if (_translationContext is not null) return;
         
@@ -142,7 +175,7 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         _timer.Start();
     }
 
-    public void StopTranslation()
+    private void StopTranslation()
     {
         if(_translationContext is null) return;
         
@@ -159,31 +192,20 @@ public class MainWindowViewModel : ViewModelBase, IDisposable
         StatusText = "Остановлено";
     }
 
-    private async Task UpdateTranslation()
+    private (BitmapSource Image, string Text) UpdateTranslation(CancellationToken cancellationToken)
     {
-        try
-        {
-            if (_translationContext is null || RectHelper.IsEmpty(_settingsViewModel.SelectedArea))
-                throw new Exception("Неверная инициализация контекста перевода или область захвата не выбрана.");
-            
-            if (_cancellationTokenSource.IsCancellationRequested) return;
-            using Bitmap screenshot = _translationContext.ScreenCaptureService.CaptureScreenArea(RectHelper.ToDrawingRectangle(_settingsViewModel.SelectedArea));
+        if (_translationContext is null)
+            throw new InvalidOperationException("Translation scope is not initialized.");
 
-            var wpfImage = BitmapHelper.ConvertToBitmapSource(screenshot);
-            
-            LastCapturedImage = wpfImage;
-            
-            TranslatedText = await _translationContext.TranslationUseCase.Translate(screenshot, _cancellationTokenSource.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            StatusText = "Остановка...";
-        }
-        catch (Exception ex)
-        {
-            StopTranslation();
-            StatusText = $"Ошибка: {ex.Message}";
-        }
+        using Bitmap screenshot = _translationContext.ScreenCaptureService.CaptureScreenArea(RectHelper.ToDrawingRectangle(_settingsViewModel.SelectedArea));
+        var wpfImage = BitmapHelper.ConvertToBitmapSource(screenshot);
+         
+        var translatedText = _translationContext.TranslationUseCase
+            .Translate(screenshot, cancellationToken)
+            .GetAwaiter()
+            .GetResult();
+
+        return (wpfImage, translatedText);
     }
 
     public void Dispose()
