@@ -1,0 +1,20 @@
+﻿<Window x:Class="GhostLang.WPF.Windows.SelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SelectionWindow"
+        WindowStyle="None" 
+        AllowsTransparency="True" 
+        WindowState="Maximized"
+        Background="#20000000"
+        Cursor="Cross"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        MouseMove="Window_MouseMove"
+        MouseLeftButtonUp="Window_MouseLeftButtonUp">
+    <Canvas x:Name="SelectionCanvas">
+        <Border x:Name="SelectionBorder"
+                BorderBrush="Red"
+                BorderThickness="2"
+                Background="#40FF0000"
+                Visibility="Collapsed" />
+    </Canvas>
+</Window>

@@ -1,0 +1,23 @@
+﻿<Window x:Class="GhostLang.WPF.Windows.CaptureOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CaptureOverlayWindow"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    
+    <Grid>
+        <Border BorderBrush="Red" BorderThickness="2" Background="#10FF0000" />
+        
+        <DockPanel VerticalAlignment="Top" Height="30" 
+                   Background="#80FFFFFF" LastChildFill="False">
+            <StackPanel Orientation="Horizontal" Margin="5,0">
+                <Button Content="Клик" Margin="2" ToolTip="Кнопка 1"/>
+                <Button Content="Клик" Margin="2" ToolTip="Кнопка 2"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>
