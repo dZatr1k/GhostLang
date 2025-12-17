@@ -1,7 +1,11 @@
 ﻿using System.Windows;
 using GhostLang.Application.Interfaces;
 using GhostLang.Infrastructure.Services;
+using GhostLang.Infrastructure.Services.OCR;
+using GhostLang.Infrastructure.Services.OCR.Tesseract;
 using GhostLang.WPF.DI;
+using GhostLang.WPF.Engines;
+using GhostLang.WPF.Services;
 using GhostLang.WPF.UseCases;
 using GhostLang.WPF.ViewModels;
 using GhostLang.WPF.Windows;
@@ -25,16 +29,21 @@ public partial class App
         services.AddScoped<TranslationUseCase>();
         
         services.AddScoped<IScreenCaptureService, ScreenCaptureService>();
-        services.AddScoped<IOcrService, OcrService>();
+        services.AddScoped<IOcrService, TesseractOcrService>();
         services.AddScoped<IGlossaryService, GlossaryService>();
         services.AddScoped<ITranslationService, TranslationService>();
 
         services.AddSingleton<ITranslationContextFactory, TranslationContextFactory>();
-
+        services.AddSingleton<ITessdataService, TessdataService>(); 
+        
+        services.AddSingleton<GlobalHotkeyService>();
+        
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<MainWindowViewModel>();
 
         services.AddSingleton<MainWindow>();
+        services.AddSingleton<IScreenTranslatorEngine, ScreenTranslationEngine>();
+        services.AddSingleton<IOverlayWindowService, OverlayWindowService>();
         services.AddTransient<SettingsWindow>();
         services.AddTransient<SelectionWindow>();
         services.AddTransient<CaptureOverlayWindow>();

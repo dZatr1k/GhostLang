@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="GhostLang.WPF.Windows.Views.TesseractSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Загрузка языков OCR (Tesseract)" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding TessdataList}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Язык" DisplayMemberBinding="{Binding LanguageName}" Width="150"/>
+                    <GridViewColumn Header="Тип" DisplayMemberBinding="{Binding Type}" Width="80"/>
+                    <GridViewColumn Header="Статус">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="✓" Foreground="Green" Visibility="{Binding IsDownloaded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    <Button Command="{Binding DataContext.DownloadLanguageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}" Content="Скачать" Margin="10,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>

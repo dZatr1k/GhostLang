@@ -15,7 +15,7 @@ public class RelayCommand(
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object? parameter)
+    public bool CanExecute(object? parameter = null)
     {
         return (canExecute == null || canExecute(parameter));
     }

@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using GhostLang.Application.Interfaces;
+using GhostLang.Application.Models;
 
 namespace GhostLang.WPF.UseCases;
 
@@ -8,15 +9,18 @@ public class TranslationUseCase(
     ITranslationService translationService,
     IGlossaryService glossaryService)
 {
-    private int _counter;
-    public async Task<string> Translate(Bitmap screenshot, CancellationToken cancellationToken = default)
+    public async Task<List<OcrBlock>> Translate(Bitmap screenshot, CancellationToken cancellationToken = default)
     {
-        var originalText = await ocrService.RecognizeTextAsync(screenshot, cancellationToken);
+        List<OcrBlock> blocks = await ocrService.RecognizeTextAsync(screenshot, cancellationToken);
 
-        var translatedText = await translationService.TranslateAsync(originalText, cancellationToken);
+        if (blocks.Count == 0) return blocks;
+
+        var fullText = string.Join("\n", blocks.Select(b => b.Text));
+        
+        var translatedText = await translationService.TranslateAsync(fullText, cancellationToken);
 
         var finalResult = await glossaryService.ApplyGlossary(translatedText, [], cancellationToken);
 
-        return $"{_counter++}: {finalResult}";
+        return blocks;
     }
 }

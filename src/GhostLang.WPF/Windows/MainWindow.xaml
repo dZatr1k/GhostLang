@@ -1,104 +1,48 @@
 ﻿<Window x:Class="GhostLang.WPF.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="MainWindow" 
-        Height="450" 
-        Width="800"
+        xmlns:vm="clr-namespace:GhostLang.WPF.ViewModels"
+        xmlns:views="clr-namespace:GhostLang.WPF.Windows.Views"
+        xmlns:models="clr-namespace:GhostLang.WPF.Models"
+        Title="GhostLang" Height="500" Width="900" 
         Topmost="True">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" /> <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="300" /> <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="1*" MinWidth="250" />
-            </Grid.ColumnDefinitions>
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:MainWindowViewModel}">
+            <views:TranslatorView/>
+        </DataTemplate>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" /> 
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:GeneralSettingsView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:TesseractSettingsViewModelWrapper}">
+            <views:TesseractSettingsView DataContext="{Binding RealSettings}"/>
+        </DataTemplate>
         
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <HierarchicalDataTemplate DataType="{x:Type models:NavigationItem}" ItemsSource="{Binding Children}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Title}" Margin="2"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/> <ColumnDefinition Width="*"/>   </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#F0F0F0" BorderBrush="#DDDDDD" BorderThickness="0,0,1,0">
+            <TreeView x:Name="MainMenu" ItemsSource="{Binding MenuItems}" SelectedItemChanged="MainMenu_SelectedItemChanged" BorderThickness="0" Background="Transparent" Margin="5">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
                 
-                <DockPanel Grid.Row="0">
-                    <TextBlock DockPanel.Dock="Top" Text="Результат перевода:" FontSize="16" FontWeight="Bold"
-                               Margin="0,0,0,5" />
+                </TreeView>
+        </Border>
 
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <TextBox Text="{Binding TranslatedText, Mode=OneWay}"
-                                 IsReadOnly="True"
-                                 TextWrapping="Wrap"
-                                 AcceptsReturn="True"
-                                 FontSize="14"
-                                 VerticalAlignment="Stretch"
-                                 HorizontalAlignment="Stretch"
-                                 FontFamily="Segoe UI" />
-                    </ScrollViewer>
-                </DockPanel>
-
-                <DockPanel Grid.Row="1">
-                    <TextBlock DockPanel.Dock="Top" Text="Скриншоты:" FontSize="14" FontWeight="Bold" Margin="0,10,0,5" />
-
-                    <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="1" Margin="3">
-                        <Image Source="{Binding LastCapturedImage}"
-                               Stretch="Uniform" />
-                    </Border>
-                </DockPanel>
-            </Grid>
-
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                          Background="LightGray" />
-
-            <DockPanel Grid.Column="2" Margin="10,0,0,0">
-
-                <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                    <TextBlock Text="Кнопочки:" FontSize="16" FontWeight="Bold" Margin="0,0,0,5" />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button Command="{Binding StartCommand}"
-                                Content="Старт"
-                                Padding="15,8"
-                                Margin="0,0,5,0"
-                                Background="#FF4CAF50"
-                                Foreground="White"
-                                FontWeight="Bold" />
-
-                        <Button Command="{Binding StopCommand}"
-                                Content="Стоп"
-                                Padding="15,8"
-                                Margin="5,0,5,0"
-                                Background="#FFF44336"
-                                Foreground="White"
-                                FontWeight="Bold" />
-
-                        <Button Command="{Binding OpenSettingsCommand}"
-                                Content="Настройки"
-                                ToolTip="Настройки"
-                                Padding="10,8"
-                                Margin="10,0,0,0" />
-                    </StackPanel>
-
-                    <Button Command="{Binding SelectAreaCommand}"
-                            Content="Выбрать область"
-                            Padding="15,8"
-                            Margin="0,0,0,10" />
-                </StackPanel>
-
-            </DockPanel>
-
-        </Grid>
-
-        <StatusBar Grid.Row="1">
-            <StatusBarItem>
-                <TextBlock Text="{Binding StatusText}" Margin="5,0" />
-            </StatusBarItem>
-        </StatusBar>
-
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" Margin="10"/>
     </Grid>
 </Window>
