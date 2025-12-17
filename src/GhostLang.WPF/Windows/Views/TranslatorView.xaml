@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="GhostLang.WPF.Windows.Views.TranslatorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <RowDefinition Height="*"/>    <RowDefinition Height="5"/>    <RowDefinition Height="*"/>    </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Horizontal" Margin="5">
+            <Button Command="{Binding SelectAreaCommand}" Content="Выделить область" Padding="5"/>
+            <Button Command="{Binding StartCommand}" Background="#FF4CAF50" Foreground="White" Content="Старт" Margin="5,0"/>
+            <Button Command="{Binding StopCommand}" Background="#FFF44336" Foreground="White" Content="Стоп"/>
+        </StackPanel>
+
+        <TextBox Grid.Row="1" 
+                 Text="{Binding TranslatedText}" 
+                 IsReadOnly="True" 
+                 TextWrapping="Wrap" 
+                 AcceptsReturn="True" 
+                 VerticalScrollBarVisibility="Auto"
+                 FontSize="14"
+                 Padding="5"/>
+
+        <GridSplitter Grid.Row="2" 
+                      Height="5" 
+                      HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Center"
+                      Background="LightGray"
+                      ShowsPreview="True"/>
+
+        <Grid Grid.Row="3" Margin="0,5,0,0">
+            
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <Image Source="{Binding LastCapturedImage}" 
+                           Stretch="None" 
+                           HorizontalAlignment="Left" 
+                           VerticalAlignment="Top"/>
+
+                    <ItemsControl ItemsSource="{Binding DetectedOcrBlocks}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding Bounds.Left}" />
+                                <Setter Property="Canvas.Top" Value="{Binding Bounds.Top}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Red" 
+                                        BorderThickness="1" 
+                                        Background="#30FF0000"
+                                        Width="{Binding Bounds.Width}" 
+                                        Height="{Binding Bounds.Height}">
+                                    <Border.ToolTip>
+                                        <ToolTip Content="{Binding Text}" />
+                                    </Border.ToolTip>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

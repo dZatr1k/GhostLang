@@ -3,28 +3,15 @@ using System.Windows;
 
 namespace GhostLang.WPF.Helpers;
 
-public class RectHelper
+public static class RectHelper
 {
-    public static RectangleF ToDrawingRectangle(Rect rect)
+    public static Rect ToWpfRect(this Rectangle rectangle)
     {
-        return new RectangleF(
-            (float)rect.X,
-            (float)rect.Y,
-            (float)rect.Width,
-            (float)rect.Height);
+        return new Rect(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
     }
-    
-    public static Rect FromDrawingRectangle(RectangleF rectangle)
+
+    public static Rectangle ToDrawingRectangle(this Rect rect)
     {
-        return new Rect(
-            rectangle.X,
-            rectangle.Y,
-            rectangle.Width,
-            rectangle.Height);
-    }
-    
-    public static bool IsEmpty(Rect rect)
-    {
-        return rect.X == 0 && rect.Y == 0 && rect.Width == 0 && rect.Height == 0;
+        return new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
     }
 }

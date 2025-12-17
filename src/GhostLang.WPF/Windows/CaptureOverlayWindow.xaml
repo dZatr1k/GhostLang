@@ -1,44 +1,194 @@
 ﻿<Window x:Class="GhostLang.WPF.Windows.CaptureOverlayWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CaptureOverlayWindow"
+        Title="GhostLang"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        ShowInTaskbar="False"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        ShowInTaskbar="False">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+        <Border DockPanel.Dock="Top" Height="30" 
+                CornerRadius="5,5,0,0"
+                MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
     
-    <Grid>
-        <DockPanel LastChildFill="True">
-            <DockPanel DockPanel.Dock="Top" Height="30"
-                       Background="#80FFFFFF"
-                       MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
-                <StackPanel Orientation="Horizontal" Margin="0,0">
-                    <Button Content="Выйти" Margin="3" ToolTip="Кнопка 1" Width="50" />
-                    <Button Content="Нажать" Margin="3" ToolTip="Кнопка 2" Width="50" />
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="#EE333333"/>
+                    <Setter Property="IsHitTestVisible" Value="True"/>
+            
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsOverlayVisible}" Value="False">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            
+            <Grid Visibility="{Binding IsOverlayVisible, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="GhostLang Overlay" Foreground="#AAAAAA" 
+                           VerticalAlignment="Center" HorizontalAlignment="Left" 
+                           Margin="10,0,0,0" FontSize="11" IsHitTestVisible="False"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,5,0">
+                    
+                    <Button Command="{Binding CopyTextCommand}" ToolTip="Копировать перевод" Margin="2">
+                        <TextBlock Text="📋"/>
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Setter Property="Width" Value="26"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#55FFFFFF"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Command="{Binding ToggleTranslationCommand}" Margin="2,2,10,2" Width="60">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="▶" Margin="0,0,4,0"/>
+                                            <TextBlock Text="Start"/>
+                                        </StackPanel>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Background" Value="#FF4CAF50"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="3" Padding="5,2">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsProcessRunning}" Value="True">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="⬛" Margin="0,0,4,0" FontSize="10"/>
+                                                    <TextBlock Text="Stop"/>
+                                                </StackPanel>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Background" Value="#FFF44336"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Rectangle Width="1" Fill="#555555" Margin="0,6"/>
+
+                    <Button Command="{Binding CloseOverlayCommand}" ToolTip="Закрыть оверлей" Margin="5,2,2,2" Width="26">
+                        <TextBlock Text="❌" Foreground="White"/>
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#CCFF0000"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
                 </StackPanel>
-            </DockPanel>
+            </Grid>
+        </Border>
 
-            <Border BorderBrush="Green" BorderThickness="2" Background="Transparent" />
-        </DockPanel>
+        <Grid>
+            <Border BorderBrush="#EE333333" BorderThickness="2" Background="Transparent" 
+                    Visibility="{Binding IsOverlayVisible, Converter={StaticResource BoolToVis}}"/> 
+            
+            <ItemsControl ItemsSource="{Binding DetectedOcrBlocks}" 
+                          Opacity="{Binding TextLayerOpacity}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding Bounds.X}"/>
+                        <Setter Property="Canvas.Top" Value="{Binding Bounds.Y}"/>
+                        <Setter Property="Width" Value="{Binding Bounds.Width}"/>
+                        <Setter Property="Height" Value="{Binding Bounds.Height}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Image Source="{Binding BlockBackground}" Stretch="Fill" />
+
+                            <Border Background="#40000000" /> 
         
-        <Rectangle Name="ResizeTop" Height="6" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNS"
-                   MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-        <Rectangle Name="ResizeBottom" Height="6" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNS"
-                   MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-        <Rectangle Name="ResizeLeft" Width="6" HorizontalAlignment="Left" Fill="Transparent" Cursor="SizeWE"
-                   MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-        <Rectangle Name="ResizeRight" Width="6" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE"
-                   MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
+                            <Viewbox Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Grid>
+                                    <TextBlock Text="{Binding Text}" 
+                                               Foreground="White" 
+                                               FontWeight="Bold"
+                                               Padding="0" 
+                                               Margin="-3,-2,-3,-3"> <TextBlock.Effect>
+                                            <DropShadowEffect ShadowDepth="0" BlurRadius="4" Color="Black" Opacity="1"/>
+                                        </TextBlock.Effect>
+                                    </TextBlock>
+                                </Grid>
+                            </Viewbox>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-        <Rectangle Name="ResizeTopLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Fill="Transparent" Cursor="SizeNWSE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-        <Rectangle Name="ResizeTopRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Top"
-                   Fill="Transparent" Cursor="SizeNESW" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-        <Rectangle Name="ResizeBottomLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                   Fill="Transparent" Cursor="SizeNESW" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-        <Rectangle Name="ResizeBottomRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                   Fill="Transparent" Cursor="SizeNWSE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown" />
-    </Grid>
+            <Grid Visibility="{Binding IsOverlayVisible, Converter={StaticResource BoolToVis}}"> <Rectangle Name="ResizeTop" Height="6" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNS" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                <Rectangle Name="ResizeBottom" Height="6" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNS" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                <Rectangle Name="ResizeLeft" Width="6" HorizontalAlignment="Left" Fill="Transparent" Cursor="SizeWE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                <Rectangle Name="ResizeRight" Width="6" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                
+                <Rectangle Name="ResizeTopLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNWSE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                <Rectangle Name="ResizeTopRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Top" Fill="Transparent" Cursor="SizeNESW" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                <Rectangle Name="ResizeBottomLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNESW" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+                <Rectangle Name="ResizeBottomRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="Transparent" Cursor="SizeNWSE" MouseLeftButtonDown="ResizeBorder_MouseLeftButtonDown"/>
+            </Grid>
+        </Grid>
+        
+    </DockPanel>
 </Window>
+        
