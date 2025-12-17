@@ -11,6 +11,9 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+      <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
+      <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507" />
+      <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.11.0.20250507" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,6 +23,11 @@
 
     <ItemGroup>
       <Page Update="Windows\MainWindow.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Windows\Views\TesseractSettingsView.xaml">
         <Generator>MSBuild:Compile</Generator>
         <XamlRuntime>Wpf</XamlRuntime>
         <SubType>Designer</SubType>

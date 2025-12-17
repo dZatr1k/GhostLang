@@ -3,15 +3,84 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:GhostLang.WPF.ViewModels"
+        d:DataContext="{d:DesignInstance Type=viewModels:SettingsViewModel}"
         mc:Ignorable="d"
-        Title="Настройки" Height="200" Width="300"
+        Title="Настройки" Height="400" Width="500"
         WindowStartupLocation="CenterOwner">
-    <Grid Margin="15">
-        <StackPanel>
-            <Label Content="Интервал таймера (мс):"/>
-            <TextBox Text="{Binding TimerIntervalMilliseconds, UpdateSourceTrigger=PropertyChanged}" />
+    
+    <Grid Margin="10">
+        <TabControl>
             
-            <Button Content="Закрыть" Click="CloseButton_Click" Margin="0,20,0,0" Padding="10,5"/>
-        </StackPanel>
+            <TabItem Header="Общие">
+                <StackPanel Margin="10">
+                    <Label Content="Интервал таймера (мс):"/>
+                    <TextBox Text="{Binding TimerIntervalMilliseconds, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+                    <TextBlock Text="Другие настройки в разработке..." Foreground="Gray"/>
+                </StackPanel>
+            </TabItem>
+            
+            <TabItem Header="Языки (OCR)">
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Управление языковыми пакетами:" FontWeight="Bold" Margin="5"/>
+                    
+                    <ListView Grid.Row="1" ItemsSource="{Binding TessdataList}" HorizontalContentAlignment="Stretch">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Язык" Width="100" DisplayMemberBinding="{Binding LanguageName}"/>
+                                <GridViewColumn Header="Тип" Width="60" DisplayMemberBinding="{Binding Type}"/>
+                                <GridViewColumn Header="Код" Width="50" DisplayMemberBinding="{Binding Code}"/>
+                                
+                                <GridViewColumn Header="Действие" Width="180">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                
+                                                <TextBlock Text="Установлен" 
+                                                           Foreground="Green" 
+                                                           VerticalAlignment="Center"
+                                                           Visibility="{Binding IsDownloaded, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                
+                                                <Button Command="{Binding DataContext.DownloadLanguageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="10,0,0,0"
+                                                        Padding="5,2"
+                                                        Width="100">
+                                                    <Button.Style>
+                                                        <Style TargetType="Button">
+                                                            <Setter Property="Content" Value="Скачать"/>
+                                                            <Setter Property="IsEnabled" Value="True"/>
+                                                            
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsDownloaded}" Value="True">
+                                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                                    <Setter Property="Content" Value="Обновить"/> 
+                                                                    </DataTrigger>
+                                                                
+                                                                <DataTrigger Binding="{Binding IsDownloading}" Value="True">
+                                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                                    <Setter Property="Content" Value="Загрузка..."/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+                                                
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+            
+        </TabControl>
     </Grid>
 </Window>
