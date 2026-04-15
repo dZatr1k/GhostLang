@@ -1,0 +1,697 @@
+﻿<UserControl x:Class="GhostLang.WPF.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:local="clr-namespace:GhostLang.WPF.Views"
+             xmlns:settings="clr-namespace:GhostLang.WPF.ViewModels.Settings"
+             xmlns:enums="clr-namespace:GhostLang.Core;assembly=GhostLang.Core"
+             xmlns:enums1="clr-namespace:GhostLang.Core.Pipelines.Enums;assembly=GhostLang.Core"
+             xmlns:converters="clr-namespace:GhostLang.WPF.Converters"
+             xmlns:svc="clr-namespace:GhostLang.WPF.Services"
+             mc:Ignorable="d"
+             d:DesignHeight="500" d:DesignWidth="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+
+        <DataTemplate DataType="{x:Type settings:GTranslateSettingsViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Engine_TranslationProvider}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <ComboBox ItemsSource="{Binding AvailableProviders}"
+                          SelectedValuePath="Key" DisplayMemberPath="Value"
+                          SelectedValue="{Binding SelectedProvider, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_GTranslateHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10" />
+                <TextBlock Text="{svc:Localize Engine_GTranslateInfo}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic" TextWrapping="Wrap" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:MyMemorySettingsViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="Email" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_MyMemoryEmailHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10" />
+                <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="API Key" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_MyMemoryKeyHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:LingvaSettingsViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBox Text="{Binding InstanceUrl, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="URL (https://lingva.ml)" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_LingvaUrlHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="{svc:Localize Engine_TestConnection}" Command="{Binding TestConnectionCommand}"
+                            IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource ButtonPrimary}" Width="150" Height="28" />
+                    <TextBlock Text="{Binding TestResult}" VerticalAlignment="Center" Margin="10,0,0,0"
+                               Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:LibreTranslateSettingsViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBox Text="{Binding InstanceUrl, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="URL (http://localhost:5000)" Margin="0,0,0,2" />
+                <TextBlock Text="docker run -ti --rm -p 5000:5000 libretranslate/libretranslate"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" FontFamily="Consolas"
+                           TextWrapping="Wrap" Margin="0,0,0,10" />
+                <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="API Key" Margin="0,0,0,10" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <Button Content="{svc:Localize Engine_TestConnection}" Command="{Binding TestConnectionCommand}"
+                            IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource ButtonPrimary}" Width="150" Height="28" />
+                    <TextBlock Text="{Binding TestResult}" VerticalAlignment="Center" Margin="10,0,0,0"
+                               Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:WindowsOcrViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Engine_WindowsOcrInfo}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
+                           TextWrapping="Wrap" Margin="0,0,0,10" />
+                <TextBlock Text="{svc:Localize Engine_WindowsOcrLanguageHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" TextWrapping="Wrap" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:TesseractOcrViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Engine_ModelType}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <ComboBox ItemsSource="{Binding AvailableModelTypes}"
+                          DisplayMemberPath="Value" SelectedValuePath="Key"
+                          SelectedValue="{Binding ModelType, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_ModelTypeHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,15" />
+
+                <TextBlock Text="{svc:Localize Engine_LanguagePacks}" Foreground="{DynamicResource PrimaryTextBrush}"
+                           FontWeight="SemiBold" Margin="0,0,0,8" />
+                <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Languages}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type settings:LanguageItemViewModel}">
+                                <Grid Margin="0,4,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="90" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding DisplayName}" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" />
+                                    <StackPanel Grid.Column="1" Margin="10,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding StatusText}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsDownloaded}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsDownloading}" Value="True">
+                                                            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <hc:ProgressButton Grid.Column="2"
+                                            Progress="{Binding DownloadProgress}"
+                                            Foreground="{DynamicResource ButtonTextBrush}"
+                                            Command="{Binding DataContext.DownloadModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}" Height="26" Width="90">
+                                        <hc:ProgressButton.Style>
+                                            <Style TargetType="hc:ProgressButton" BasedOn="{StaticResource ProgressButtonPrimary}">
+                                                <Setter Property="Content" Value="{Binding [Engine_Download], Source={x:Static svc:LocalizationService.Instance}}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDownloaded}" Value="True">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                        <Setter Property="Opacity" Value="0.3" />
+                                                        <Setter Property="Content" Value="{Binding [Engine_Done], Source={x:Static svc:LocalizationService.Instance}}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsDownloading}" Value="True">
+                                                        <Setter Property="Content" Value="{Binding [Engine_Downloading], Source={x:Static svc:LocalizationService.Instance}}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </hc:ProgressButton.Style>
+                                    </hc:ProgressButton>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:OcrSpaceViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Engine_OcrSpaceInfo}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
+                           TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="API Key" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_OcrSpaceApiKeyHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11"
+                           TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <TextBlock Text="{svc:Localize Engine_OcrSpaceEngineLabel}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <ComboBox ItemsSource="{Binding AvailableEngines}"
+                          SelectedValuePath="Key" DisplayMemberPath="Value"
+                          SelectedValue="{Binding SelectedEngine, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_OcrSpaceEngineHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11"
+                           TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{svc:Localize Engine_TestConnection}" Command="{Binding TestConnectionCommand}"
+                            IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource ButtonPrimary}" Width="150" Height="28" />
+                    <TextBlock Text="{Binding TestResult}" VerticalAlignment="Center" Margin="10,0,0,0"
+                               Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:AzureVisionOcrViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Engine_AzureInfo}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
+                           TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <TextBox Text="{Binding EndpointUrl, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="Endpoint URL" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_AzureEndpointHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11"
+                           TextWrapping="Wrap" Margin="0,0,0,10" />
+
+                <TextBox Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="API Key" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Engine_AzureApiKeyHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11"
+                           TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{svc:Localize Engine_TestConnection}" Command="{Binding TestConnectionCommand}"
+                            IsEnabled="{Binding IsTesting, Converter={StaticResource InverseBoolConverter}}"
+                            Style="{StaticResource ButtonPrimary}" Width="150" Height="28" />
+                    <TextBlock Text="{Binding TestResult}" VerticalAlignment="Center" Margin="10,0,0,0"
+                               Foreground="{DynamicResource SecondaryTextBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:TextRenderingViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Rendering_Font}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <ComboBox ItemsSource="{Binding AvailableFonts}"
+                          SelectedItem="{Binding SelectedFontFamily, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Rendering_FontHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,15" />
+
+                <TextBlock Text="{svc:Localize Rendering_FitMode}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <ComboBox ItemsSource="{Binding AvailableRenderingModes}"
+                          DisplayMemberPath="Value" SelectedValuePath="Key"
+                          SelectedValue="{Binding RenderingMode, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Rendering_FitModeHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,15" />
+
+                <CheckBox x:Name="UseOriginalColorCheck"
+                          Content="{svc:Localize Rendering_AutoColor}"
+                          IsChecked="{Binding UseOriginalColor, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Rendering_AutoColorHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10" />
+
+                <StackPanel Margin="0,5,0,0">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="IsEnabled" Value="False" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=UseOriginalColorCheck, Path=IsChecked}" Value="False">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBox Text="{Binding DefaultColorHex, UpdateSourceTrigger=PropertyChanged}"
+                             hc:InfoElement.Placeholder="{Binding [Rendering_ColorPlaceholder], Source={x:Static svc:LocalizationService.Instance}}" Width="180" HorizontalAlignment="Left" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:SolidColorErasureViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBox Text="{Binding ColorHex, UpdateSourceTrigger=PropertyChanged}"
+                         hc:InfoElement.Placeholder="{Binding [Erasure_ColorPlaceholder], Source={x:Static svc:LocalizationService.Instance}}" Width="180" HorizontalAlignment="Left" />
+                <TextBlock Text="{svc:Localize Erasure_SolidColorHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,5,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:OpenCvErasureViewModel}">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="{svc:Localize Erasure_MaskAggression}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <Slider Minimum="1" Maximum="10" Value="{Binding DilationIterations}"
+                        IsSnapToTickEnabled="True" TickFrequency="1" Margin="0,0,0,5" />
+                <TextBlock Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,2">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} {1}">
+                            <Binding Path="[Filter_Value]" Source="{x:Static svc:LocalizationService.Instance}" />
+                            <Binding Path="DilationIterations" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Text="{svc:Localize Erasure_MaskHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,15" />
+
+                <TextBlock Text="{svc:Localize Erasure_InpaintRadius}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <Slider Minimum="1" Maximum="10" Value="{Binding InpaintRadius}"
+                        IsSnapToTickEnabled="True" TickFrequency="1" Margin="0,0,0,5" />
+                <TextBlock Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,2">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} {1} px">
+                            <Binding Path="[Filter_Value]" Source="{x:Static svc:LocalizationService.Instance}" />
+                            <Binding Path="InpaintRadius" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Text="{svc:Localize Erasure_InpaintHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,15" />
+
+                <CheckBox Content="{svc:Localize Erasure_TeleaAlgorithm}"
+                          IsChecked="{Binding UseTeleaAlgorithm, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,2" />
+                <TextBlock Text="{svc:Localize Erasure_TeleaHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" TextWrapping="Wrap" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TabControl BorderThickness="0">
+            <TabItem Header="{svc:Localize Settings_TabGeneral}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
+                    <StackPanel>
+                        <!-- Appearance -->
+                        <hc:Card Padding="16" Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="{svc:Localize General_Appearance}" FontSize="16" FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                    <TextBlock Text="{svc:Localize General_Theme}" Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                              SelectedValuePath="Key" DisplayMemberPath="Value"
+                                              SelectedValue="{Binding SelectedTheme}" Width="150" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{svc:Localize General_Language}" Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                              SelectedValuePath="Key" DisplayMemberPath="Value"
+                                              SelectedValue="{Binding SelectedLanguage}" Width="150" />
+                                </StackPanel>
+                            </StackPanel>
+                        </hc:Card>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="{svc:Localize Settings_TabHotKeys}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
+                    <hc:Card Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="{svc:Localize General_HotKeys}" FontSize="16" FontWeight="Bold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,5" />
+                            <TextBlock Text="{svc:Localize General_HotKeysHint}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
+                                       TextWrapping="Wrap" Margin="0,0,0,12" />
+
+                            <ItemsControl ItemsSource="{Binding HotKeyBindings}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" Text="{Binding DisplayName}"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       VerticalAlignment="Center" />
+
+                                            <TextBox Grid.Column="1" Text="{Binding KeyDisplayString, Mode=OneWay}"
+                                                     IsReadOnly="True" FontFamily="Consolas"
+                                                     VerticalContentAlignment="Center" Padding="6,0"
+                                                     hc:InfoElement.Placeholder="{Binding [General_HotKeyPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                                                     PreviewKeyDown="HotKeyTextBox_PreviewKeyDown"
+                                                     GotFocus="HotKeyTextBox_GotFocus"
+                                                     LostFocus="HotKeyTextBox_LostFocus" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </hc:Card>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="{svc:Localize Settings_TabImagePipeline}">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <hc:Card Grid.Column="0" Padding="0">
+                        <ListBox ItemsSource="{Binding ImagePipelineSteps}"
+                                 SelectedItem="{Binding SelectedImagePipelineStep}"
+                                 Background="Transparent" BorderThickness="0"
+                                 HorizontalContentAlignment="Stretch">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="Bd" Padding="0" Background="Transparent" CornerRadius="4" Margin="4,1">
+                                                    <ContentPresenter />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource DarkMaskBrush}" />
+                                                    </Trigger>
+                                                    <MultiTrigger>
+                                                        <MultiTrigger.Conditions>
+                                                            <Condition Property="IsMouseOver" Value="True" />
+                                                            <Condition Property="IsSelected" Value="False" />
+                                                        </MultiTrigger.Conditions>
+                                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource DarkMaskBrush}" />
+                                                    </MultiTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="8,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Width="26" Height="26" CornerRadius="13"
+                                                Margin="0,0,10,0">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsOptional}" Value="True" />
+                                                                <Condition Binding="{Binding IsEnabled}" Value="False" />
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}" />
+                                                        </MultiDataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding StepNumber}" Foreground="White" FontWeight="Bold"
+                                                       FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding StepName}" VerticalAlignment="Center"
+                                                   FontSize="13" Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   TextWrapping="Wrap" />
+                                        <ToggleButton Grid.Column="2" IsChecked="{Binding IsEnabled}"
+                                                      Visibility="{Binding IsOptional, Converter={StaticResource BoolToVis}}"
+                                                      Style="{StaticResource ToggleButtonSwitch}"
+                                                      VerticalAlignment="Center" Margin="6,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </hc:Card>
+
+                    <hc:Card Grid.Column="2" Padding="15">
+                        <Grid DataContext="{Binding SelectedImagePipelineStep}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                                <TextBlock Text="{Binding StepName}" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                                <TextBlock Text="{Binding Description}"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
+                                           TextWrapping="Wrap" FontSize="12" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Row="1" Margin="0,0,0,20" IsEnabled="{Binding IsEnabled}">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding AvailableEngines.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <TextBlock Text="{svc:Localize Settings_SelectEngine}"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                                <ComboBox ItemsSource="{Binding AvailableEngines}"
+                                          SelectedItem="{Binding SelectedEngineViewModel}"
+                                          DisplayMemberPath="EngineName"
+                                          Height="25" />
+                            </StackPanel>
+
+                            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <ContentControl Content="{Binding SelectedEngineViewModel}"
+                                                    IsEnabled="{Binding IsEnabled}" />
+
+                                    <ItemsControl Margin="0,10,0,0" IsEnabled="{Binding IsEnabled}"
+                                                  ItemsSource="{Binding DataContext.PreProcessFilters, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                        <ItemsControl.Style>
+                                            <Style TargetType="ItemsControl">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding StepId}" Value="step.image.preprocess">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ItemsControl.Style>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,5,0,10">
+                                                    <CheckBox x:Name="FilterCheckBox"
+                                                              Content="{Binding DisplayName}"
+                                                              IsChecked="{Binding Option.IsEnabled}"
+                                                              FontSize="14" />
+                                                    <TextBlock Text="{Binding Description}"
+                                                               Foreground="{DynamicResource ThirdlyTextBrush}"
+                                                               FontSize="11" TextWrapping="Wrap" Margin="20,2,0,0" />
+
+                                                    <StackPanel x:Name="ValuePanel" Orientation="Horizontal"
+                                                                Margin="25,5,0,0" Visibility="Collapsed">
+                                                        <TextBlock Text="{svc:Localize Filter_Value}"
+                                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                   VerticalAlignment="Center" Margin="0,0,10,0" />
+                                                        <Slider Width="100" VerticalAlignment="Center" Margin="0,0,10,0"
+                                                                Minimum="0" Maximum="3" TickFrequency="0.1"
+                                                                IsSnapToTickEnabled="True"
+                                                                Value="{Binding Option.Value, UpdateSourceTrigger=PropertyChanged}" />
+                                                        <TextBox Text="{Binding Option.Value, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F2}'}"
+                                                                 Width="50" Padding="2" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <DataTemplate.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding HasParameter}" Value="True" />
+                                                            <Condition Binding="{Binding ElementName=FilterCheckBox, Path=IsChecked}" Value="True" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter TargetName="ValuePanel" Property="Visibility" Value="Visible" />
+                                                    </MultiDataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsEnabled}">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding StepId}" Value="step.image.cachecheck">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+
+                                        <TextBox Text="{Binding DataContext.CacheTtlMinutes, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                                                 hc:InfoElement.Placeholder="{Binding [Cache_TtlPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                                                 Width="200" HorizontalAlignment="Left" Margin="0,0,0,2" />
+                                        <TextBlock Text="{svc:Localize Cache_TtlHint}"
+                                                   Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11"
+                                                   TextWrapping="Wrap" Margin="0,0,0,15" />
+
+                                        <TextBox Text="{Binding DataContext.CacheMaxCharacters, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                                                 hc:InfoElement.Placeholder="{Binding [Cache_MaxCharsPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                                                 Width="200" HorizontalAlignment="Left" Margin="0,0,0,2" />
+                                        <TextBlock Text="{svc:Localize Cache_MaxCharsHint}"
+                                                   Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+
+                                    <StackPanel Margin="0,10,0,0" IsEnabled="{Binding IsEnabled}">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding StepId}" Value="step.image.glossary">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+
+                                        <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
+                                                   TextWrapping="Wrap" Margin="0,0,0,4"
+                                                   Text="{svc:Localize Glossary_Info}" />
+                                        <TextBlock Foreground="{DynamicResource ThirdlyTextBrush}" FontFamily="Consolas"
+                                                   FontSize="11" Margin="0,0,0,10"
+                                                   Text="{svc:Localize Glossary_Example}" />
+
+                                        <TextBlock Text="{svc:Localize Glossary_TokenMode}" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                                        <ComboBox ItemsSource="{Binding DataContext.AvailableTokenModes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                  SelectedValuePath="Key" DisplayMemberPath="Value"
+                                                  SelectedValue="{Binding DataContext.GlossaryTokenMode, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                                                  Margin="0,0,0,15" />
+
+                                        <Grid Margin="0,0,26,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{svc:Localize Glossary_Original}" Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" />
+                                            <TextBlock Grid.Column="1" Text="{svc:Localize Glossary_Translation}" Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="5,0,0,0" />
+                                            <TextBlock Grid.Column="2" Text="{svc:Localize Glossary_Variants}" Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="5,0,0,0" />
+                                        </Grid>
+
+                                        <ItemsControl ItemsSource="{Binding DataContext.GlossaryRules, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,0,0,4">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="26" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBox Grid.Column="0"
+                                                                 Text="{Binding SourceTerm, UpdateSourceTrigger=PropertyChanged}"
+                                                                 hc:InfoElement.Placeholder="{Binding [Glossary_PlaceholderWord], Source={x:Static svc:LocalizationService.Instance}}" Margin="0,0,2,0" />
+                                                        <TextBox Grid.Column="1"
+                                                                 Text="{Binding TargetTerm, UpdateSourceTrigger=PropertyChanged}"
+                                                                 hc:InfoElement.Placeholder="{Binding [Glossary_PlaceholderTranslation], Source={x:Static svc:LocalizationService.Instance}}" Margin="2,0,2,0" />
+                                                        <TextBox Grid.Column="2"
+                                                                 Text="{Binding SourceVariants, UpdateSourceTrigger=PropertyChanged}"
+                                                                 hc:InfoElement.Placeholder="{Binding [Glossary_PlaceholderForms], Source={x:Static svc:LocalizationService.Instance}}" Margin="2,0,2,0" />
+                                                        <Button Grid.Column="3" Width="22" Height="22" Padding="0"
+                                                                Style="{StaticResource ButtonDanger}"
+                                                                Command="{Binding DataContext.RemoveGlossaryRuleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}">
+                                                            <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12Z"
+                                                                  Fill="{DynamicResource ButtonTextBrush}"
+                                                                  Width="10" Height="10" Stretch="Uniform" />
+                                                        </Button>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+
+                                        <Button Margin="0,8,0,0" HorizontalAlignment="Left" Height="30"
+                                                Style="{StaticResource ButtonPrimary}"
+                                                Command="{Binding DataContext.AddGlossaryRuleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+                                                      Fill="{DynamicResource ButtonTextBrush}"
+                                                      Width="14" Height="14" Stretch="Uniform"
+                                                      VerticalAlignment="Center" Margin="0,0,6,0" />
+                                                <TextBlock Text="{svc:Localize Glossary_AddRule}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </hc:Card>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="{svc:Localize Settings_TabAudio}">
+                <Grid>
+                    <TextBlock Text="{svc:Localize Settings_AudioPlaceholder}" HorizontalAlignment="Center"
+                               VerticalAlignment="Center" FontSize="18"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Border Grid.Row="1" Background="{DynamicResource SecondaryRegionBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="{Binding SaveSettingsCommand}" Width="150" Height="32">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ButtonPrimary}">
+                            <Setter Property="Content" Value="{Binding [Settings_Save], Source={x:Static svc:LocalizationService.Instance}}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasUnsavedChanges}" Value="True">
+                                    <Setter Property="Content" Value="{Binding [Settings_SaveUnsaved], Source={x:Static svc:LocalizationService.Instance}}" />
+                                    <Setter Property="Background" Value="#CC7A00" />
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

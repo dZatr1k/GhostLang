@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0-windows10.0.22621</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Azure.AI.Vision.ImageAnalysis" Version="1.0.0" />
+      <PackageReference Include="GTranslate" Version="2.3.1" />
+      <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260330" />
+      <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260302" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+      <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
+      <PackageReference Include="Tesseract" Version="5.2.0" />
+    </ItemGroup>
+
+</Project>

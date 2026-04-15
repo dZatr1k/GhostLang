@@ -1,0 +1,28 @@
+<Window x:Class="GhostLang.WPF.Views.RegionSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svc="clr-namespace:GhostLang.WPF.Services"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#40000000"
+        Topmost="True"
+        WindowState="Maximized"
+        Cursor="Cross"
+        ShowInTaskbar="False">
+    <Canvas x:Name="SelectionCanvas">
+        <Rectangle x:Name="SelectionRect"
+                   Stroke="{DynamicResource PrimaryBrush}" StrokeThickness="2"
+                   Fill="#30007ACC"
+                   Visibility="Collapsed" />
+
+        <TextBlock x:Name="SizeLabel"
+                   Foreground="White" FontSize="12" FontFamily="Consolas"
+                   Background="#CC000000" Padding="6,3"
+                   Visibility="Collapsed" />
+
+        <Border Canvas.Left="20" Canvas.Top="20" Background="#CC000000" CornerRadius="4" Padding="12,8">
+            <TextBlock Text="{svc:Localize Region_Hint}"
+                       Foreground="White" FontSize="15" />
+        </Border>
+    </Canvas>
+</Window>
