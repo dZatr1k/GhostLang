@@ -1,57 +1,79 @@
 ﻿using System.Windows;
-using GhostLang.Application.Interfaces;
-using GhostLang.Infrastructure.Services;
-using GhostLang.Infrastructure.Services.OCR;
-using GhostLang.Infrastructure.Services.OCR.Tesseract;
-using GhostLang.WPF.DI;
-using GhostLang.WPF.Engines;
+using GhostLang.Core.Pipelines;
+using GhostLang.Core.Services;
+using GhostLang.Core.Services.Erasure;
+using GhostLang.Core.Services.Ocr;
+using GhostLang.Core.Settings.Erasure;
+using GhostLang.Core.Settings.Ocr;
+using GhostLang.Core.Settings.Translation;
 using GhostLang.WPF.Services;
-using GhostLang.WPF.UseCases;
 using GhostLang.WPF.ViewModels;
-using GhostLang.WPF.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace GhostLang.WPF;
 
-public partial class App
+public partial class App : Application
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IHost _host;
+
+    public T? GetService<T>() where T : class => _host.Services.GetService<T>();
 
     public App()
     {
-        var services = new ServiceCollection();
-        ConfigureServices(services);
-        _serviceProvider = services.BuildServiceProvider();
+        _host = Host.CreateDefaultBuilder()
+            .ConfigureServices((context, services) => { ConfigureServices(services); })
+            .Build();
+
+        // Force LocalizationService creation BEFORE any XAML parsing (InitializeComponent).
+        // Instance and culture must be set before {svc:Localize} bindings are resolved.
+        _host.Services.GetRequiredService<LocalizationService>();
     }
 
-    public void ConfigureServices(IServiceCollection services)
+    private void ConfigureServices(IServiceCollection services)
     {
-        services.AddScoped<TranslationUseCase>();
-        
-        services.AddScoped<IScreenCaptureService, ScreenCaptureService>();
-        services.AddScoped<IOcrService, TesseractOcrService>();
-        services.AddScoped<IGlossaryService, GlossaryService>();
-        services.AddScoped<ITranslationService, TranslationService>();
+        services.AddSingleton<IImageTranslationPipeline, ImageTranslationPipeline>();
 
-        services.AddSingleton<ITranslationContextFactory, TranslationContextFactory>();
-        services.AddSingleton<ITessdataService, TessdataService>(); 
+        services.AddSingleton<MainViewModel>();
+        services.AddSingleton<HomeViewModel>();
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<DebugViewModel>();
         
-        services.AddSingleton<GlobalHotkeyService>();
+        services.AddSingleton<IOcrEngineFactory, OcrEngineFactory>();
         
-        services.AddSingleton<SettingsViewModel>();
-        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<IConfigurationService, JsonConfigurationService>();
+        services.AddSingleton<IPipelineRegistry, PipelineRegistry>();
+        services.AddSingleton<IPipelineBuilder, PipelineBuilder>();
+        services.AddSingleton<ITranslationCacheService, TranslationCacheService>();
+        services.AddSingleton<ITextErasureEngineFactory, TextErasureEngineFactory>();
+        services.AddSingleton<ITesseractModelManager, TesseractModelManager>();
+        services.AddSingleton<ITranslationEngineFactory, TranslationEngineFactory>();
+        services.AddSingleton<IScreenCaptureService, ScreenCaptureService>();
+        services.AddSingleton<IScreenTranslationManager, ScreenTranslationManager>();
+        services.AddSingleton<GlobalHotKeyService>();
+        services.AddSingleton<ThemeService>();
+        services.AddSingleton<LocalizationService>();
 
         services.AddSingleton<MainWindow>();
-        services.AddSingleton<IScreenTranslatorEngine, ScreenTranslationEngine>();
-        services.AddSingleton<IOverlayWindowService, OverlayWindowService>();
-        services.AddTransient<SettingsWindow>();
-        services.AddTransient<SelectionWindow>();
-        services.AddTransient<CaptureOverlayWindow>();
     }
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
-        var mainWindow = _serviceProvider.GetService<MainWindow>();
-        mainWindow?.Show();
+        base.OnStartup(e);
+
+        await _host.StartAsync();
+
+        var themeService = _host.Services.GetRequiredService<ThemeService>();
+        themeService.ApplyFromConfig();
+
+        var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+        mainWindow.Show();
+    }
+
+    protected override async void OnExit(ExitEventArgs e)
+    {
+        using var host = _host;
+        await _host.StopAsync(TimeSpan.FromSeconds(5));
+        base.OnExit(e);
     }
 }

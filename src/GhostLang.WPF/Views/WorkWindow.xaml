@@ -1,0 +1,48 @@
+<Window x:Class="GhostLang.WPF.Views.WorkWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:svc="clr-namespace:GhostLang.WPF.Services"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="CanResizeWithGrip">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="34" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{DynamicResource RegionBrush}" CornerRadius="6,6,0,0"
+                Opacity="0.95" MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
+            <DockPanel Margin="8,0">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button x:Name="StartButton" Content="{svc:Localize Work_Start}" Click="StartButton_Click"
+                            Style="{StaticResource ButtonPrimary}"
+                            Width="80" Height="26" FontSize="12" Margin="0,0,4,0" />
+                    <Button x:Name="StopButton" Content="{svc:Localize Work_Stop}" Click="StopButton_Click"
+                            Width="80" Height="26" FontSize="12" IsEnabled="False" />
+                </StackPanel>
+
+                <Button Content="✕" Click="CloseButton_Click" DockPanel.Dock="Right"
+                        Style="{StaticResource ButtonDanger}"
+                        Width="26" Height="26" FontSize="14" Padding="0"
+                        HorizontalAlignment="Right" />
+
+                <Button x:Name="RecButton" Content="REC" Click="RecButton_Click" DockPanel.Dock="Right"
+                        Width="42" Height="26" FontSize="10" FontWeight="Bold"
+                        HorizontalAlignment="Right" Margin="0,0,4,0" />
+
+                <TextBlock x:Name="StatusLabel" Text="{svc:Localize Work_Stopped}"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                           FontSize="11" FontFamily="Consolas" />
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="1" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="2"
+                Background="#08007ACC" CornerRadius="0,0,6,6" Opacity="0.7" />
+    </Grid>
+</Window>
