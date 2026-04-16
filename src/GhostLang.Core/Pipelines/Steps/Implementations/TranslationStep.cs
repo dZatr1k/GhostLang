@@ -9,7 +9,7 @@ public class TranslationStep(ITranslationEngine translationEngine, ITranslationC
 
     public string StepName => "Machine Translation";
 
-    public async Task ExecuteAsync(TranslationContext context)
+    public async Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted) return;
 
@@ -19,14 +19,12 @@ public class TranslationStep(ITranslationEngine translationEngine, ITranslationC
 
         if (toTranslate.Count == 0) return;
 
-        // Try batch translation (1 request for all fragments)
         if (toTranslate.Count > 1)
         {
             var batchSuccess = await TryBatchTranslate(toTranslate, context);
             if (batchSuccess) return;
         }
 
-        // Fallback: parallel individual requests
         await TranslateParallel(toTranslate, context);
     }
 

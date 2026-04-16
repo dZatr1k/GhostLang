@@ -4,5 +4,5 @@ namespace GhostLang.Core.Pipelines;
 
 public interface IImageTranslationPipeline
 {
-    Task<TranslationContext> ProcessFrameAsync(byte[] imageBytes, SupportedLanguage targetLanguage, List<SupportedLanguage> sourceLanguage);
+    Task<TranslationContext> ProcessFrameAsync(byte[] imageBytes, SupportedLanguage targetLanguage, List<SupportedLanguage> sourceLanguage, CancellationToken ct = default);
 }

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using GhostLang.Core.Settings.Erasure;
 
 namespace GhostLang.WPF.ViewModels.Settings;
@@ -10,9 +10,15 @@ public partial class OpenCvErasureViewModel : ObservableObject, IEngineSettingsV
 
     [ObservableProperty]
     private bool _useTeleaAlgorithm = true;
-    
+
     [ObservableProperty]
     private int _dilationIterations = 3;
+
+    [ObservableProperty]
+    private int _adaptiveBlockSize = 15;
+
+    [ObservableProperty]
+    private double _adaptiveConstant = 10;
 
     public void ApplyOptions(object options)
     {
@@ -20,6 +26,9 @@ public partial class OpenCvErasureViewModel : ObservableObject, IEngineSettingsV
         {
             InpaintRadius = opt.InpaintRadius;
             UseTeleaAlgorithm = opt.UseTeleaAlgorithm;
+            DilationIterations = opt.DilationIterations;
+            AdaptiveBlockSize = opt.AdaptiveBlockSize;
+            AdaptiveConstant = opt.AdaptiveConstant;
         }
     }
 
@@ -31,7 +40,10 @@ public partial class OpenCvErasureViewModel : ObservableObject, IEngineSettingsV
         return new OpenCvErasureOptions
         {
             InpaintRadius = InpaintRadius,
-            UseTeleaAlgorithm = UseTeleaAlgorithm
+            UseTeleaAlgorithm = UseTeleaAlgorithm,
+            DilationIterations = DilationIterations,
+            AdaptiveBlockSize = AdaptiveBlockSize,
+            AdaptiveConstant = AdaptiveConstant
         };
     }
 }

@@ -25,8 +25,6 @@ public partial class App : Application
             .ConfigureServices((context, services) => { ConfigureServices(services); })
             .Build();
 
-        // Force LocalizationService creation BEFORE any XAML parsing (InitializeComponent).
-        // Instance and culture must be set before {svc:Localize} bindings are resolved.
         _host.Services.GetRequiredService<LocalizationService>();
     }
 
@@ -50,6 +48,7 @@ public partial class App : Application
         services.AddSingleton<ITranslationEngineFactory, TranslationEngineFactory>();
         services.AddSingleton<IScreenCaptureService, ScreenCaptureService>();
         services.AddSingleton<IScreenTranslationManager, ScreenTranslationManager>();
+        services.AddSingleton<PipelineValidationService>();
         services.AddSingleton<GlobalHotKeyService>();
         services.AddSingleton<ThemeService>();
         services.AddSingleton<LocalizationService>();

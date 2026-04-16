@@ -74,7 +74,6 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Custom title bar -->
             <Grid Grid.Row="0" Background="{DynamicResource SecondaryRegionBrush}"
                   MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -91,21 +90,19 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Main content -->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Sidebar -->
                 <Border x:Name="SidebarBorder" Grid.Column="0" Width="48"
                         Background="{DynamicResource SecondaryRegionBrush}"
                         BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0"
                         ClipToBounds="True">
                     <Grid Width="200" HorizontalAlignment="Left">
                         <StackPanel>
-                            <!-- Header: toggle + app name -->
+                            
                             <Grid Height="44" Margin="0,4,0,6">
                                 <svgc:SvgViewbox x:Name="LabelAppName" Source="/Assets/logo-text-black-theme.svg"
                                                  Height="22" VerticalAlignment="Center"
@@ -123,7 +120,6 @@
                                 </Button>
                             </Grid>
 
-                            <!-- Home -->
                             <Button Click="NavHome_Click" Style="{StaticResource NavButton}">
                                 <Grid Margin="14,0,0,0">
                                     <Grid.ColumnDefinitions>
@@ -141,7 +137,6 @@
                                 </Grid>
                             </Button>
 
-                            <!-- Settings -->
                             <Button Click="NavSettings_Click" Style="{StaticResource NavButton}">
                                 <Grid Margin="14,0,0,0">
                                     <Grid.ColumnDefinitions>
@@ -171,7 +166,6 @@
                                 </Grid>
                             </Button>
 
-                            <!-- Debug -->
                             <Button Click="NavDebug_Click" Style="{StaticResource NavButton}">
                                 <Grid Margin="14,0,0,0">
                                     <Grid.ColumnDefinitions>
@@ -194,7 +188,6 @@
 
                 <ContentControl Grid.Column="1" Content="{Binding CurrentViewModel}" Margin="10"/>
 
-                <!-- Growl panel overlays content area -->
                 <StackPanel Grid.Column="1"
                             hc:Growl.GrowlParent="True" hc:Growl.Token="MainGrowl"
                             VerticalAlignment="Top" HorizontalAlignment="Right"

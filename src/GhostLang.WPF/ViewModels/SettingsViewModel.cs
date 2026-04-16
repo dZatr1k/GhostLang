@@ -68,7 +68,6 @@ public partial class SettingsViewModel : ObservableObject
 
         _themeService?.Apply(value);
 
-        // Save theme immediately and update snapshot so it doesn't count as unsaved
         var config = _configService.Load();
         config.Theme = value;
         _configService.Save(config);
@@ -95,7 +94,6 @@ public partial class SettingsViewModel : ObservableObject
 
         _localizationService?.Apply(value);
 
-        // Save ALL current settings so the rebuild preserves them
         var config = BuildCurrentConfig();
         config.Language = value;
         _configService.Save(config);
@@ -115,20 +113,16 @@ public partial class SettingsViewModel : ObservableObject
 
     private void RefreshLocalizedContent()
     {
-        // Rebuild dictionaries with new localized strings
         AvailableThemes = BuildThemes();
         OnPropertyChanged(nameof(AvailableThemes));
 
         AvailableTokenModes = BuildTokenModes();
         OnPropertyChanged(nameof(AvailableTokenModes));
 
-        // Rebuild pipeline steps (recreates sub-ViewModels with fresh localized strings)
         CreatePipelineStructure();
 
-        // Reload settings into the new pipeline structure
         LoadAndApplySettings();
 
-        // Reload glossary and hotkey display names
         LoadGlossary();
     }
 
@@ -167,8 +161,6 @@ public partial class SettingsViewModel : ObservableObject
             { typeof(LibreTranslateOptions), () => new LibreTranslateSettingsViewModel() }
         };
 
-        // Pre-set language/theme fields directly to avoid triggering
-        // OnSelectedLanguageChanged/OnSelectedThemeChanged during init
         var initialConfig = _configService.Load();
         _selectedLanguage = initialConfig.Language;
         _selectedTheme = initialConfig.Theme;
@@ -219,8 +211,6 @@ public partial class SettingsViewModel : ObservableObject
             });
         }
 
-        // Set theme/language LAST so that OnSelectedLanguageChanged
-        // can safely call BuildCurrentConfig() with all data loaded
         SelectedTheme = config.Theme;
         SelectedLanguage = config.Language;
     }
@@ -268,10 +258,33 @@ public partial class SettingsViewModel : ObservableObject
             if (stepVm.AvailableEngines.Any())
                 stepVm.SelectedEngineViewModel = stepVm.AvailableEngines.First();
 
+            stepVm.PropertyChanged += OnPipelineStepPropertyChanged;
             ImagePipelineSteps.Add(stepVm);
         }
 
         SelectedImagePipelineStep = ImagePipelineSteps.FirstOrDefault();
+    }
+
+    private bool _isSyncingGlossarySteps;
+
+    private void OnPipelineStepPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(PipelineStepViewModel.IsEnabled)) return;
+        if (_isSyncingGlossarySteps) return;
+        if (sender is not PipelineStepViewModel changed) return;
+
+        if (changed.StepId is not ("step.image.glossary" or "step.image.glossary_restore")) return;
+
+        var pairedId = changed.StepId == "step.image.glossary"
+            ? "step.image.glossary_restore"
+            : "step.image.glossary";
+
+        var paired = ImagePipelineSteps.FirstOrDefault(s => s.StepId == pairedId);
+        if (paired == null) return;
+
+        _isSyncingGlossarySteps = true;
+        paired.IsEnabled = changed.IsEnabled;
+        _isSyncingGlossarySteps = false;
     }
 
     private void LoadAndApplySettings()
@@ -437,7 +450,6 @@ public partial class SettingsViewModel : ObservableObject
         }
         catch
         {
-            // ignore serialization errors during editing
         }
     }
 

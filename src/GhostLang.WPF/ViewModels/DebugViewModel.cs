@@ -38,6 +38,7 @@ public partial class DebugViewModel : ObservableObject
     [ObservableProperty] private bool _isConfigExpanded;
 
     [ObservableProperty] private string _pipelineInfo = "";
+    [ObservableProperty] private bool _isProcessing;
 
     public IEnumerable<SupportedLanguage> AvailableLanguages =>
         Enum.GetValues(typeof(SupportedLanguage)).Cast<SupportedLanguage>();
@@ -179,10 +180,17 @@ public partial class DebugViewModel : ObservableObject
 
         var dynamicPipeline = _pipelineBuilder.BuildImagePipeline(config);
 
-        var context =
-            await dynamicPipeline.ProcessFrameAsync(CurrentImageBytes, SelectedTargetLanguage, selectedSourceLangs);
+        IsProcessing = true;
+        TranslationContext context;
+        try
+        {
+            context = await dynamicPipeline.ProcessFrameAsync(CurrentImageBytes, SelectedTargetLanguage, selectedSourceLangs);
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
 
-        // Preprocessed image
         if (context.ProcessedImage is { Length: > 0 })
         {
             var prepFrame = BitmapFrame.Create(new MemoryStream(context.ProcessedImage),

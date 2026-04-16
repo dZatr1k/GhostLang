@@ -29,7 +29,6 @@
   <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
 
-  <!-- Navigation -->
   <data name="Nav_Home" xml:space="preserve"><value>Home</value></data>
   <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Nav_SettingsUnsaved" xml:space="preserve"><value>Settings *</value></data>
@@ -37,30 +36,27 @@
   <data name="Nav_ExpandPanel" xml:space="preserve"><value>Expand panel</value></data>
   <data name="Nav_CollapsePanel" xml:space="preserve"><value>Collapse panel</value></data>
 
-  <!-- Home -->
   <data name="Home_Subtitle" xml:space="preserve"><value>Multimodal streaming translator</value></data>
   <data name="Home_CaptureTitle" xml:space="preserve"><value>Screen Region Capture</value></data>
+  <data name="Home_SourceLanguages" xml:space="preserve"><value>Source languages</value></data>
+  <data name="Home_SourceLanguagesPlaceholder" xml:space="preserve"><value>Select languages...</value></data>
   <data name="Home_TargetLanguage" xml:space="preserve"><value>Target translation language</value></data>
   <data name="Home_SelectRegion" xml:space="preserve"><value>Select screen region</value></data>
   <data name="Home_Status" xml:space="preserve"><value>Status:</value></data>
   <data name="Home_NoRegion" xml:space="preserve"><value>No region selected</value></data>
 
-  <!-- Home - Cards -->
   <data name="Home_ScreenTranslation" xml:space="preserve"><value>Screen Translation</value></data>
   <data name="Home_AudioTranslation" xml:space="preserve"><value>Audio Translation</value></data>
   <data name="Home_CaptureAudio" xml:space="preserve"><value>Capture Audio</value></data>
   <data name="Home_AudioComingSoon" xml:space="preserve"><value>Coming soon</value></data>
 
-  <!-- Work Window -->
   <data name="Work_Start" xml:space="preserve"><value>▶ Start</value></data>
   <data name="Work_Stop" xml:space="preserve"><value>■ Stop</value></data>
   <data name="Work_Stopped" xml:space="preserve"><value>Stopped</value></data>
   <data name="Work_Running" xml:space="preserve"><value>Running...</value></data>
 
-  <!-- Region Selection -->
   <data name="Region_Hint" xml:space="preserve"><value>Select a screen region for translation.  ESC — cancel.</value></data>
 
-  <!-- Settings - Tabs -->
   <data name="Settings_TabGeneral" xml:space="preserve"><value>General</value></data>
   <data name="Settings_TabImagePipeline" xml:space="preserve"><value>Image Pipeline</value></data>
   <data name="Settings_TabHotKeys" xml:space="preserve"><value>Hotkeys</value></data>
@@ -72,7 +68,6 @@
   <data name="Settings_SaveError" xml:space="preserve"><value>Save error:</value></data>
   <data name="Settings_SelectEngine" xml:space="preserve"><value>Select processing engine:</value></data>
 
-  <!-- Settings - General -->
   <data name="General_Appearance" xml:space="preserve"><value>Appearance</value></data>
   <data name="General_Theme" xml:space="preserve"><value>Theme:</value></data>
   <data name="General_HotKeys" xml:space="preserve"><value>Hotkeys</value></data>
@@ -80,7 +75,6 @@
   <data name="General_HotKeyPlaceholder" xml:space="preserve"><value>Click here...</value></data>
   <data name="General_Language" xml:space="preserve"><value>Interface language:</value></data>
 
-  <!-- Settings - Translation Engines -->
   <data name="Engine_TranslationProvider" xml:space="preserve"><value>Translation provider:</value></data>
   <data name="Engine_GTranslateHint" xml:space="preserve"><value>Google — universal. Yandex — good for ru↔en. Bing/Microsoft — alternative.</value></data>
   <data name="Engine_GTranslateInfo" xml:space="preserve"><value>Free web gateway without API key. Rate limiting may apply.</value></data>
@@ -101,7 +95,6 @@
   <data name="Engine_Loading" xml:space="preserve"><value>Loading</value></data>
   <data name="Engine_UseProxy" xml:space="preserve"><value>Use proxy</value></data>
 
-  <!-- Settings - Text Rendering -->
   <data name="Rendering_Font" xml:space="preserve"><value>Font:</value></data>
   <data name="Rendering_FontHint" xml:space="preserve"><value>System font for rendering translated text.</value></data>
   <data name="Rendering_FitMode" xml:space="preserve"><value>Fit mode:</value></data>
@@ -111,7 +104,6 @@
   <data name="Rendering_Compress" xml:space="preserve"><value>Compress width</value></data>
   <data name="Rendering_MatchHeight" xml:space="preserve"><value>Fixed height</value></data>
 
-  <!-- Settings - Erasure -->
   <data name="Erasure_SolidColorHint" xml:space="preserve"><value>Text area is filled with the specified color. Suitable for solid backgrounds.</value></data>
   <data name="Erasure_MaskAggression" xml:space="preserve"><value>Mask aggressiveness:</value></data>
   <data name="Erasure_MaskHint" xml:space="preserve"><value>Expands text mask. Higher — cleaner, but may affect background.</value></data>
@@ -119,12 +111,14 @@
   <data name="Erasure_InpaintHint" xml:space="preserve"><value>How many pixels around the mask are used for restoration.</value></data>
   <data name="Erasure_TeleaAlgorithm" xml:space="preserve"><value>Telea algorithm (otherwise Navier-Stokes)</value></data>
   <data name="Erasure_TeleaHint" xml:space="preserve"><value>Telea — fast, for small text. Navier-Stokes — more accurate on complex backgrounds.</value></data>
+  <data name="Erasure_AdaptiveBlockSize" xml:space="preserve"><value>Adaptive threshold block size</value></data>
+  <data name="Erasure_AdaptiveBlockSizeHint" xml:space="preserve"><value>Neighborhood size for threshold calculation. Smaller values detect fine text better, larger values suit bigger text.</value></data>
+  <data name="Erasure_AdaptiveConstant" xml:space="preserve"><value>Threshold constant</value></data>
+  <data name="Erasure_AdaptiveConstantHint" xml:space="preserve"><value>Subtracted from the local mean. Lower values capture more text pixels but may pick up background noise.</value></data>
 
-  <!-- Settings - Cache -->
   <data name="Cache_TtlHint" xml:space="preserve"><value>Entries older than this are deleted. Default: 60 min.</value></data>
   <data name="Cache_MaxCharsHint" xml:space="preserve"><value>Total cache volume. Oldest entries are removed when exceeded. Default: 10,000.</value></data>
 
-  <!-- Settings - Glossary -->
   <data name="Glossary_Info" xml:space="preserve"><value>Glossary words are replaced with your translation. Variants — word forms separated by commas.</value></data>
   <data name="Glossary_Example" xml:space="preserve"><value>Example: Slime → Green Monster  |  Slimes, Slime's</value></data>
   <data name="Glossary_TokenMode" xml:space="preserve"><value>Tokenization mode:</value></data>
@@ -133,7 +127,6 @@
   <data name="Glossary_Variants" xml:space="preserve"><value>Word forms</value></data>
   <data name="Glossary_AddRule" xml:space="preserve"><value>Add rule</value></data>
 
-  <!-- Settings - Preprocessing Filters -->
   <data name="Filter_Upscale" xml:space="preserve"><value>Upscale</value></data>
   <data name="Filter_UpscaleDesc" xml:space="preserve"><value>Scales the image before OCR. 2.0 = double size.</value></data>
   <data name="Filter_Blur" xml:space="preserve"><value>Blur</value></data>
@@ -154,11 +147,11 @@
   <data name="Filter_InvertDesc" xml:space="preserve"><value>Inverts colors. Useful for light text on dark background.</value></data>
   <data name="Filter_Value" xml:space="preserve"><value>Value:</value></data>
 
-  <!-- Debug -->
   <data name="Debug_PipelineOcr" xml:space="preserve"><value>OCR Pipeline</value></data>
   <data name="Debug_LoadImage" xml:space="preserve"><value>Load image</value></data>
   <data name="Debug_SelectRegion" xml:space="preserve"><value>Select region</value></data>
   <data name="Debug_Process" xml:space="preserve"><value>Process</value></data>
+  <data name="Debug_Processing" xml:space="preserve"><value>Processing...</value></data>
   <data name="Debug_RefreshConfig" xml:space="preserve"><value>Refresh config</value></data>
   <data name="Debug_SourceLanguages" xml:space="preserve"><value>Source languages:</value></data>
   <data name="Debug_TargetLanguage" xml:space="preserve"><value>Target language:</value></data>
@@ -171,7 +164,6 @@
   <data name="Debug_SelectSourceLang" xml:space="preserve"><value>Please select at least one source language for OCR.</value></data>
   <data name="Debug_Warning" xml:space="preserve"><value>Warning</value></data>
 
-  <!-- Debug - Image Tabs -->
   <data name="Debug_TabOriginal" xml:space="preserve"><value>Original</value></data>
   <data name="Debug_TabPreprocessed" xml:space="preserve"><value>Preprocessing</value></data>
   <data name="Debug_TabResult" xml:space="preserve"><value>Result</value></data>
@@ -179,7 +171,6 @@
   <data name="Debug_TimeLabel" xml:space="preserve"><value>Time (ms)</value></data>
   <data name="Debug_NoImage" xml:space="preserve"><value>No image loaded</value></data>
 
-  <!-- Pipeline Steps -->
   <data name="Step_MotionDetection" xml:space="preserve"><value>Motion Detection</value></data>
   <data name="Step_MotionDetectionDesc" xml:space="preserve"><value>Compares current frame with previous. If unchanged — pipeline is aborted to save resources.</value></data>
   <data name="Step_Preprocessing" xml:space="preserve"><value>Image Preprocessing</value></data>
@@ -199,7 +190,12 @@
   <data name="Step_Rendering" xml:space="preserve"><value>Translation Rendering</value></data>
   <data name="Step_RenderingDesc" xml:space="preserve"><value>Draws translated text over the cleaned image area.</value></data>
 
-  <!-- HotKey Actions -->
+  <data name="HotKeyGroup_ImagePipeline" xml:space="preserve"><value>Screen Translation</value></data>
+  <data name="HotKeyGroup_AudioPipeline" xml:space="preserve"><value>Audio Translation</value></data>
+  <data name="HotKey_AudioComingSoon" xml:space="preserve"><value>Hotkeys will be available after audio pipeline implementation</value></data>
+
+  <data name="Home_SelectRegionHint" xml:space="preserve"><value>Hotkey: {0}</value></data>
+  <data name="HotKey_SelectRegion" xml:space="preserve"><value>Select screen region</value></data>
   <data name="HotKey_ToggleVisibility" xml:space="preserve"><value>Show/hide window</value></data>
   <data name="HotKey_MoveUp" xml:space="preserve"><value>Move up</value></data>
   <data name="HotKey_MoveDown" xml:space="preserve"><value>Move down</value></data>
@@ -210,25 +206,20 @@
   <data name="HotKey_ResizeLeft" xml:space="preserve"><value>Decrease width</value></data>
   <data name="HotKey_ResizeRight" xml:space="preserve"><value>Increase width</value></data>
 
-  <!-- Settings - Theme -->
   <data name="General_ThemeDark" xml:space="preserve"><value>Dark</value></data>
   <data name="General_ThemeLight" xml:space="preserve"><value>Light</value></data>
 
-  <!-- Settings - GTranslate Providers -->
   <data name="Engine_ProviderGoogle" xml:space="preserve"><value>Google Translate</value></data>
   <data name="Engine_ProviderYandex" xml:space="preserve"><value>Yandex Translate</value></data>
   <data name="Engine_ProviderBing" xml:space="preserve"><value>Bing Translator</value></data>
   <data name="Engine_ProviderMicrosoft" xml:space="preserve"><value>Microsoft Translator</value></data>
 
-  <!-- Settings - Tesseract Model Types -->
   <data name="Engine_ModelFast" xml:space="preserve"><value>Fast — lighter, faster</value></data>
   <data name="Engine_ModelBest" xml:space="preserve"><value>Best — most accurate, slower</value></data>
 
-  <!-- Settings - Glossary Token Modes -->
   <data name="Glossary_ModePlaceholder" xml:space="preserve"><value>Placeholder</value></data>
   <data name="Glossary_ModeHtmlTag" xml:space="preserve"><value>HTML Tag</value></data>
 
-  <!-- Settings - OCR.space -->
   <data name="Engine_OcrSpaceInfo" xml:space="preserve"><value>Cloud OCR. Free: 25,000 requests/month. No credit card required.</value></data>
   <data name="Engine_OcrSpaceApiKeyHint" xml:space="preserve"><value>API key from ocr.space. For testing you can use the key "helloworld".</value></data>
   <data name="Engine_OcrSpaceEngineLabel" xml:space="preserve"><value>OCR engine:</value></data>
@@ -236,47 +227,51 @@
   <data name="Engine_OcrSpaceEngine1" xml:space="preserve"><value>Engine 1 — fast, Asian languages</value></data>
   <data name="Engine_OcrSpaceEngine2" xml:space="preserve"><value>Engine 2 — auto-detect, Latin + Chinese</value></data>
 
-  <!-- Settings - Azure Vision -->
   <data name="Engine_AzureEndpointHint" xml:space="preserve"><value>Your Azure Computer Vision resource endpoint (e.g., https://myresource.cognitiveservices.azure.com).</value></data>
   <data name="Engine_AzureApiKeyHint" xml:space="preserve"><value>Access key from the "Keys and Endpoint" section in Azure Portal.</value></data>
   <data name="Engine_AzureInfo" xml:space="preserve"><value>Cloud OCR by Microsoft. High accuracy, 160+ languages. Free tier: 5,000 calls/month.</value></data>
   <data name="Engine_TestConnectionOk" xml:space="preserve"><value>Connection OK</value></data>
   <data name="Engine_TestConnectionFail" xml:space="preserve"><value>Connection failed</value></data>
 
-  <!-- Settings - Slider Labels -->
   <data name="Slider_Value" xml:space="preserve"><value>Value: {0}</value></data>
   <data name="Slider_ValuePx" xml:space="preserve"><value>Value: {0} px</value></data>
 
-  <!-- Settings - Engine Loading -->
   <data name="Engine_LoadingText" xml:space="preserve"><value>Loading</value></data>
 
-  <!-- Settings - Test Connection -->
   <data name="Engine_TestOk" xml:space="preserve"><value>OK: Hello → {0}</value></data>
   <data name="Engine_TestError" xml:space="preserve"><value>Error: {0}</value></data>
 
-  <!-- Debug - Error Messages -->
   <data name="Debug_OcrLangNotFound" xml:space="preserve"><value>Language pack for '{0}' not found. Download it in Settings.</value></data>
   <data name="Debug_OcrError" xml:space="preserve"><value>OCR Error</value></data>
   <data name="Debug_InitError" xml:space="preserve"><value>OCR init error: {0}</value></data>
   <data name="Debug_Error" xml:space="preserve"><value>Error</value></data>
   <data name="Debug_PipelineDone" xml:space="preserve"><value>DONE (Fragments: {0}, Aborted: {1})</value></data>
 
-  <!-- Cache Placeholders -->
   <data name="Cache_TtlPlaceholder" xml:space="preserve"><value>TTL (min)</value></data>
   <data name="Cache_MaxCharsPlaceholder" xml:space="preserve"><value>Max chars</value></data>
 
-  <!-- Color Placeholders -->
   <data name="Rendering_ColorPlaceholder" xml:space="preserve"><value>HEX color (#FFFFFF)</value></data>
   <data name="Erasure_ColorPlaceholder" xml:space="preserve"><value>HEX bg color (#000000)</value></data>
 
-  <!-- Glossary Placeholders -->
   <data name="Glossary_PlaceholderWord" xml:space="preserve"><value>Word</value></data>
   <data name="Glossary_PlaceholderTranslation" xml:space="preserve"><value>Translation</value></data>
   <data name="Glossary_PlaceholderForms" xml:space="preserve"><value>Forms</value></data>
 
-  <!-- Misc -->
   <data name="Misc_Active" xml:space="preserve"><value>(Active)</value></data>
   <data name="Misc_Disabled" xml:space="preserve"><value>(Disabled)</value></data>
   <data name="Misc_Error" xml:space="preserve"><value>Error:</value></data>
   <data name="Misc_Cancelled" xml:space="preserve"><value>Cancelled</value></data>
+
+  <data name="Validation_Title" xml:space="preserve"><value>Cannot start translation</value></data>
+  <data name="Validation_Description" xml:space="preserve"><value>The following issues must be resolved before the pipeline can run:</value></data>
+  <data name="Validation_NoOcrEngine" xml:space="preserve"><value>OCR engine is not configured. Select a text recognition engine in pipeline settings.</value></data>
+  <data name="Validation_TesseractMissingModels" xml:space="preserve"><value>Tesseract language models not downloaded: {0}. Download them in OCR settings.</value></data>
+  <data name="Validation_AzureNoEndpoint" xml:space="preserve"><value>Azure Vision endpoint URL is not set.</value></data>
+  <data name="Validation_AzureNoApiKey" xml:space="preserve"><value>Azure Vision API key is not set.</value></data>
+  <data name="Validation_OcrSpaceNoApiKey" xml:space="preserve"><value>OCR.space API key is not set.</value></data>
+  <data name="Validation_NoTranslationEngine" xml:space="preserve"><value>Translation engine is not configured. Select an engine in pipeline settings.</value></data>
+  <data name="Validation_LibreNoUrl" xml:space="preserve"><value>LibreTranslate instance URL is not set.</value></data>
+  <data name="Validation_LingvaNoUrl" xml:space="preserve"><value>Lingva instance URL is not set.</value></data>
+  <data name="Validation_OpenSettings" xml:space="preserve"><value>Open Settings</value></data>
+  <data name="Validation_Close" xml:space="preserve"><value>Close</value></data>
 </root>

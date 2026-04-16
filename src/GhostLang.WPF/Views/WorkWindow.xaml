@@ -43,6 +43,7 @@
         </Border>
 
         <Border Grid.Row="1" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="2"
-                Background="#08007ACC" CornerRadius="0,0,6,6" Opacity="0.7" />
+                CornerRadius="0,0,6,6" Opacity="0.7"
+                IsHitTestVisible="False" />
     </Grid>
 </Window>

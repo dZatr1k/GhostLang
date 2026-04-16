@@ -8,7 +8,7 @@ public class TranslationCacheCheckStep(ITranslationCacheService cacheService) : 
 
     public bool IsEnabled { get; set; } = true;
 
-    public Task ExecuteAsync(TranslationContext context)
+    public Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || !IsEnabled || context.TextFragments.Count == 0)
             return Task.CompletedTask;

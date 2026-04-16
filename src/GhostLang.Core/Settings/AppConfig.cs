@@ -39,14 +39,15 @@ public class AppConfig
 
     private static List<HotKeyBinding> DefaultHotKeys() =>
     [
-        new() { ActionId = "toggle_visibility", DisplayName = "HotKey_ToggleVisibility", Modifiers = 0x0002, Key = 0x48 },
-        new() { ActionId = "move_up", DisplayName = "HotKey_MoveUp", Modifiers = 0x0002, Key = 0x26 },
-        new() { ActionId = "move_down", DisplayName = "HotKey_MoveDown", Modifiers = 0x0002, Key = 0x28 },
-        new() { ActionId = "move_left", DisplayName = "HotKey_MoveLeft", Modifiers = 0x0002, Key = 0x25 },
-        new() { ActionId = "move_right", DisplayName = "HotKey_MoveRight", Modifiers = 0x0002, Key = 0x27 },
-        new() { ActionId = "resize_up", DisplayName = "HotKey_ResizeUp", Modifiers = 0x0006, Key = 0x26 },
-        new() { ActionId = "resize_down", DisplayName = "HotKey_ResizeDown", Modifiers = 0x0006, Key = 0x28 },
-        new() { ActionId = "resize_left", DisplayName = "HotKey_ResizeLeft", Modifiers = 0x0006, Key = 0x25 },
-        new() { ActionId = "resize_right", DisplayName = "HotKey_ResizeRight", Modifiers = 0x0006, Key = 0x27 }
+        new() { ActionId = "select_region", DisplayName = "HotKey_SelectRegion", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0002, Key = 0x51 },
+        new() { ActionId = "toggle_visibility", DisplayName = "HotKey_ToggleVisibility", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0002, Key = 0x48 },
+        new() { ActionId = "move_up", DisplayName = "HotKey_MoveUp", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0002, Key = 0x26 },
+        new() { ActionId = "move_down", DisplayName = "HotKey_MoveDown", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0002, Key = 0x28 },
+        new() { ActionId = "move_left", DisplayName = "HotKey_MoveLeft", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0002, Key = 0x25 },
+        new() { ActionId = "move_right", DisplayName = "HotKey_MoveRight", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0002, Key = 0x27 },
+        new() { ActionId = "resize_up", DisplayName = "HotKey_ResizeUp", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x26 },
+        new() { ActionId = "resize_down", DisplayName = "HotKey_ResizeDown", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x28 },
+        new() { ActionId = "resize_left", DisplayName = "HotKey_ResizeLeft", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x25 },
+        new() { ActionId = "resize_right", DisplayName = "HotKey_ResizeRight", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x27 }
     ];
 }

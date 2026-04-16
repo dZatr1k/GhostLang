@@ -19,9 +19,11 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
     private readonly Dictionary<int, string> _idToAction = new();
     private int _nextId = 9001;
 
+    public event Action? SelectRegionRequested;
     public event Action? ToggleVisibility;
     public event Action<int, int>? MoveRequested;
     public event Action<int, int>? ResizeRequested;
+    public event Action? BindingsReloaded;
 
     public void Register(Window window)
     {
@@ -39,10 +41,13 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
         var config = configService.Load();
         foreach (var binding in config.HotKeys)
         {
+            if (binding.IsEmpty) continue;
             var id = _nextId++;
             if (RegisterHotKey(_hwnd, id, binding.Modifiers, binding.Key))
                 _idToAction[id] = binding.ActionId;
         }
+
+        BindingsReloaded?.Invoke();
     }
 
     private void UnregisterAll()
@@ -71,6 +76,7 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
 
         switch (action)
         {
+            case "select_region": SelectRegionRequested?.Invoke(); break;
             case "toggle_visibility": ToggleVisibility?.Invoke(); break;
             case "move_up": MoveRequested?.Invoke(0, -step); break;
             case "move_down": MoveRequested?.Invoke(0, step); break;

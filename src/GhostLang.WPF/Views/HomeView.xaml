@@ -4,17 +4,17 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
              xmlns:svc="clr-namespace:GhostLang.WPF.Services"
+             xmlns:controls="clr-namespace:GhostLang.WPF.Controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="700">
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="720">
+    <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="720">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Logo -->
         <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,24">
             <svgc:SvgViewbox x:Name="LogoImage" Source="/Assets/logo-full-black-theme.svg"
                              Width="180" Height="160" />
@@ -23,7 +23,6 @@
                        HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="12" />
         </StackPanel>
 
-        <!-- Two cards side by side -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -31,17 +30,25 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Card 1: Screen Translation -->
             <Grid Grid.Column="0">
-                <!-- Shadow layer (empty, only renders the shadow) -->
+                
                 <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="12"
                         Effect="{StaticResource EffectShadow2}" />
-                <!-- Content layer (no Effect, renders crisp) -->
+                
                 <Border Background="{DynamicResource SecondaryRegionBrush}"
                         CornerRadius="12" Padding="24">
-                    <StackPanel>
-                        <!-- Header -->
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
                             <Path Data="M21,2H3A2,2 0 0,0 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4A2,2 0 0,0 21,2M21,16H3V4H21"
                                   Fill="{DynamicResource PrimaryBrush}"
                                   Width="22" Height="22" Stretch="Uniform"
@@ -52,29 +59,38 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <!-- Target language -->
-                        <TextBlock Text="{svc:Localize Home_TargetLanguage}"
+                        <TextBlock Grid.Row="1" Text="{svc:Localize Home_SourceLanguages}"
                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                    FontSize="12" Margin="0,0,0,6" />
-                        <ComboBox ItemsSource="{Binding TargetLanguages}"
+                        <controls:LanguageMultiSelect Grid.Row="2"
+                            ItemsSource="{Binding SourceLanguages}"
+                            Placeholder="{Binding [Home_SourceLanguagesPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                            Margin="0,0,0,12" />
+
+                        <TextBlock Grid.Row="3" Text="{svc:Localize Home_TargetLanguage}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="12" Margin="0,0,0,6" />
+                        <ComboBox Grid.Row="4" ItemsSource="{Binding TargetLanguages}"
                                   SelectedItem="{Binding SelectedTargetLanguage}"
                                   Height="32" Margin="0,0,0,20" />
 
-                        <!-- Select region button -->
-                        <Button Content="{svc:Localize Home_SelectRegion}"
+                        <Button Grid.Row="5" Content="{svc:Localize Home_SelectRegion}"
                                 Command="{Binding SelectScreenRegionCommand}"
                                 Style="{StaticResource ButtonPrimary}"
                                 Height="38" FontSize="14" HorizontalAlignment="Stretch" />
-                    </StackPanel>
+                        <TextBlock Grid.Row="6" Text="{Binding SelectRegionHotKeyHint}"
+                                   Foreground="{DynamicResource ThirdlyTextBrush}"
+                                   FontSize="11" HorizontalAlignment="Center"
+                                   Margin="0,6,0,0" />
+                    </Grid>
                 </Border>
             </Grid>
 
-            <!-- Card 2: Audio Translation -->
             <Grid Grid.Column="2">
-                <!-- Shadow layer -->
+                
                 <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="12"
                         Effect="{StaticResource EffectShadow2}" />
-                <!-- Content layer -->
+                
                 <Border Background="{DynamicResource SecondaryRegionBrush}"
                         CornerRadius="12" Padding="24">
                     <Grid>
@@ -84,7 +100,6 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <!-- Header -->
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
                             <Path Data="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
                                   Fill="{DynamicResource PrimaryBrush}"
@@ -96,14 +111,12 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <!-- Coming soon label -->
                         <TextBlock Grid.Row="1" Text="{svc:Localize Home_AudioComingSoon}"
                                    Foreground="{DynamicResource ThirdlyTextBrush}"
                                    FontSize="13" FontStyle="Italic"
                                    VerticalAlignment="Center" HorizontalAlignment="Center"
                                    Margin="0,10,0,10" />
 
-                        <!-- Capture audio button (disabled) -->
                         <Button Grid.Row="2"
                                 Content="{svc:Localize Home_CaptureAudio}"
                                 Style="{StaticResource ButtonPrimary}"

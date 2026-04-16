@@ -22,7 +22,6 @@ public class JsonConfigurationService : IConfigurationService
         var json = File.ReadAllText(FilePath);
         var config = JsonSerializer.Deserialize<AppConfig>(json, _jsonOptions) ?? new AppConfig();
 
-        // Restore defaults for collections that must not be empty
         if (config.HotKeys is not { Count: > 0 })
         {
             config.HotKeys = new AppConfig().HotKeys;

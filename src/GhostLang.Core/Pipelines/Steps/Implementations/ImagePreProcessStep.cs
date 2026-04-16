@@ -10,7 +10,7 @@ public class ImagePreProcessStep(ImagePreProcessOptions options) : IOptionalPipe
 
     public bool IsEnabled { get; set; }
 
-    public async Task ExecuteAsync(TranslationContext context)
+    public async Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || !IsEnabled || context.OriginalImage is null)
         {

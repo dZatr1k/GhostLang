@@ -14,7 +14,7 @@ public class TextRenderingStep(TextRenderingOptions options) : IMandatoryPipelin
 {
     public string StepName => "Text Rendering";
 
-    public async Task ExecuteAsync(TranslationContext context)
+    public async Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || context.OriginalImage == null || context.TextFragments.Count == 0)
             return;

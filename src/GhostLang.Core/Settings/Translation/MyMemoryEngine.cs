@@ -22,6 +22,9 @@ public class MyMemoryEngine(MyMemoryOptions options) : ITranslationEngine
             ? sourceLanguages[0].ToIsoLanguageCode()
             : "autodetect";
 
+        if (sourceCode == targetCode)
+            return text;
+
         var langPair = $"{sourceCode}|{targetCode}";
 
         try
@@ -37,7 +40,13 @@ public class MyMemoryEngine(MyMemoryOptions options) : ITranslationEngine
             var response = await HttpClient.GetFromJsonAsync<MyMemoryResponse>(BaseUrl + query);
 
             if (response?.ResponseStatus is not 200)
+            {
+                if (response?.ResponseDetails != null &&
+                    response.ResponseDetails.Contains("select two distinct languages", StringComparison.OrdinalIgnoreCase))
+                    return text;
+
                 return $"[MyMemory error: {response?.ResponseDetails}]";
+            }
 
             return response.ResponseData?.TranslatedText ?? text;
         }

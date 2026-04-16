@@ -11,7 +11,7 @@ public class TextErasureStep(ITextErasureEngine erasureEngine) : IOptionalPipeli
 
     public string StepName => "Text Erasure";
 
-    public async Task ExecuteAsync(TranslationContext context)
+    public async Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || context.OriginalImage == null || context.TextFragments.Count == 0)
             return;

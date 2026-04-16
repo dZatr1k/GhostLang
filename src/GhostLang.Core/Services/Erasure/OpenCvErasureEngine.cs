@@ -1,4 +1,4 @@
-﻿using GhostLang.Core.Settings.Erasure;
+using GhostLang.Core.Settings.Erasure;
 using OpenCvSharp;
 
 namespace GhostLang.Core.Services.Erasure;
@@ -13,23 +13,28 @@ public class OpenCvErasureEngine(OpenCvErasureOptions options) : ITextErasureEng
                 return imagePatch;
 
             using var srcMat = Cv2.ImDecode(imagePatch, ImreadModes.Color);
-            if (srcMat.Empty()) 
+            if (srcMat.Empty())
                 return imagePatch;
 
             using var grayMat = new Mat();
             Cv2.CvtColor(srcMat, grayMat, ColorConversionCodes.BGR2GRAY);
 
-            using var edges = new Mat();
-            Cv2.Canny(grayMat, edges, 50, 150);
+            var blockSize = options.AdaptiveBlockSize;
+            if (blockSize % 2 == 0) blockSize++;
+            if (blockSize < 3) blockSize = 3;
 
-            Cv2.FindContours(edges, out var contours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+            using var binaryMask = new Mat();
+            Cv2.AdaptiveThreshold(grayMat, binaryMask, 255,
+                AdaptiveThresholdTypes.GaussianC,
+                ThresholdTypes.BinaryInv, blockSize, options.AdaptiveConstant);
 
-            using var filledMask = new Mat(edges.Size(), MatType.CV_8UC1, Scalar.Black);
-            Cv2.DrawContours(filledMask, contours, -1, Scalar.White, thickness: -1);
+            using var closeKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
+            using var closedMask = new Mat();
+            Cv2.MorphologyEx(binaryMask, closedMask, MorphTypes.Close, closeKernel);
 
             using var maskMat = new Mat();
-            using var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
-            Cv2.Dilate(filledMask, maskMat, kernel, iterations: options.DilationIterations);
+            using var dilateKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
+            Cv2.Dilate(closedMask, maskMat, dilateKernel, iterations: options.DilationIterations);
 
             using var dstMat = new Mat();
             var inpaintMethod = options.UseTeleaAlgorithm ? InpaintTypes.Telea : InpaintTypes.NS;

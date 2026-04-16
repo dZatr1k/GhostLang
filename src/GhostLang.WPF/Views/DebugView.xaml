@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:svc="clr-namespace:GhostLang.WPF.Services"
+             xmlns:controls="clr-namespace:GhostLang.WPF.Controls"
              xmlns:conv="clr-namespace:GhostLang.WPF.Converters"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,81 +20,63 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Row 0: Control panel -->
                 <Border Grid.Row="0" Margin="0,0,0,10"
                         Background="{DynamicResource SecondaryRegionBrush}"
                         CornerRadius="6" Padding="10,8">
                     <DockPanel>
-                        <!-- Action buttons (ButtonGroup) -->
-                        <hc:ButtonGroup DockPanel.Dock="Left" Margin="0,0,12,0">
+                        
+                        <hc:ButtonGroup DockPanel.Dock="Left" Margin="0,0,8,0">
                             <Button Content="{svc:Localize Debug_LoadImage}"
-                                    Command="{Binding LoadImageCommand}" Padding="12,0" />
+                                    Command="{Binding LoadImageCommand}" Padding="8,0" />
                             <Button Content="{svc:Localize Debug_SelectRegion}"
-                                    Command="{Binding CaptureRegionCommand}" Padding="12,0" />
-                            <Button Content="{svc:Localize Debug_Process}"
-                                    Command="{Binding ProcessImageCommand}"
-                                    Style="{StaticResource ButtonPrimary}" Padding="12,0" />
+                                    Command="{Binding CaptureRegionCommand}" Padding="8,0" />
+                            <Button Command="{Binding ProcessImageCommand}"
+                                    Style="{StaticResource ButtonPrimary}" Padding="8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <hc:LoadingCircle Width="14" Height="14" Margin="0,0,6,0"
+                                                      Visibility="{Binding IsProcessing, Converter={StaticResource BoolToVis}}"
+                                                      Foreground="White" />
+                                    <TextBlock Text="{svc:Localize Debug_Process}" />
+                                </StackPanel>
+                            </Button>
                             <Button Content="{svc:Localize Debug_RefreshConfig}"
-                                    Command="{Binding LoadCurrentConfigurationCommand}" Padding="12,0" />
+                                    Command="{Binding LoadCurrentConfigurationCommand}" Padding="8,0" />
                         </hc:ButtonGroup>
 
-                        <!-- Divider -->
-                        <hc:Divider Orientation="Vertical" Margin="4,0,12,0" />
+                        <hc:Divider Orientation="Vertical" Margin="4,0,8,0" />
 
-                        <!-- Language selectors with floating titles -->
-                        <ComboBox DockPanel.Dock="Left"
-                                  ItemsSource="{Binding SourceLanguages}"
-                                  Width="190" Margin="0,0,10,0"
-                                  hc:InfoElement.Title="{Binding [Debug_SourceLanguages], Source={x:Static svc:LocalizationService.Instance}}"
-                                  hc:InfoElement.TitlePlacement="Left"
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                  MaxDropDownHeight="250">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Content="{Binding DisplayName}"
-                                              IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"
-                                              Margin="2,3"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                            <ComboBox.ItemContainerStyle>
-                                <Style TargetType="ComboBoxItem">
-                                    <Setter Property="Focusable" Value="False"/>
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                </Style>
-                            </ComboBox.ItemContainerStyle>
-                        </ComboBox>
+                        <controls:LanguageMultiSelect DockPanel.Dock="Left"
+                            ItemsSource="{Binding SourceLanguages}"
+                            Placeholder="{Binding [Home_SourceLanguagesPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                            Width="150" Margin="0,0,8,0" />
 
                         <ComboBox DockPanel.Dock="Left"
                                   ItemsSource="{Binding TargetLanguages}"
-                                  SelectedItem="{Binding SelectedTargetLanguage}" Width="160"
+                                  SelectedItem="{Binding SelectedTargetLanguage}" Width="145"
                                   hc:InfoElement.Title="{Binding [Debug_TargetLanguage], Source={x:Static svc:LocalizationService.Instance}}"
                                   hc:InfoElement.TitlePlacement="Left" />
                     </DockPanel>
                 </Border>
 
-                <!-- Row 1: Image viewer tabs + result overlay -->
                 <Grid Grid.Row="1" Margin="0,0,0,10">
                     <TabControl BorderThickness="0">
-                        <!-- Original -->
+                        
                         <TabItem Header="{svc:Localize Debug_TabOriginal}">
                             <hc:ImageViewer ImageSource="{Binding OriginalImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="True" />
+                                            ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
 
-                        <!-- Preprocessed -->
                         <TabItem Header="{svc:Localize Debug_TabPreprocessed}">
                             <hc:ImageViewer ImageSource="{Binding PreprocessedImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="True" />
+                                            ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
 
-                        <!-- Result (composite overlay) -->
                         <TabItem Header="{svc:Localize Debug_TabResult}">
                             <hc:ImageViewer ImageSource="{Binding ResultImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="True" />
+                                            ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
                     </TabControl>
 
-                    <!-- Expand button (top-right corner) -->
                     <Button HorizontalAlignment="Right" VerticalAlignment="Top"
                             Margin="0,4,8,0"
                             Command="{Binding ToggleImageExpandedCommand}"
@@ -103,7 +86,6 @@
                     </Button>
                 </Grid>
 
-                <!-- Row 2: Metrics + Config -->
                 <Grid Grid.Row="2" Height="190">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -111,7 +93,6 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Metrics DataGrid -->
                     <Border Grid.Column="0" Background="{DynamicResource SecondaryRegionBrush}"
                             CornerRadius="8" Padding="12">
                         <Grid>
@@ -172,7 +153,6 @@
                         </Grid>
                     </Border>
 
-                    <!-- Configuration -->
                     <Border Grid.Column="2" Background="{DynamicResource SecondaryRegionBrush}"
                             CornerRadius="8" Padding="12">
                         <Grid>
@@ -202,30 +182,26 @@
                     </Border>
                 </Grid>
 
-                <!-- Expanded Image Overlay -->
                 <Grid Grid.Row="0" Grid.RowSpan="3"
                       Visibility="{Binding IsImageExpanded, Converter={StaticResource BoolToVis}}">
                     <TabControl BorderThickness="0">
-                        <!-- Original -->
+                        
                         <TabItem Header="{svc:Localize Debug_TabOriginal}">
                             <hc:ImageViewer ImageSource="{Binding OriginalImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="True" />
+                                            ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
 
-                        <!-- Preprocessed -->
                         <TabItem Header="{svc:Localize Debug_TabPreprocessed}">
                             <hc:ImageViewer ImageSource="{Binding PreprocessedImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="True" />
+                                            ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
 
-                        <!-- Result (composite overlay) -->
                         <TabItem Header="{svc:Localize Debug_TabResult}">
                             <hc:ImageViewer ImageSource="{Binding ResultImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="True" />
+                                            ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
                     </TabControl>
 
-                    <!-- Collapse button -->
                     <Button HorizontalAlignment="Right" VerticalAlignment="Top"
                             Margin="0,4,8,0"
                             Command="{Binding ToggleImageExpandedCommand}"
@@ -235,7 +211,6 @@
                     </Button>
                 </Grid>
 
-                <!-- Expanded Metrics Overlay -->
                 <Border Grid.Row="0" Grid.RowSpan="3"
                         Background="{DynamicResource SecondaryRegionBrush}"
                         CornerRadius="8" Padding="16"
@@ -295,7 +270,6 @@
                     </Grid>
                 </Border>
 
-                <!-- Expanded Configuration Overlay -->
                 <Border Grid.Row="0" Grid.RowSpan="3"
                         Background="{DynamicResource SecondaryRegionBrush}"
                         CornerRadius="8" Padding="16"

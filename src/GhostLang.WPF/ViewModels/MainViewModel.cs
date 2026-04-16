@@ -24,6 +24,8 @@ public partial class MainViewModel : ObservableObject
 
         _currentViewModel = _homeViewModel;
 
+        _homeViewModel.NavigateToSettingsRequested += NavigateSettings;
+
         _settingsViewModel.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SettingsViewModel.HasUnsavedChanges))
