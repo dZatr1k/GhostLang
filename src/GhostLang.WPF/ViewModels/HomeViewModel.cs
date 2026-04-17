@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Services;
+using GhostLang.Core.Services.AudioCapture;
 using GhostLang.WPF.Services;
 using GhostLang.WPF.ViewModels.Settings;
 using GhostLang.WPF.Views;
@@ -16,6 +17,8 @@ public partial class HomeViewModel : ObservableObject
     private readonly GlobalHotKeyService _hotKeyService;
     private readonly IConfigurationService _configService;
     private readonly PipelineValidationService _validationService;
+    private readonly IAudioTranslationManager _audioManager;
+    private SubtitleOverlayWindow? _subtitleOverlay;
 
     public event Action? NavigateToSettingsRequested;
 
@@ -33,12 +36,14 @@ public partial class HomeViewModel : ObservableObject
         Enum.GetValues(typeof(SupportedLanguage)).Cast<SupportedLanguage>().Where(l => l != SupportedLanguage.Unknown);
 
     public HomeViewModel(IScreenTranslationManager translationManager, GlobalHotKeyService hotKeyService,
-        IConfigurationService configService, PipelineValidationService validationService)
+        IConfigurationService configService, PipelineValidationService validationService,
+        IAudioTranslationManager audioManager)
     {
         _translationManager = translationManager;
         _hotKeyService = hotKeyService;
         _configService = configService;
         _validationService = validationService;
+        _audioManager = audioManager;
 
         _translationManager.FrameProcessed += OnFrameProcessed;
         _translationManager.StatusChanged += OnStatusChanged;
@@ -46,6 +51,10 @@ public partial class HomeViewModel : ObservableObject
         _translationManager.AfterCapture += () => _overlayWindow?.ShowOverlay();
         _translationManager.MajorContentChanged += () =>
             System.Windows.Application.Current.Dispatcher.Invoke(() => _overlayWindow?.ClearOverlay());
+
+        _audioManager.FragmentsReady += OnAudioFragmentsReady;
+        _audioManager.StatusChanged += OnAudioStatusChanged;
+        _audioManager.LevelChanged += OnAudioLevelChanged;
 
         _hotKeyService.SelectRegionRequested += OnSelectRegionRequested;
         _hotKeyService.ToggleVisibility += OnToggleVisibility;
@@ -241,5 +250,72 @@ public partial class HomeViewModel : ObservableObject
         _overlayWindow?.Close();
         _overlayWindow = null;
         _workWindowVisible = true;
+    }
+
+    [ObservableProperty] private bool _isAudioActive;
+    [ObservableProperty] private string _audioStatusText = string.Empty;
+    [ObservableProperty] private float _audioLevelDb = -100f;
+
+    public string AudioButtonText => IsAudioActive
+        ? LocalizationService.Instance?["Home_AudioStop"] ?? "⏹ Stop"
+        : LocalizationService.Instance?["Home_AudioStart"] ?? "▶ Start audio";
+
+    partial void OnIsAudioActiveChanged(bool value) => OnPropertyChanged(nameof(AudioButtonText));
+
+    [RelayCommand]
+    private async Task ToggleAudioTranslationAsync()
+    {
+        if (_audioManager.IsActive)
+        {
+            await _audioManager.StopAsync();
+            IsAudioActive = false;
+
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                _subtitleOverlay?.HideSubtitle();
+            });
+            return;
+        }
+
+        var config = _configService.Load();
+
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            _subtitleOverlay ??= new SubtitleOverlayWindow();
+            _subtitleOverlay.Configure(config.SubtitleOptions.ShowOriginal, config.SubtitleOptions.Position);
+        });
+
+        await _audioManager.StartAsync(
+            config.ActiveAudioCaptureSource,
+            SelectedTargetLanguage,
+            GetSelectedSourceLanguages());
+
+        IsAudioActive = true;
+    }
+
+    private void OnAudioFragmentsReady(object? sender, AudioTranslationSessionEventArgs e)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (_subtitleOverlay == null)
+                return;
+
+            var original = string.Join(" ", e.Fragments.Select(f => f.OriginalText));
+            var translated = string.Join(" ", e.Fragments.Select(f => f.TranslatedText));
+            _subtitleOverlay.ShowSubtitle(original, translated);
+        });
+    }
+
+    private void OnAudioStatusChanged(object? sender, string status)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            AudioStatusText = status;
+        });
+    }
+
+    private void OnAudioLevelChanged(object? sender, float levelDb)
+    {
+        AudioLevelDb = levelDb;
     }
 }

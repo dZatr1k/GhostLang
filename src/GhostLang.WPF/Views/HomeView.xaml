@@ -111,17 +111,23 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <TextBlock Grid.Row="1" Text="{svc:Localize Home_AudioComingSoon}"
-                                   Foreground="{DynamicResource ThirdlyTextBrush}"
-                                   FontSize="13" FontStyle="Italic"
-                                   VerticalAlignment="Center" HorizontalAlignment="Center"
-                                   Margin="0,10,0,10" />
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding AudioStatusText}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       FontSize="13" HorizontalAlignment="Center" TextAlignment="Center"
+                                       TextWrapping="Wrap" Margin="0,0,0,12" />
+                            <ProgressBar Minimum="-60" Maximum="0"
+                                         Value="{Binding AudioLevelDb, Mode=OneWay}"
+                                         Height="6" Width="180" HorizontalAlignment="Center"
+                                         Foreground="{DynamicResource PrimaryBrush}"
+                                         Background="{DynamicResource BorderBrush}" />
+                        </StackPanel>
 
                         <Button Grid.Row="2"
-                                Content="{svc:Localize Home_CaptureAudio}"
+                                Content="{Binding AudioButtonText}"
+                                Command="{Binding ToggleAudioTranslationCommand}"
                                 Style="{StaticResource ButtonPrimary}"
-                                Height="38" FontSize="14" HorizontalAlignment="Stretch"
-                                IsEnabled="False" Opacity="0.5" />
+                                Height="38" FontSize="14" HorizontalAlignment="Stretch" />
                     </Grid>
                 </Border>
             </Grid>

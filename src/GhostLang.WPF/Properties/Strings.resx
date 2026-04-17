@@ -318,5 +318,8 @@
 
   <data name="Debug_LoadAudioFile" xml:space="preserve"><value>Загрузить WAV/MP3</value></data>
   <data name="Debug_AudioInfo" xml:space="preserve"><value>{0:F1}s • {1} Hz • {2} ch</value></data>
+
+  <data name="Home_AudioStart" xml:space="preserve"><value>▶ Старт аудио-перевода</value></data>
+  <data name="Home_AudioStop" xml:space="preserve"><value>⏹ Стоп</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>

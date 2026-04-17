@@ -38,6 +38,7 @@ public partial class App : Application
         services.AddSingleton<IAsrEngineFactory, AsrEngineFactory>();
         services.AddSingleton<IAudioCaptureServiceFactory, AudioCaptureServiceFactory>();
         services.AddSingleton<IWhisperModelManager, WhisperModelManager>();
+        services.AddSingleton<IAudioTranslationManager, AudioTranslationManager>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomeViewModel>();
