@@ -193,6 +193,8 @@
   <data name="HotKeyGroup_ImagePipeline" xml:space="preserve"><value>Screen Translation</value></data>
   <data name="HotKeyGroup_AudioPipeline" xml:space="preserve"><value>Audio Translation</value></data>
   <data name="HotKey_AudioComingSoon" xml:space="preserve"><value>Hotkeys will be available after audio pipeline implementation</value></data>
+  <data name="HotKey_StartStopAudio" xml:space="preserve"><value>Start / Stop</value></data>
+  <data name="HotKey_ToggleSubtitleVisibility" xml:space="preserve"><value>Hide subtitles</value></data>
 
   <data name="Home_SelectRegionHint" xml:space="preserve"><value>Hotkey: {0}</value></data>
   <data name="HotKey_SelectRegion" xml:space="preserve"><value>Select screen region</value></data>

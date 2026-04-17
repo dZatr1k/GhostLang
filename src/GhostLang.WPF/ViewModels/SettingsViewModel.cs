@@ -120,6 +120,9 @@ public partial class SettingsViewModel : ObservableObject
 
     public ObservableCollection<HotKeyBindingViewModel> HotKeyBindings { get; } = [];
 
+    public ObservableCollection<HotKeyBindingViewModel> ImagePipelineHotKeys { get; } = [];
+    public ObservableCollection<HotKeyBindingViewModel> AudioPipelineHotKeys { get; } = [];
+
     [ObservableProperty] private string _selectedTheme = "Dark";
 
     partial void OnSelectedThemeChanged(string value)
@@ -257,11 +260,17 @@ public partial class SettingsViewModel : ObservableObject
         CacheMaxCharacters = config.CacheMaxCharacters;
 
         HotKeyBindings.Clear();
+        ImagePipelineHotKeys.Clear();
+        AudioPipelineHotKeys.Clear();
         foreach (var hk in config.HotKeys)
         {
             var vm = new HotKeyBindingViewModel();
             vm.LoadFrom(hk);
             HotKeyBindings.Add(vm);
+            if (hk.GroupKey == "HotKeyGroup_AudioPipeline")
+                AudioPipelineHotKeys.Add(vm);
+            else
+                ImagePipelineHotKeys.Add(vm);
         }
 
         GlossaryRules.Clear();

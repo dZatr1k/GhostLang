@@ -196,6 +196,8 @@
   <data name="HotKeyGroup_ImagePipeline" xml:space="preserve"><value>Перевод экрана</value></data>
   <data name="HotKeyGroup_AudioPipeline" xml:space="preserve"><value>Перевод аудио</value></data>
   <data name="HotKey_AudioComingSoon" xml:space="preserve"><value>Горячие клавиши будут доступны после реализации аудио пайплайна</value></data>
+  <data name="HotKey_StartStopAudio" xml:space="preserve"><value>Старт / Стоп</value></data>
+  <data name="HotKey_ToggleSubtitleVisibility" xml:space="preserve"><value>Скрыть субтитры</value></data>
 
   <data name="Home_SelectRegionHint" xml:space="preserve"><value>Горячая клавиша: {0}</value></data>
   <data name="HotKey_SelectRegion" xml:space="preserve"><value>Выделить область экрана</value></data>

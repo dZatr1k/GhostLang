@@ -61,6 +61,8 @@ public partial class HomeViewModel : ObservableObject
         _hotKeyService.MoveRequested += OnMoveRequested;
         _hotKeyService.ResizeRequested += OnResizeRequested;
         _hotKeyService.BindingsReloaded += UpdateSelectRegionHotKeyHint;
+        _hotKeyService.StartStopAudioRequested += OnStartStopAudioRequested;
+        _hotKeyService.ToggleSubtitleVisibilityRequested += OnToggleSubtitleVisibilityRequested;
 
         if (LocalizationService.Instance != null)
             LocalizationService.Instance.PropertyChanged += (_, _) => UpdateSelectRegionHotKeyHint();
@@ -319,5 +321,23 @@ public partial class HomeViewModel : ObservableObject
     private void OnAudioLevelChanged(object? sender, float levelDb)
     {
         AudioLevelDb = levelDb;
+    }
+
+    private void OnStartStopAudioRequested()
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (ToggleAudioTranslationCommand.CanExecute(null))
+                ToggleAudioTranslationCommand.Execute(null);
+        });
+    }
+
+    private void OnToggleSubtitleVisibilityRequested()
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            if (_subtitleOverlay is { IsVisible: true })
+                _subtitleOverlay.HideSubtitle();
+        });
     }
 }

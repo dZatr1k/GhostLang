@@ -26,6 +26,15 @@ public class JsonConfigurationService : IConfigurationService
         {
             config.HotKeys = new AppConfig().HotKeys;
         }
+        else
+        {
+            var defaults = AppConfig.GetDefaultHotKeys();
+            foreach (var def in defaults)
+            {
+                if (!config.HotKeys.Any(h => h.ActionId == def.ActionId))
+                    config.HotKeys.Add(def);
+            }
+        }
 
         return config;
     }

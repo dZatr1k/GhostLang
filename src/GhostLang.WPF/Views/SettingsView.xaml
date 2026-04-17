@@ -598,7 +598,7 @@
 
                         <Border Grid.Column="2"
                                 Background="{DynamicResource SecondaryRegionBrush}"
-                                CornerRadius="8" Padding="20" Opacity="0.6">
+                                CornerRadius="8" Padding="20">
                             <StackPanel VerticalAlignment="Top">
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                                     <Path Data="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
@@ -611,9 +611,47 @@
                                                VerticalAlignment="Center" />
                                 </StackPanel>
 
-                                <TextBlock Text="{svc:Localize HotKey_AudioComingSoon}"
-                                           Foreground="{DynamicResource ThirdlyTextBrush}"
-                                           FontStyle="Italic" TextWrapping="Wrap" />
+                                <ItemsControl ItemsSource="{Binding AudioPipelineHotKeys}"
+                                              Grid.IsSharedSizeScope="True">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"
+                                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                                           VerticalAlignment="Center" />
+
+                                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                    <TextBox Text="{Binding KeyDisplayString, Mode=OneWay}"
+                                                             IsReadOnly="True" FontFamily="Consolas"
+                                                             MinWidth="130" MaxWidth="180" Height="30"
+                                                             VerticalContentAlignment="Center"
+                                                             HorizontalContentAlignment="Center" Padding="8,0"
+                                                             hc:InfoElement.Placeholder="{Binding [General_HotKeyPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                                                             PreviewKeyDown="HotKeyTextBox_PreviewKeyDown"
+                                                             GotFocus="HotKeyTextBox_GotFocus"
+                                                             LostFocus="HotKeyTextBox_LostFocus" />
+
+                                                    <Button Command="{Binding ClearBindingCommand}"
+                                                            Visibility="{Binding HasBinding, Converter={StaticResource BoolToVis}}"
+                                                            Background="Transparent" BorderThickness="0"
+                                                            Padding="2,0" Margin="4,0,0,0" Width="20" Height="20"
+                                                            VerticalAlignment="Center" Cursor="Hand"
+                                                            ToolTip="Clear">
+                                                        <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z"
+                                                              Fill="{DynamicResource ThirdlyTextBrush}"
+                                                              Width="10" Height="10" Stretch="Uniform" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Border>
                     </Grid>

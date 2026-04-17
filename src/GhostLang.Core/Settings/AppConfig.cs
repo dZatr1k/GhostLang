@@ -39,6 +39,8 @@ public class AppConfig
 
     public List<HotKeyBinding> HotKeys { get; set; } = DefaultHotKeys();
 
+    public static List<HotKeyBinding> GetDefaultHotKeys() => DefaultHotKeys();
+
     public bool IsAudioPipelineEnabled { get; set; } = false;
 
     public AsrEngineOptions? ActiveAsrEngine { get; set; }
@@ -62,6 +64,8 @@ public class AppConfig
         new() { ActionId = "resize_up", DisplayName = "HotKey_ResizeUp", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x26 },
         new() { ActionId = "resize_down", DisplayName = "HotKey_ResizeDown", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x28 },
         new() { ActionId = "resize_left", DisplayName = "HotKey_ResizeLeft", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x25 },
-        new() { ActionId = "resize_right", DisplayName = "HotKey_ResizeRight", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x27 }
+        new() { ActionId = "resize_right", DisplayName = "HotKey_ResizeRight", GroupKey = "HotKeyGroup_ImagePipeline", Modifiers = 0x0006, Key = 0x27 },
+        new() { ActionId = "start_stop_audio", DisplayName = "HotKey_StartStopAudio", GroupKey = "HotKeyGroup_AudioPipeline", Modifiers = 0x0003, Key = 0x41 },
+        new() { ActionId = "toggle_subtitle_visibility", DisplayName = "HotKey_ToggleSubtitleVisibility", GroupKey = "HotKeyGroup_AudioPipeline", Modifiers = 0x0003, Key = 0x53 }
     ];
 }
