@@ -319,13 +319,32 @@
                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                    FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16" />
 
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="{svc:Localize Home_SourceLanguages}"
+                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <controls:LanguageMultiSelect
+                                ItemsSource="{Binding SourceLanguages}"
+                                Placeholder="{Binding [Home_SourceLanguagesPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                                Width="220" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="{svc:Localize Home_TargetLanguage}"
+                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <ComboBox ItemsSource="{Binding TargetLanguages}"
+                                      SelectedItem="{Binding SelectedTargetLanguage}"
+                                      Width="220" Height="30" />
+                        </StackPanel>
+
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                             <TextBlock Text="{svc:Localize Debug_AudioSource}"
-                                       VerticalAlignment="Center" Margin="0,0,10,0"
+                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
                                        Foreground="{DynamicResource SecondaryTextBrush}" />
                             <ComboBox ItemsSource="{Binding AudioSources}"
                                       SelectedItem="{Binding SelectedAudioSource}"
-                                      Width="200" Height="30" />
+                                      Width="220" Height="30" />
                         </StackPanel>
 
                         <Button Command="{Binding RecordAudioTestCommand}"
