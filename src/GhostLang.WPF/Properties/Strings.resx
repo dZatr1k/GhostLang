@@ -277,4 +277,11 @@
   <data name="Validation_LingvaNoUrl" xml:space="preserve"><value>Не указан URL инстанса Lingva.</value></data>
   <data name="Validation_OpenSettings" xml:space="preserve"><value>Открыть настройки</value></data>
   <data name="Validation_Close" xml:space="preserve"><value>Закрыть</value></data>
+
+  <data name="Debug_AudioSmokeTestTitle" xml:space="preserve"><value>Проверка захвата аудио</value></data>
+  <data name="Debug_AudioSmokeTestHint" xml:space="preserve"><value>Запишет 5 секунд в WAV-файл (16 kHz, моно, 16-бит). Откройте файл любым плеером чтобы проверить захват.</value></data>
+  <data name="Debug_AudioSource" xml:space="preserve"><value>Источник:</value></data>
+  <data name="Debug_AudioRecord" xml:space="preserve"><value>Записать 5 сек</value></data>
+  <data name="Debug_AudioTestSaved" xml:space="preserve"><value>Сохранено: {0}</value></data>
+  <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>

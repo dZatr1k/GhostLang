@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Services;
+using GhostLang.Core.Services.AudioCapture;
 using GhostLang.Core.Services.Erasure;
 using GhostLang.Core.Services.Ocr;
 using GhostLang.Core.Settings.Asr;
@@ -34,6 +35,7 @@ public partial class App : Application
         services.AddSingleton<IImageTranslationPipeline, ImageTranslationPipeline>();
         services.AddSingleton<IAudioTranslationPipeline, AudioTranslationPipeline>();
         services.AddSingleton<IAsrEngineFactory, AsrEngineFactory>();
+        services.AddSingleton<IAudioCaptureServiceFactory, AudioCaptureServiceFactory>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomeViewModel>();

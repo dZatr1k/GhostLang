@@ -11,6 +11,7 @@ using GhostLang.WPF.Services;
 using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Pipelines.Models;
 using GhostLang.Core.Services;
+using GhostLang.Core.Services.AudioCapture;
 using GhostLang.Core.Settings;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.WPF.ViewModels.Settings;
@@ -25,6 +26,7 @@ public partial class DebugViewModel : ObservableObject
     private readonly IPipelineBuilder _pipelineBuilder;
     private readonly IOcrEngineFactory _ocrEngineFactory;
     private readonly IScreenCaptureService _screenCaptureService;
+    private readonly IAudioCaptureServiceFactory _audioCaptureFactory;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ProcessImageCommand))]
     private byte[]? _currentImageBytes;
@@ -57,12 +59,14 @@ public partial class DebugViewModel : ObservableObject
     public ObservableCollection<RenderedFragmentViewModel> RenderedFragments { get; } = new();
 
     public DebugViewModel(IConfigurationService configService, IPipelineBuilder pipelineBuilder,
-        IOcrEngineFactory ocrEngineFactory, IScreenCaptureService screenCaptureService)
+        IOcrEngineFactory ocrEngineFactory, IScreenCaptureService screenCaptureService,
+        IAudioCaptureServiceFactory audioCaptureFactory)
     {
         _configService = configService;
         _pipelineBuilder = pipelineBuilder;
         _ocrEngineFactory = ocrEngineFactory;
         _screenCaptureService = screenCaptureService;
+        _audioCaptureFactory = audioCaptureFactory;
 
         LoadCurrentConfiguration();
         InitializeSourceLanguages();
@@ -237,6 +241,53 @@ public partial class DebugViewModel : ObservableObject
     }
 
     private bool CanProcessImage() => CurrentImageBytes != null;
+
+    public IEnumerable<AudioCaptureSource> AudioSources =>
+        Enum.GetValues(typeof(AudioCaptureSource)).Cast<AudioCaptureSource>();
+
+    [ObservableProperty] private AudioCaptureSource _selectedAudioSource = AudioCaptureSource.Microphone;
+    [ObservableProperty] private string _audioTestResultText = string.Empty;
+    [ObservableProperty] private bool _hasAudioTestResult;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RecordAudioTestCommand))]
+    private bool _isAudioRecording;
+
+    [RelayCommand(CanExecute = nameof(CanRecordAudioTest))]
+    private async Task RecordAudioTestAsync()
+    {
+        IsAudioRecording = true;
+        HasAudioTestResult = false;
+        AudioTestResultText = string.Empty;
+
+        try
+        {
+            using var service = _audioCaptureFactory.Create(SelectedAudioSource);
+            var pcm = await service.CaptureForDurationAsync(TimeSpan.FromSeconds(5));
+
+            var path = Path.Combine(
+                Path.GetTempPath(),
+                $"ghostlang-audio-{SelectedAudioSource}-{DateTime.Now:yyyyMMdd-HHmmss}.wav");
+
+            PcmWavWriter.WritePcm16Mono(path, pcm, service.SampleRate);
+
+            var template = LocalizationService.Instance?["Debug_AudioTestSaved"] ?? "Saved: {0}";
+            AudioTestResultText = string.Format(template, path);
+            HasAudioTestResult = true;
+        }
+        catch (Exception ex)
+        {
+            var template = LocalizationService.Instance?["Debug_AudioTestError"] ?? "Error: {0}";
+            AudioTestResultText = string.Format(template, ex.Message);
+            HasAudioTestResult = true;
+        }
+        finally
+        {
+            IsAudioRecording = false;
+        }
+    }
+
+    private bool CanRecordAudioTest() => !IsAudioRecording;
 
     [RelayCommand]
     private void ToggleImageExpanded() => IsImageExpanded = !IsImageExpanded;

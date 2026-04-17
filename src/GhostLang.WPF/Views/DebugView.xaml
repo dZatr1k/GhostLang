@@ -303,10 +303,48 @@
         </TabItem>
 
         <TabItem Header="{svc:Localize Settings_TabAudio}">
-            <Grid>
-                <TextBlock Text="{svc:Localize Settings_AudioPlaceholder}" HorizontalAlignment="Center"
-                           VerticalAlignment="Center" FontSize="18"
-                           Foreground="{DynamicResource SecondaryTextBrush}" />
+            <Grid Margin="20">
+                <Grid.Resources>
+                    <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
+                </Grid.Resources>
+
+                <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="8" Padding="24"
+                        VerticalAlignment="Top" HorizontalAlignment="Center" MaxWidth="560">
+                    <StackPanel>
+                        <TextBlock Text="{svc:Localize Debug_AudioSmokeTestTitle}"
+                                   FontSize="16" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   Margin="0,0,0,8" />
+                        <TextBlock Text="{svc:Localize Debug_AudioSmokeTestHint}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="{svc:Localize Debug_AudioSource}"
+                                       VerticalAlignment="Center" Margin="0,0,10,0"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <ComboBox ItemsSource="{Binding AudioSources}"
+                                      SelectedItem="{Binding SelectedAudioSource}"
+                                      Width="200" Height="30" />
+                        </StackPanel>
+
+                        <Button Command="{Binding RecordAudioTestCommand}"
+                                Style="{StaticResource ButtonPrimary}"
+                                Height="36" Padding="16,0" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal">
+                                <hc:LoadingCircle Width="14" Height="14" Margin="0,0,8,0"
+                                                  Visibility="{Binding IsAudioRecording, Converter={StaticResource BoolToVis}}"
+                                                  Foreground="White" />
+                                <TextBlock Text="{svc:Localize Debug_AudioRecord}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Text="{Binding AudioTestResultText}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="12" TextWrapping="Wrap" Margin="0,16,0,0"
+                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                </Border>
             </Grid>
         </TabItem>
     </TabControl>

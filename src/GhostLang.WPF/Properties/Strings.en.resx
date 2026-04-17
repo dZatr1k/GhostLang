@@ -274,4 +274,11 @@
   <data name="Validation_LingvaNoUrl" xml:space="preserve"><value>Lingva instance URL is not set.</value></data>
   <data name="Validation_OpenSettings" xml:space="preserve"><value>Open Settings</value></data>
   <data name="Validation_Close" xml:space="preserve"><value>Close</value></data>
+
+  <data name="Debug_AudioSmokeTestTitle" xml:space="preserve"><value>Audio capture smoke test</value></data>
+  <data name="Debug_AudioSmokeTestHint" xml:space="preserve"><value>Records 5 seconds to a WAV file (16 kHz, mono, 16-bit). Open the file in any audio player to verify capture.</value></data>
+  <data name="Debug_AudioSource" xml:space="preserve"><value>Source:</value></data>
+  <data name="Debug_AudioRecord" xml:space="preserve"><value>Record 5s</value></data>
+  <data name="Debug_AudioTestSaved" xml:space="preserve"><value>Saved: {0}</value></data>
+  <data name="Debug_AudioTestError" xml:space="preserve"><value>Error: {0}</value></data>
 </root>
