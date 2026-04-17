@@ -299,6 +299,8 @@
   <data name="Audio_SubtitlePosition" xml:space="preserve"><value>Screen position</value></data>
   <data name="Audio_SubtitlePositionTop" xml:space="preserve"><value>Top</value></data>
   <data name="Audio_SubtitlePositionBottom" xml:space="preserve"><value>Bottom</value></data>
+  <data name="Audio_SubtitleMonitor" xml:space="preserve"><value>Monitor</value></data>
+  <data name="Audio_SubtitleMonitorPrimary" xml:space="preserve"><value>Primary (default)</value></data>
 
   <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — local recognition engine. Models are downloaded automatically to the folder below.</value></data>
   <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Models folder:</value></data>

@@ -276,7 +276,10 @@ public partial class HomeViewModel : ObservableObject
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
             _subtitleOverlay ??= new SubtitleOverlayWindow();
-            _subtitleOverlay.Configure(config.SubtitleOptions.ShowOriginal, config.SubtitleOptions.Position);
+            _subtitleOverlay.Configure(
+                config.SubtitleOptions.ShowOriginal,
+                config.SubtitleOptions.Position,
+                config.SubtitleOptions.MonitorIndex);
         });
 
         await _audioManager.StartAsync(

@@ -62,8 +62,11 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private bool _showOriginalSubtitle = true;
     [ObservableProperty] private string _subtitlePosition = "Bottom";
+    [ObservableProperty] private int _subtitleMonitorIndex = -1;
 
     public Dictionary<string, string> AvailableSubtitlePositions { get; private set; } = BuildSubtitlePositions();
+
+    public Dictionary<int, string> AvailableMonitors { get; private set; } = BuildMonitors();
 
     private static Dictionary<string, string> BuildSubtitlePositions()
     {
@@ -73,6 +76,22 @@ public partial class SettingsViewModel : ObservableObject
             { "Top", l?["Audio_SubtitlePositionTop"] ?? "Top" },
             { "Bottom", l?["Audio_SubtitlePositionBottom"] ?? "Bottom" }
         };
+    }
+
+    private static Dictionary<int, string> BuildMonitors()
+    {
+        var result = new Dictionary<int, string>();
+        var l = LocalizationService.Instance;
+        result[-1] = l?["Audio_SubtitleMonitorPrimary"] ?? "Primary monitor (default)";
+
+        var monitors = MonitorEnumeration.EnumerateMonitors();
+        foreach (var m in monitors)
+        {
+            var suffix = m.IsPrimary ? " ★" : "";
+            result[m.Index] = $"#{m.Index + 1}: {m.Bounds.Width}×{m.Bounds.Height}{suffix}";
+        }
+
+        return result;
     }
 
     public ObservableCollection<FilterViewModel> PreProcessFilters { get; } = [];
@@ -453,6 +472,7 @@ public partial class SettingsViewModel : ObservableObject
         MinSilenceDurationMs = config.VadOptions.MinSilenceDurationMs;
         ShowOriginalSubtitle = config.SubtitleOptions.ShowOriginal;
         SubtitlePosition = string.IsNullOrWhiteSpace(config.SubtitleOptions.Position) ? "Bottom" : config.SubtitleOptions.Position;
+        SubtitleMonitorIndex = config.SubtitleOptions.MonitorIndex;
     }
 
     private AppConfig BuildCurrentConfig()
@@ -524,7 +544,8 @@ public partial class SettingsViewModel : ObservableObject
         config.SubtitleOptions = new SubtitleOptions
         {
             ShowOriginal = ShowOriginalSubtitle,
-            Position = SubtitlePosition
+            Position = SubtitlePosition,
+            MonitorIndex = SubtitleMonitorIndex
         };
 
         config.GlossaryTokenMode = GlossaryTokenMode;

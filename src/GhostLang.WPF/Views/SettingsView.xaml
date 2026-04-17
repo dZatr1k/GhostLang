@@ -1284,7 +1284,13 @@
                                            Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,0,0,2" />
                                 <ComboBox ItemsSource="{Binding AvailableSubtitlePositions}"
                                           SelectedValuePath="Key" DisplayMemberPath="Value"
-                                          SelectedValue="{Binding SubtitlePosition}" Height="28" />
+                                          SelectedValue="{Binding SubtitlePosition}" Height="28" Margin="0,0,0,8" />
+
+                                <TextBlock Text="{svc:Localize Audio_SubtitleMonitor}"
+                                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,0,0,2" />
+                                <ComboBox ItemsSource="{Binding AvailableMonitors}"
+                                          SelectedValuePath="Key" DisplayMemberPath="Value"
+                                          SelectedValue="{Binding SubtitleMonitorIndex}" Height="28" />
                             </StackPanel>
                         </Grid>
                     </Border>

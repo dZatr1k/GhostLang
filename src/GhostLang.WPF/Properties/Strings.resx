@@ -302,6 +302,8 @@
   <data name="Audio_SubtitlePosition" xml:space="preserve"><value>Позиция на экране</value></data>
   <data name="Audio_SubtitlePositionTop" xml:space="preserve"><value>Сверху</value></data>
   <data name="Audio_SubtitlePositionBottom" xml:space="preserve"><value>Снизу</value></data>
+  <data name="Audio_SubtitleMonitor" xml:space="preserve"><value>Монитор</value></data>
+  <data name="Audio_SubtitleMonitorPrimary" xml:space="preserve"><value>Основной (по умолчанию)</value></data>
 
   <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — локальный движок распознавания. Модели скачиваются автоматически в папку ниже.</value></data>
   <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Папка моделей:</value></data>
