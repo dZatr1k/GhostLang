@@ -1,11 +1,17 @@
+using GhostLang.Core.Services.Asr;
+
 namespace GhostLang.Core.Settings.Asr;
 
-public class AsrEngineFactory : IAsrEngineFactory
+public class AsrEngineFactory(IWhisperModelManager whisperModelManager) : IAsrEngineFactory
 {
     public IAsrEngine Create(AsrEngineOptions options)
     {
-        throw new NotSupportedException(
-            $"ASR engine '{options.GetType().Name}' is not yet implemented. " +
-            "Concrete engines are added in Phase 3 (Whisper) and Phase 5 (Vosk, Azure).");
+        return options switch
+        {
+            WhisperAsrOptions whisper => new WhisperAsrEngine(whisper, whisperModelManager),
+            _ => throw new NotSupportedException(
+                $"ASR engine '{options.GetType().Name}' is not yet implemented. " +
+                "Vosk and Azure engines are added in Phase 5.")
+        };
     }
 }

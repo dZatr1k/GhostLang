@@ -15,6 +15,8 @@
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
       <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
       <PackageReference Include="Tesseract" Version="5.2.0" />
+      <PackageReference Include="Whisper.net" Version="1.9.0" />
+      <PackageReference Include="Whisper.net.Runtime" Version="1.9.0" />
     </ItemGroup>
 
 </Project>

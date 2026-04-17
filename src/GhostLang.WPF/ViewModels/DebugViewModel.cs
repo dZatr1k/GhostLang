@@ -13,6 +13,7 @@ using GhostLang.Core.Pipelines.Models;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.AudioCapture;
 using GhostLang.Core.Settings;
+using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.WPF.ViewModels.Settings;
 using GhostLang.WPF.Views;
@@ -27,6 +28,7 @@ public partial class DebugViewModel : ObservableObject
     private readonly IOcrEngineFactory _ocrEngineFactory;
     private readonly IScreenCaptureService _screenCaptureService;
     private readonly IAudioCaptureServiceFactory _audioCaptureFactory;
+    private readonly IAsrEngineFactory _asrEngineFactory;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ProcessImageCommand))]
     private byte[]? _currentImageBytes;
@@ -60,13 +62,15 @@ public partial class DebugViewModel : ObservableObject
 
     public DebugViewModel(IConfigurationService configService, IPipelineBuilder pipelineBuilder,
         IOcrEngineFactory ocrEngineFactory, IScreenCaptureService screenCaptureService,
-        IAudioCaptureServiceFactory audioCaptureFactory)
+        IAudioCaptureServiceFactory audioCaptureFactory,
+        IAsrEngineFactory asrEngineFactory)
     {
         _configService = configService;
         _pipelineBuilder = pipelineBuilder;
         _ocrEngineFactory = ocrEngineFactory;
         _screenCaptureService = screenCaptureService;
         _audioCaptureFactory = audioCaptureFactory;
+        _asrEngineFactory = asrEngineFactory;
 
         LoadCurrentConfiguration();
         InitializeSourceLanguages();
@@ -271,9 +275,36 @@ public partial class DebugViewModel : ObservableObject
 
             PcmWavWriter.WritePcm16Mono(path, pcm, service.SampleRate);
 
-            var template = LocalizationService.Instance?["Debug_AudioTestSaved"] ?? "Saved: {0}";
-            AudioTestResultText = string.Format(template, path);
+            var savedTemplate = LocalizationService.Instance?["Debug_AudioTestSaved"] ?? "Saved: {0}";
+            var savedLine = string.Format(savedTemplate, path);
+
+            var transcribingLine = LocalizationService.Instance?["Debug_AudioTranscribing"] ?? "Transcribing...";
+            AudioTestResultText = savedLine + "\n\n" + transcribingLine;
             HasAudioTestResult = true;
+
+            var selectedSourceLangs = SourceLanguages
+                .Where(x => x.IsSelected)
+                .Select(x => x.Language)
+                .ToList();
+
+            var asrEngine = _asrEngineFactory.Create(new WhisperAsrOptions());
+
+            var audioContext = new AudioTranslationContext
+            {
+                OriginalAudio = pcm,
+                SampleRate = service.SampleRate,
+                ChannelCount = service.ChannelCount,
+                SourceLanguage = selectedSourceLangs
+            };
+
+            var fragments = await asrEngine.RecognizeAsync(audioContext, selectedSourceLangs);
+
+            var transcript = fragments.Count == 0
+                ? LocalizationService.Instance?["Debug_AudioTranscribedEmpty"] ?? "(no speech detected)"
+                : string.Join(" ", fragments.Select(f => f.OriginalText));
+
+            var transcribedTemplate = LocalizationService.Instance?["Debug_AudioTranscribed"] ?? "Transcribed: {0}";
+            AudioTestResultText = savedLine + "\n\n" + string.Format(transcribedTemplate, transcript);
         }
         catch (Exception ex)
         {
