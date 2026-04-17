@@ -24,6 +24,8 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
     public event Action<int, int>? MoveRequested;
     public event Action<int, int>? ResizeRequested;
     public event Action? BindingsReloaded;
+    public event Action? StartStopAudioRequested;
+    public event Action? ToggleSubtitleVisibilityRequested;
 
     public void Register(Window window)
     {
@@ -86,6 +88,8 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
             case "resize_down": ResizeRequested?.Invoke(0, step); break;
             case "resize_left": ResizeRequested?.Invoke(-step, 0); break;
             case "resize_right": ResizeRequested?.Invoke(step, 0); break;
+            case "start_stop_audio": StartStopAudioRequested?.Invoke(); break;
+            case "toggle_subtitle_visibility": ToggleSubtitleVisibilityRequested?.Invoke(); break;
             default: handled = false; break;
         }
 
