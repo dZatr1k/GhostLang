@@ -270,14 +270,15 @@ public partial class DebugViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RecordAudioTestCommand))]
+    [NotifyCanExecuteChangedFor(nameof(LoadAudioFileCommand))]
     private bool _isAudioRecording;
+
+    [ObservableProperty] private string _audioInfoText = string.Empty;
 
     [RelayCommand(CanExecute = nameof(CanRecordAudioTest))]
     private async Task RecordAudioTestAsync()
     {
         IsAudioRecording = true;
-        HasAudioTestResult = false;
-        AudioTestResultText = string.Empty;
 
         try
         {
@@ -290,53 +291,7 @@ public partial class DebugViewModel : ObservableObject
 
             PcmWavWriter.WritePcm16Mono(path, pcm, service.SampleRate);
 
-            var savedTemplate = LocalizationService.Instance?["Debug_AudioTestSaved"] ?? "Saved: {0}";
-            var savedLine = string.Format(savedTemplate, path);
-
-            var transcribingLine = LocalizationService.Instance?["Debug_AudioTranscribing"] ?? "Transcribing...";
-            AudioTestResultText = savedLine + "\n\n" + transcribingLine;
-            HasAudioTestResult = true;
-
-            AudioPipelineFragments.Clear();
-            AudioPipelineMetrics.Clear();
-
-            var selectedSourceLangs = SourceLanguages
-                .Where(x => x.IsSelected)
-                .Select(x => x.Language)
-                .ToList();
-
-            var config = _configService.Load();
-            var configuredAsr = config.ActiveAsrEngine;
-            config.ActiveAsrEngine = SelectedAsrEngine switch
-            {
-                DebugAsrEngineChoice.Vosk => configuredAsr as VoskAsrOptions ?? new VoskAsrOptions(),
-                DebugAsrEngineChoice.Azure => configuredAsr as AzureAsrOptions ?? new AzureAsrOptions(),
-                _ => configuredAsr as WhisperAsrOptions ?? new WhisperAsrOptions()
-            };
-
-            var pipeline = _pipelineBuilder.BuildAudioPipeline(config);
-
-            var audioContext = await pipeline.ProcessAsync(
-                pcm, service.SampleRate, service.ChannelCount,
-                SelectedTargetLanguage, selectedSourceLangs);
-
-            foreach (var fragment in audioContext.AudioFragments)
-            {
-                AudioPipelineFragments.Add(fragment);
-            }
-
-            foreach (var metric in audioContext.Metrics)
-            {
-                AudioPipelineMetrics.Add(metric);
-            }
-
-            var summary = audioContext.AudioFragments.Count == 0
-                ? LocalizationService.Instance?["Debug_AudioTranscribedEmpty"] ?? "(no speech detected)"
-                : string.Format(
-                    LocalizationService.Instance?["Debug_AudioFragmentCount"] ?? "{0} fragment(s)",
-                    audioContext.AudioFragments.Count);
-
-            AudioTestResultText = savedLine + "\n\n" + summary;
+            await ProcessAudioPcmAsync(pcm, service.SampleRate, service.ChannelCount, path);
         }
         catch (Exception ex)
         {
@@ -348,6 +303,93 @@ public partial class DebugViewModel : ObservableObject
         {
             IsAudioRecording = false;
         }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRecordAudioTest))]
+    private async Task LoadAudioFileAsync()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "Audio files (*.wav;*.mp3;*.m4a;*.flac;*.ogg)|*.wav;*.mp3;*.m4a;*.flac;*.ogg|All files (*.*)|*.*"
+        };
+
+        if (dialog.ShowDialog() != true)
+            return;
+
+        IsAudioRecording = true;
+        try
+        {
+            var pcm = await Task.Run(() => AudioFileLoader.LoadAsPcm16Mono16kHz(dialog.FileName));
+            await ProcessAudioPcmAsync(pcm, AudioFileLoader.TargetSampleRate, AudioFileLoader.TargetChannels, dialog.FileName);
+        }
+        catch (Exception ex)
+        {
+            var template = LocalizationService.Instance?["Debug_AudioTestError"] ?? "Error: {0}";
+            AudioTestResultText = string.Format(template, ex.Message);
+            HasAudioTestResult = true;
+        }
+        finally
+        {
+            IsAudioRecording = false;
+        }
+    }
+
+    private async Task ProcessAudioPcmAsync(byte[] pcm, int sampleRate, int channelCount, string sourceLabel)
+    {
+        HasAudioTestResult = false;
+        AudioTestResultText = string.Empty;
+        AudioPipelineFragments.Clear();
+        AudioPipelineMetrics.Clear();
+
+        var durationSeconds = pcm.Length / (double)(sampleRate * channelCount * 2);
+        AudioInfoText = string.Format(
+            LocalizationService.Instance?["Debug_AudioInfo"] ?? "{0:F1}s • {1} Hz • {2} ch",
+            durationSeconds, sampleRate, channelCount);
+
+        var savedTemplate = LocalizationService.Instance?["Debug_AudioTestSaved"] ?? "Saved: {0}";
+        var savedLine = string.Format(savedTemplate, sourceLabel);
+
+        var transcribingLine = LocalizationService.Instance?["Debug_AudioTranscribing"] ?? "Transcribing...";
+        AudioTestResultText = savedLine + "\n\n" + transcribingLine;
+        HasAudioTestResult = true;
+
+        var selectedSourceLangs = SourceLanguages
+            .Where(x => x.IsSelected)
+            .Select(x => x.Language)
+            .ToList();
+
+        var config = _configService.Load();
+        var configuredAsr = config.ActiveAsrEngine;
+        config.ActiveAsrEngine = SelectedAsrEngine switch
+        {
+            DebugAsrEngineChoice.Vosk => configuredAsr as VoskAsrOptions ?? new VoskAsrOptions(),
+            DebugAsrEngineChoice.Azure => configuredAsr as AzureAsrOptions ?? new AzureAsrOptions(),
+            _ => configuredAsr as WhisperAsrOptions ?? new WhisperAsrOptions()
+        };
+
+        var pipeline = _pipelineBuilder.BuildAudioPipeline(config);
+
+        var audioContext = await pipeline.ProcessAsync(
+            pcm, sampleRate, channelCount,
+            SelectedTargetLanguage, selectedSourceLangs);
+
+        foreach (var fragment in audioContext.AudioFragments)
+        {
+            AudioPipelineFragments.Add(fragment);
+        }
+
+        foreach (var metric in audioContext.Metrics)
+        {
+            AudioPipelineMetrics.Add(metric);
+        }
+
+        var summary = audioContext.AudioFragments.Count == 0
+            ? LocalizationService.Instance?["Debug_AudioTranscribedEmpty"] ?? "(no speech detected)"
+            : string.Format(
+                LocalizationService.Instance?["Debug_AudioFragmentCount"] ?? "{0} fragment(s)",
+                audioContext.AudioFragments.Count);
+
+        AudioTestResultText = savedLine + "\n\n" + summary;
     }
 
     private bool CanRecordAudioTest() => !IsAudioRecording;

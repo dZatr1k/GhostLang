@@ -312,5 +312,8 @@
   <data name="Engine_Download" xml:space="preserve"><value>Download</value></data>
   <data name="Engine_Delete" xml:space="preserve"><value>Delete</value></data>
   <data name="Engine_Browse" xml:space="preserve"><value>Browse</value></data>
+
+  <data name="Debug_LoadAudioFile" xml:space="preserve"><value>Load WAV/MP3</value></data>
+  <data name="Debug_AudioInfo" xml:space="preserve"><value>{0:F1}s • {1} Hz • {2} ch</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Error: {0}</value></data>
 </root>

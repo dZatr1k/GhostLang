@@ -315,5 +315,8 @@
   <data name="Engine_Download" xml:space="preserve"><value>Скачать</value></data>
   <data name="Engine_Delete" xml:space="preserve"><value>Удалить</value></data>
   <data name="Engine_Browse" xml:space="preserve"><value>Обзор</value></data>
+
+  <data name="Debug_LoadAudioFile" xml:space="preserve"><value>Загрузить WAV/MP3</value></data>
+  <data name="Debug_AudioInfo" xml:space="preserve"><value>{0:F1}s • {1} Hz • {2} ch</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>
