@@ -305,6 +305,15 @@
   <data name="Engine_Whisper_ActiveModel" xml:space="preserve"><value>Active model:</value></data>
   <data name="Engine_Whisper_Models" xml:space="preserve"><value>Available models</value></data>
   <data name="Engine_NotDownloaded" xml:space="preserve"><value>Not downloaded</value></data>
+
+  <data name="Filter_Audio_Resample" xml:space="preserve"><value>Resample to 16 kHz</value></data>
+  <data name="Filter_Audio_ResampleDesc" xml:space="preserve"><value>Converts sample rate to 16 kHz (required by Whisper and most ASR engines).</value></data>
+  <data name="Filter_Audio_Normalize" xml:space="preserve"><value>Loudness normalization</value></data>
+  <data name="Filter_Audio_NormalizeDesc" xml:space="preserve"><value>Normalizes peak level to a target value (improves recognition of quiet speech).</value></data>
+  <data name="Filter_Audio_HighPass" xml:space="preserve"><value>High-pass filter</value></data>
+  <data name="Filter_Audio_HighPassDesc" xml:space="preserve"><value>Cuts low-frequency noise (fans, mains hum 50 Hz) at the specified cutoff frequency (Hz).</value></data>
+  <data name="Filter_Audio_NoiseSuppress" xml:space="preserve"><value>Noise suppression</value></data>
+  <data name="Filter_Audio_NoiseSuppressDesc" xml:space="preserve"><value>Suppresses background noise (keyboard, street). Requires additional CPU.</value></data>
   <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — local Kaldi-based engine. Models are downloaded manually from alphacephei.com — extract the zip and point to the folder.</value></data>
   <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Model folder path:</value></data>
   <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Open Vosk downloads page</value></data>

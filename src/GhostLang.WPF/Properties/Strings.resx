@@ -308,6 +308,15 @@
   <data name="Engine_Whisper_ActiveModel" xml:space="preserve"><value>Активная модель:</value></data>
   <data name="Engine_Whisper_Models" xml:space="preserve"><value>Доступные модели</value></data>
   <data name="Engine_NotDownloaded" xml:space="preserve"><value>Не скачана</value></data>
+
+  <data name="Filter_Audio_Resample" xml:space="preserve"><value>Ресэмплинг 16 kHz</value></data>
+  <data name="Filter_Audio_ResampleDesc" xml:space="preserve"><value>Приводит частоту дискретизации к 16 kHz (требование Whisper и большинства ASR-движков).</value></data>
+  <data name="Filter_Audio_Normalize" xml:space="preserve"><value>Нормализация громкости</value></data>
+  <data name="Filter_Audio_NormalizeDesc" xml:space="preserve"><value>Выравнивает пиковую громкость сигнала до заданного уровня (улучшает распознавание тихой речи).</value></data>
+  <data name="Filter_Audio_HighPass" xml:space="preserve"><value>Высокочастотный фильтр</value></data>
+  <data name="Filter_Audio_HighPassDesc" xml:space="preserve"><value>Срезает низкочастотный шум (гул вентиляторов, сетевой гул 50 Гц) на заданной частоте среза (Гц).</value></data>
+  <data name="Filter_Audio_NoiseSuppress" xml:space="preserve"><value>Шумоподавление</value></data>
+  <data name="Filter_Audio_NoiseSuppressDesc" xml:space="preserve"><value>Подавляет фоновый шум (клавиатура, шум улицы). Требует вычислительных ресурсов.</value></data>
   <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — локальный движок на основе Kaldi. Модели скачиваются вручную с alphacephei.com — распакуйте zip и укажите путь к папке.</value></data>
   <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Путь к папке модели:</value></data>
   <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Открыть страницу загрузок Vosk</value></data>

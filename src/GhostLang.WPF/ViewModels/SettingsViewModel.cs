@@ -77,6 +77,8 @@ public partial class SettingsViewModel : ObservableObject
 
     public ObservableCollection<FilterViewModel> PreProcessFilters { get; } = [];
 
+    public ObservableCollection<FilterViewModel> AudioPreProcessFilters { get; } = [];
+
     public ObservableCollection<GlossaryRuleViewModel> GlossaryRules { get; } = [];
 
     [ObservableProperty]
@@ -364,6 +366,16 @@ public partial class SettingsViewModel : ObservableObject
         PreProcessFilters.Add(new FilterViewModel
             { DisplayName = l["Filter_Invert"], Description = l["Filter_InvertDesc"], Option = config.PreProcessOptions.Invert, HasParameter = false });
 
+        AudioPreProcessFilters.Clear();
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_Resample"], Description = l["Filter_Audio_ResampleDesc"], Option = config.AudioPreProcessOptions.Resample16kHz, HasParameter = false });
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_Normalize"], Description = l["Filter_Audio_NormalizeDesc"], Option = config.AudioPreProcessOptions.NormalizeLoudness, HasParameter = false });
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_HighPass"], Description = l["Filter_Audio_HighPassDesc"], Option = config.AudioPreProcessOptions.HighPassFilter, HasParameter = true });
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_NoiseSuppress"], Description = l["Filter_Audio_NoiseSuppressDesc"], Option = config.AudioPreProcessOptions.NoiseSuppression, HasParameter = false });
+
         foreach (var step in ImagePipelineSteps)
         {
             if (step.IsOptional && config.OptionalStepStates != null &&
@@ -480,6 +492,14 @@ public partial class SettingsViewModel : ObservableObject
             config.PreProcessOptions.Brightness = PreProcessFilters[6].Option;
             config.PreProcessOptions.Sharpen = PreProcessFilters[7].Option;
             config.PreProcessOptions.Invert = PreProcessFilters[8].Option;
+        }
+
+        if (AudioPreProcessFilters.Count >= 4)
+        {
+            config.AudioPreProcessOptions.Resample16kHz = AudioPreProcessFilters[0].Option;
+            config.AudioPreProcessOptions.NormalizeLoudness = AudioPreProcessFilters[1].Option;
+            config.AudioPreProcessOptions.HighPassFilter = AudioPreProcessFilters[2].Option;
+            config.AudioPreProcessOptions.NoiseSuppression = AudioPreProcessFilters[3].Option;
         }
 
         foreach (var step in AudioPipelineSteps)
