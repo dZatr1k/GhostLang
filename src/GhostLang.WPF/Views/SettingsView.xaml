@@ -687,7 +687,7 @@
                                            TextWrapping="Wrap" FontSize="12" />
                             </StackPanel>
 
-                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="False" PanningMode="VerticalOnly">
                                 <StackPanel>
                                     <StackPanel Margin="0,0,0,10" IsEnabled="{Binding IsEnabled}">
                                         <StackPanel.Style>
@@ -962,7 +962,7 @@
                                                TextWrapping="Wrap" FontSize="12" />
                                 </StackPanel>
 
-                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" CanContentScroll="False" PanningMode="VerticalOnly">
                                     <StackPanel>
                                         <StackPanel Margin="0,0,0,10" IsEnabled="{Binding IsEnabled}">
                                             <StackPanel.Style>

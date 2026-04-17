@@ -316,7 +316,26 @@
   <data name="Debug_LoadAudioFile" xml:space="preserve"><value>Load WAV/MP3</value></data>
   <data name="Debug_AudioInfo" xml:space="preserve"><value>{0:F1}s • {1} Hz • {2} ch</value></data>
 
-  <data name="Home_AudioStart" xml:space="preserve"><value>▶ Start audio translation</value></data>
-  <data name="Home_AudioStop" xml:space="preserve"><value>⏹ Stop</value></data>
+  <data name="Home_AudioStart" xml:space="preserve"><value>Start audio translation</value></data>
+  <data name="Home_AudioStop" xml:space="preserve"><value>Stop</value></data>
+  <data name="Home_AudioStatusActive" xml:space="preserve"><value>Active</value></data>
+  <data name="Home_AudioStatusStopped" xml:space="preserve"><value>Stopped</value></data>
+
+  <data name="Step_Audio_Vad" xml:space="preserve"><value>Voice Activity Detection</value></data>
+  <data name="Step_Audio_VadDesc" xml:space="preserve"><value>Aborts the pipeline if the audio chunk contains no speech (dB energy threshold).</value></data>
+  <data name="Step_Audio_Preprocess" xml:space="preserve"><value>Audio Preprocessing</value></data>
+  <data name="Step_Audio_PreprocessDesc" xml:space="preserve"><value>Resampling, loudness normalization and noise suppression before recognition.</value></data>
+  <data name="Step_Audio_Asr" xml:space="preserve"><value>Speech Recognition</value></data>
+  <data name="Step_Audio_AsrDesc" xml:space="preserve"><value>Converts audio to text fragments with word-level timings and confidence.</value></data>
+  <data name="Step_Audio_Cache" xml:space="preserve"><value>Translation Cache</value></data>
+  <data name="Step_Audio_CacheDesc" xml:space="preserve"><value>Resolves previously translated fragments from cache without hitting the translation engine.</value></data>
+  <data name="Step_Audio_Glossary" xml:space="preserve"><value>Glossary Tokenization</value></data>
+  <data name="Step_Audio_GlossaryDesc" xml:space="preserve"><value>Replaces domain terms with tokens before translation to protect them from MT.</value></data>
+  <data name="Step_Audio_Translation" xml:space="preserve"><value>Machine Translation</value></data>
+  <data name="Step_Audio_TranslationDesc" xml:space="preserve"><value>Translates recognized text through the selected MT engine.</value></data>
+  <data name="Step_Audio_GlossaryRestore" xml:space="preserve"><value>Glossary Restoration</value></data>
+  <data name="Step_Audio_GlossaryRestoreDesc" xml:space="preserve"><value>Restores glossary-term translations in the final text.</value></data>
+  <data name="Step_Audio_Rendering" xml:space="preserve"><value>Subtitle Dispatch</value></data>
+  <data name="Step_Audio_RenderingDesc" xml:space="preserve"><value>Emits final fragments to the on-screen subtitle overlay.</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Error: {0}</value></data>
 </root>

@@ -319,7 +319,26 @@
   <data name="Debug_LoadAudioFile" xml:space="preserve"><value>Загрузить WAV/MP3</value></data>
   <data name="Debug_AudioInfo" xml:space="preserve"><value>{0:F1}s • {1} Hz • {2} ch</value></data>
 
-  <data name="Home_AudioStart" xml:space="preserve"><value>▶ Старт аудио-перевода</value></data>
-  <data name="Home_AudioStop" xml:space="preserve"><value>⏹ Стоп</value></data>
+  <data name="Home_AudioStart" xml:space="preserve"><value>Старт аудио-перевода</value></data>
+  <data name="Home_AudioStop" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Home_AudioStatusActive" xml:space="preserve"><value>Активен</value></data>
+  <data name="Home_AudioStatusStopped" xml:space="preserve"><value>Остановлен</value></data>
+
+  <data name="Step_Audio_Vad" xml:space="preserve"><value>Детекция речи</value></data>
+  <data name="Step_Audio_VadDesc" xml:space="preserve"><value>Прерывает пайплайн если аудио-чанк не содержит речи (порог по энергии в дБ).</value></data>
+  <data name="Step_Audio_Preprocess" xml:space="preserve"><value>Предобработка аудио</value></data>
+  <data name="Step_Audio_PreprocessDesc" xml:space="preserve"><value>Ресэмплинг, нормализация громкости и шумоподавление перед распознаванием.</value></data>
+  <data name="Step_Audio_Asr" xml:space="preserve"><value>Распознавание речи</value></data>
+  <data name="Step_Audio_AsrDesc" xml:space="preserve"><value>Преобразует аудио в текстовые фрагменты с временными метками и уверенностью.</value></data>
+  <data name="Step_Audio_Cache" xml:space="preserve"><value>Кэш переводов</value></data>
+  <data name="Step_Audio_CacheDesc" xml:space="preserve"><value>Подставляет ранее переведённые фрагменты из кэша без повторного обращения к движку перевода.</value></data>
+  <data name="Step_Audio_Glossary" xml:space="preserve"><value>Токенизация глоссария</value></data>
+  <data name="Step_Audio_GlossaryDesc" xml:space="preserve"><value>Заменяет доменные термины на токены перед переводом, защищая их от перевода.</value></data>
+  <data name="Step_Audio_Translation" xml:space="preserve"><value>Машинный перевод</value></data>
+  <data name="Step_Audio_TranslationDesc" xml:space="preserve"><value>Переводит распознанный текст через выбранный MT-движок.</value></data>
+  <data name="Step_Audio_GlossaryRestore" xml:space="preserve"><value>Восстановление глоссария</value></data>
+  <data name="Step_Audio_GlossaryRestoreDesc" xml:space="preserve"><value>Возвращает переводы терминов из глоссария в итоговый текст.</value></data>
+  <data name="Step_Audio_Rendering" xml:space="preserve"><value>Рендер субтитров</value></data>
+  <data name="Step_Audio_RenderingDesc" xml:space="preserve"><value>Передаёт готовые фрагменты в окно субтитров поверх экрана.</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>

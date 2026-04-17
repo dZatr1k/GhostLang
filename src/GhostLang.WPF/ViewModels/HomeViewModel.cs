@@ -256,12 +256,6 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty] private string _audioStatusText = string.Empty;
     [ObservableProperty] private float _audioLevelDb = -100f;
 
-    public string AudioButtonText => IsAudioActive
-        ? LocalizationService.Instance?["Home_AudioStop"] ?? "⏹ Stop"
-        : LocalizationService.Instance?["Home_AudioStart"] ?? "▶ Start audio";
-
-    partial void OnIsAudioActiveChanged(bool value) => OnPropertyChanged(nameof(AudioButtonText));
-
     [RelayCommand]
     private async Task ToggleAudioTranslationAsync()
     {
@@ -310,7 +304,12 @@ public partial class HomeViewModel : ObservableObject
     {
         System.Windows.Application.Current.Dispatcher.Invoke(() =>
         {
-            AudioStatusText = status;
+            AudioStatusText = status switch
+            {
+                "Active" => LocalizationService.Instance?["Home_AudioStatusActive"] ?? "Active",
+                "Stopped" => LocalizationService.Instance?["Home_AudioStatusStopped"] ?? "Stopped",
+                _ => status
+            };
         });
     }
 
