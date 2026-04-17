@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using GhostLang.Core.Pipelines.Steps;
+using GhostLang.Core.Pipelines.Steps.Audio;
+using GhostLang.Core.Pipelines.Steps.Audio.Implementations;
 using GhostLang.Core.Pipelines.Steps.Implementations;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.Erasure;
@@ -73,6 +75,23 @@ public class PipelineBuilder(
         steps.Add(new TextRenderingStep(config.TextRendering));
 
         return new ImageTranslationPipeline(steps);
+    }
+
+    public IAudioTranslationPipeline BuildAudioPipeline(AppConfig config)
+    {
+        var steps = new List<IAudioPipelineStep>
+        {
+            new VoiceActivityDetectionStep { IsEnabled = IsStepEnabled(config, "step.audio.vad") },
+            new AudioPreProcessStep { IsEnabled = IsStepEnabled(config, "step.audio.preprocess") },
+            new SpeechRecognitionStep(),
+            new AudioTranslationCacheCheckStep { IsEnabled = IsStepEnabled(config, "step.audio.cachecheck") },
+            new AudioGlossaryTokenizationStep { IsEnabled = IsStepEnabled(config, "step.audio.glossary") },
+            new AudioTranslationStep(),
+            new AudioGlossaryRestorationStep { IsEnabled = IsStepEnabled(config, "step.audio.glossary_restore") },
+            new SubtitleRenderingStep()
+        };
+
+        return new AudioTranslationPipeline(steps);
     }
 
     private bool IsStepEnabled(AppConfig config, string stepId)

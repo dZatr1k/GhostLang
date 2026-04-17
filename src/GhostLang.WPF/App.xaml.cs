@@ -3,6 +3,7 @@ using GhostLang.Core.Pipelines;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.Erasure;
 using GhostLang.Core.Services.Ocr;
+using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Erasure;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.Core.Settings.Translation;
@@ -31,6 +32,8 @@ public partial class App : Application
     private void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IImageTranslationPipeline, ImageTranslationPipeline>();
+        services.AddSingleton<IAudioTranslationPipeline, AudioTranslationPipeline>();
+        services.AddSingleton<IAsrEngineFactory, AsrEngineFactory>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomeViewModel>();

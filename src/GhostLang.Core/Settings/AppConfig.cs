@@ -1,5 +1,7 @@
 ﻿using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Pipelines.Models;
+using GhostLang.Core.Settings.Asr;
+using GhostLang.Core.Settings.Audio;
 using GhostLang.Core.Settings.Erasure;
 using GhostLang.Core.Settings.ImagePreProcessing;
 using GhostLang.Core.Settings.Ocr;
@@ -36,6 +38,18 @@ public class AppConfig
     public string Language { get; set; } = "ru";
 
     public List<HotKeyBinding> HotKeys { get; set; } = DefaultHotKeys();
+
+    public bool IsAudioPipelineEnabled { get; set; } = false;
+
+    public AsrEngineOptions? ActiveAsrEngine { get; set; }
+
+    public AudioCaptureSource ActiveAudioCaptureSource { get; set; } = AudioCaptureSource.SystemLoopback;
+
+    public AudioPreProcessOptions AudioPreProcessOptions { get; set; } = new();
+
+    public VadOptions VadOptions { get; set; } = new();
+
+    public SubtitleOptions SubtitleOptions { get; set; } = new();
 
     private static List<HotKeyBinding> DefaultHotKeys() =>
     [
