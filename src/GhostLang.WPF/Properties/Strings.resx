@@ -286,5 +286,8 @@
   <data name="Debug_AudioTranscribing" xml:space="preserve"><value>Распознавание... (при первом запуске сначала скачается модель Whisper ~150 МБ)</value></data>
   <data name="Debug_AudioTranscribed" xml:space="preserve"><value>Распознано: {0}</value></data>
   <data name="Debug_AudioTranscribedEmpty" xml:space="preserve"><value>(речь не обнаружена)</value></data>
+  <data name="Debug_AudioFragmentCount" xml:space="preserve"><value>Фрагментов: {0}</value></data>
+  <data name="Debug_AudioPipelineFragments" xml:space="preserve"><value>Фрагменты</value></data>
+  <data name="Debug_AudioPipelineMetrics" xml:space="preserve"><value>Метрики шагов</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>

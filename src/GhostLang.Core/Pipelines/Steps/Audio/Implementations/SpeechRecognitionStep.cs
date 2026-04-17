@@ -1,9 +1,15 @@
+using GhostLang.Core.Settings.Asr;
+
 namespace GhostLang.Core.Pipelines.Steps.Audio.Implementations;
 
-public class SpeechRecognitionStep : IMandatoryAudioPipelineStep
+public class SpeechRecognitionStep(IAsrEngine asrEngine) : IMandatoryAudioPipelineStep
 {
-    public Task ExecuteAsync(AudioTranslationContext context, CancellationToken ct = default)
+    public async Task ExecuteAsync(AudioTranslationContext context, CancellationToken ct = default)
     {
-        return Task.CompletedTask;
+        if (context.IsAborted)
+            return;
+
+        var fragments = await asrEngine.RecognizeAsync(context, context.SourceLanguage);
+        context.AudioFragments.AddRange(fragments);
     }
 }

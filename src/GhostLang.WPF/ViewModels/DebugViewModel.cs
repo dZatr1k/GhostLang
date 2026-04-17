@@ -51,6 +51,9 @@ public partial class DebugViewModel : ObservableObject
     [ObservableProperty] private double _originalImageHeight;
     [ObservableProperty] private ObservableCollection<StepMetric> _pipelineMetrics = new();
 
+    public ObservableCollection<AudioFragment> AudioPipelineFragments { get; } = new();
+    public ObservableCollection<StepMetric> AudioPipelineMetrics { get; } = new();
+
     public ObservableCollection<LanguageSelectionItem> SourceLanguages { get; } = new();
 
     [ObservableProperty] private SupportedLanguage _selectedTargetLanguage = SupportedLanguage.Unknown;
@@ -282,29 +285,43 @@ public partial class DebugViewModel : ObservableObject
             AudioTestResultText = savedLine + "\n\n" + transcribingLine;
             HasAudioTestResult = true;
 
+            AudioPipelineFragments.Clear();
+            AudioPipelineMetrics.Clear();
+
             var selectedSourceLangs = SourceLanguages
                 .Where(x => x.IsSelected)
                 .Select(x => x.Language)
                 .ToList();
 
-            var asrEngine = _asrEngineFactory.Create(new WhisperAsrOptions());
-
-            var audioContext = new AudioTranslationContext
+            var config = _configService.Load();
+            if (config.ActiveAsrEngine is null)
             {
-                OriginalAudio = pcm,
-                SampleRate = service.SampleRate,
-                ChannelCount = service.ChannelCount,
-                SourceLanguage = selectedSourceLangs
-            };
+                config.ActiveAsrEngine = new WhisperAsrOptions();
+            }
 
-            var fragments = await asrEngine.RecognizeAsync(audioContext, selectedSourceLangs);
+            var pipeline = _pipelineBuilder.BuildAudioPipeline(config);
 
-            var transcript = fragments.Count == 0
+            var audioContext = await pipeline.ProcessAsync(
+                pcm, service.SampleRate, service.ChannelCount,
+                SelectedTargetLanguage, selectedSourceLangs);
+
+            foreach (var fragment in audioContext.AudioFragments)
+            {
+                AudioPipelineFragments.Add(fragment);
+            }
+
+            foreach (var metric in audioContext.Metrics)
+            {
+                AudioPipelineMetrics.Add(metric);
+            }
+
+            var summary = audioContext.AudioFragments.Count == 0
                 ? LocalizationService.Instance?["Debug_AudioTranscribedEmpty"] ?? "(no speech detected)"
-                : string.Join(" ", fragments.Select(f => f.OriginalText));
+                : string.Format(
+                    LocalizationService.Instance?["Debug_AudioFragmentCount"] ?? "{0} fragment(s)",
+                    audioContext.AudioFragments.Count);
 
-            var transcribedTemplate = LocalizationService.Instance?["Debug_AudioTranscribed"] ?? "Transcribed: {0}";
-            AudioTestResultText = savedLine + "\n\n" + string.Format(transcribedTemplate, transcript);
+            AudioTestResultText = savedLine + "\n\n" + summary;
         }
         catch (Exception ex)
         {

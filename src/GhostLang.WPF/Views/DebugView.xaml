@@ -362,6 +362,59 @@
                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                    FontSize="12" TextWrapping="Wrap" Margin="0,16,0,0"
                                    Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
+
+                        <TextBlock Text="{svc:Localize Debug_AudioPipelineFragments}"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,16,0,8"
+                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
+
+                        <ItemsControl ItemsSource="{Binding AudioPipelineFragments}"
+                                      Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource RegionBrush}"
+                                            CornerRadius="6" Padding="10" Margin="0,0,0,8">
+                                        <StackPanel>
+                                            <TextBlock FontSize="10" Foreground="{DynamicResource ThirdlyTextBrush}">
+                                                <Run Text="["/><Run Text="{Binding StartMs, Mode=OneWay}"/><Run Text=" ms → "/><Run Text="{Binding EndMs, Mode=OneWay}"/><Run Text=" ms]"/>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding OriginalText}"
+                                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                                       FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0" />
+                                            <TextBlock Text="{Binding TranslatedText}"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       FontSize="13" FontWeight="SemiBold"
+                                                       TextWrapping="Wrap" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{svc:Localize Debug_AudioPipelineMetrics}"
+                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                   FontSize="13" FontWeight="SemiBold" Margin="0,12,0,8"
+                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
+
+                        <ItemsControl ItemsSource="{Binding AudioPipelineMetrics}"
+                                      Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,1,0,1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding StepName}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}" FontSize="11" />
+                                        <TextBlock Grid.Column="1" FontFamily="Consolas" FontSize="11"
+                                                   Foreground="{DynamicResource ThirdlyTextBrush}">
+                                            <Run Text="{Binding ElapsedMilliseconds, Mode=OneWay}" /><Run Text=" ms" />
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Border>
             </Grid>

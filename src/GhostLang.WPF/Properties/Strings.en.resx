@@ -283,5 +283,8 @@
   <data name="Debug_AudioTranscribing" xml:space="preserve"><value>Transcribing... (first run will download Whisper model ~150 MB)</value></data>
   <data name="Debug_AudioTranscribed" xml:space="preserve"><value>Transcribed: {0}</value></data>
   <data name="Debug_AudioTranscribedEmpty" xml:space="preserve"><value>(no speech detected)</value></data>
+  <data name="Debug_AudioFragmentCount" xml:space="preserve"><value>Fragments: {0}</value></data>
+  <data name="Debug_AudioPipelineFragments" xml:space="preserve"><value>Fragments</value></data>
+  <data name="Debug_AudioPipelineMetrics" xml:space="preserve"><value>Step metrics</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Error: {0}</value></data>
 </root>
