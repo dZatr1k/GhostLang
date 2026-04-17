@@ -9,9 +9,9 @@ public class AsrEngineFactory(IWhisperModelManager whisperModelManager) : IAsrEn
         return options switch
         {
             WhisperAsrOptions whisper => new WhisperAsrEngine(whisper, whisperModelManager),
-            _ => throw new NotSupportedException(
-                $"ASR engine '{options.GetType().Name}' is not yet implemented. " +
-                "Vosk and Azure engines are added in Phase 5.")
+            VoskAsrOptions vosk => new VoskAsrEngine(vosk),
+            AzureAsrOptions azure => new AzureAsrEngine(azure),
+            _ => throw new NotSupportedException($"ASR engine '{options.GetType().Name}' is not supported.")
         };
     }
 }

@@ -338,12 +338,21 @@
                                       Width="220" Height="30" />
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <TextBlock Text="{svc:Localize Debug_AudioSource}"
                                        VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
                                        Foreground="{DynamicResource SecondaryTextBrush}" />
                             <ComboBox ItemsSource="{Binding AudioSources}"
                                       SelectedItem="{Binding SelectedAudioSource}"
+                                      Width="220" Height="30" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="{svc:Localize Debug_AsrEngine}"
+                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
+                                       Foreground="{DynamicResource SecondaryTextBrush}" />
+                            <ComboBox ItemsSource="{Binding AsrEngines}"
+                                      SelectedItem="{Binding SelectedAsrEngine}"
                                       Width="220" Height="30" />
                         </StackPanel>
 

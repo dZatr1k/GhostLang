@@ -289,5 +289,6 @@
   <data name="Debug_AudioFragmentCount" xml:space="preserve"><value>Фрагментов: {0}</value></data>
   <data name="Debug_AudioPipelineFragments" xml:space="preserve"><value>Фрагменты</value></data>
   <data name="Debug_AudioPipelineMetrics" xml:space="preserve"><value>Метрики шагов</value></data>
+  <data name="Debug_AsrEngine" xml:space="preserve"><value>Движок ASR:</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>

@@ -21,6 +21,13 @@ using Microsoft.Win32;
 
 namespace GhostLang.WPF.ViewModels;
 
+public enum DebugAsrEngineChoice
+{
+    Whisper,
+    Vosk,
+    Azure
+}
+
 public partial class DebugViewModel : ObservableObject
 {
     private readonly IConfigurationService _configService;
@@ -253,6 +260,11 @@ public partial class DebugViewModel : ObservableObject
         Enum.GetValues(typeof(AudioCaptureSource)).Cast<AudioCaptureSource>();
 
     [ObservableProperty] private AudioCaptureSource _selectedAudioSource = AudioCaptureSource.Microphone;
+
+    public IEnumerable<DebugAsrEngineChoice> AsrEngines =>
+        Enum.GetValues(typeof(DebugAsrEngineChoice)).Cast<DebugAsrEngineChoice>();
+
+    [ObservableProperty] private DebugAsrEngineChoice _selectedAsrEngine = DebugAsrEngineChoice.Whisper;
     [ObservableProperty] private string _audioTestResultText = string.Empty;
     [ObservableProperty] private bool _hasAudioTestResult;
 
@@ -294,10 +306,13 @@ public partial class DebugViewModel : ObservableObject
                 .ToList();
 
             var config = _configService.Load();
-            if (config.ActiveAsrEngine is null)
+            var configuredAsr = config.ActiveAsrEngine;
+            config.ActiveAsrEngine = SelectedAsrEngine switch
             {
-                config.ActiveAsrEngine = new WhisperAsrOptions();
-            }
+                DebugAsrEngineChoice.Vosk => configuredAsr as VoskAsrOptions ?? new VoskAsrOptions(),
+                DebugAsrEngineChoice.Azure => configuredAsr as AzureAsrOptions ?? new AzureAsrOptions(),
+                _ => configuredAsr as WhisperAsrOptions ?? new WhisperAsrOptions()
+            };
 
             var pipeline = _pipelineBuilder.BuildAudioPipeline(config);
 
