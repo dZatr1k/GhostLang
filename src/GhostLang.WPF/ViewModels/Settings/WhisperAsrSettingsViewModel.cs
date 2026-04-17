@@ -29,14 +29,15 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
         Models.Clear();
         foreach (var name in KnownModels)
         {
+            var isDownloaded = _modelManager.IsModelDownloaded(name, ModelsPath);
             Models.Add(new WhisperModelItemViewModel
             {
                 ModelName = name,
                 SizeInfo = GetModelSizeInfo(name),
-                IsDownloaded = _modelManager.IsModelDownloaded(name, ModelsPath),
-                StatusText = _modelManager.IsModelDownloaded(name, ModelsPath)
+                IsDownloaded = isDownloaded,
+                StatusText = isDownloaded
                     ? Services.LocalizationService.Instance?["Engine_Downloaded"] ?? "Downloaded"
-                    : string.Empty
+                    : Services.LocalizationService.Instance?["Engine_NotDownloaded"] ?? "Not downloaded"
             });
         }
 
@@ -88,7 +89,7 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
         {
             _modelManager.DeleteModel(item.ModelName, ModelsPath);
             item.IsDownloaded = false;
-            item.StatusText = string.Empty;
+            item.StatusText = Services.LocalizationService.Instance?["Engine_NotDownloaded"] ?? "Not downloaded";
         }
         catch (Exception ex)
         {

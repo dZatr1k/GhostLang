@@ -305,7 +305,9 @@
 
   <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — локальный движок распознавания. Модели скачиваются автоматически в папку ниже.</value></data>
   <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Папка моделей:</value></data>
+  <data name="Engine_Whisper_ActiveModel" xml:space="preserve"><value>Активная модель:</value></data>
   <data name="Engine_Whisper_Models" xml:space="preserve"><value>Доступные модели</value></data>
+  <data name="Engine_NotDownloaded" xml:space="preserve"><value>Не скачана</value></data>
   <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — локальный движок на основе Kaldi. Модели скачиваются вручную с alphacephei.com — распакуйте zip и укажите путь к папке.</value></data>
   <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Путь к папке модели:</value></data>
   <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Открыть страницу загрузок Vosk</value></data>

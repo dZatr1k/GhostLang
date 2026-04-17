@@ -62,6 +62,18 @@ public class TesseractModelManager : ITesseractModelManager
         }
     }
 
+    public void DeleteModel(SupportedLanguage language, TesseractModelType modelType)
+    {
+        var directory = GetModelDirectoryPath(modelType);
+        var langCode = language.ToTesseractCode();
+        var filePath = Path.Combine(directory, $"{langCode}.traineddata");
+
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
+
     private string GetDownloadUrl(string langCode, TesseractModelType modelType)
     {
         return modelType switch

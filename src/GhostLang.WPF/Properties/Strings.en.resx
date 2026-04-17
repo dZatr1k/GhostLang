@@ -302,7 +302,9 @@
 
   <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — local recognition engine. Models are downloaded automatically to the folder below.</value></data>
   <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Models folder:</value></data>
+  <data name="Engine_Whisper_ActiveModel" xml:space="preserve"><value>Active model:</value></data>
   <data name="Engine_Whisper_Models" xml:space="preserve"><value>Available models</value></data>
+  <data name="Engine_NotDownloaded" xml:space="preserve"><value>Not downloaded</value></data>
   <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — local Kaldi-based engine. Models are downloaded manually from alphacephei.com — extract the zip and point to the folder.</value></data>
   <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Model folder path:</value></data>
   <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Open Vosk downloads page</value></data>

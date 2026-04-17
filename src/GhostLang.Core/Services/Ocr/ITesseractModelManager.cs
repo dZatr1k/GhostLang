@@ -9,4 +9,6 @@ public interface ITesseractModelManager
     string GetModelDirectoryPath(TesseractModelType modelType);
 
     Task DownloadModelAsync(SupportedLanguage language, TesseractModelType modelType, IProgress<double> progress, CancellationToken ct = default);
+
+    void DeleteModel(SupportedLanguage language, TesseractModelType modelType);
 }
