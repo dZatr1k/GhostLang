@@ -290,5 +290,30 @@
   <data name="Debug_AudioPipelineFragments" xml:space="preserve"><value>Фрагменты</value></data>
   <data name="Debug_AudioPipelineMetrics" xml:space="preserve"><value>Метрики шагов</value></data>
   <data name="Debug_AsrEngine" xml:space="preserve"><value>Движок ASR:</value></data>
+
+  <data name="Audio_CaptureSource" xml:space="preserve"><value>Источник захвата</value></data>
+  <data name="Audio_SourceMicrophone" xml:space="preserve"><value>Микрофон</value></data>
+  <data name="Audio_SourceLoopback" xml:space="preserve"><value>Системный звук (loopback)</value></data>
+  <data name="Audio_VadOptions" xml:space="preserve"><value>Детекция тишины (VAD)</value></data>
+  <data name="Audio_SilenceThresholdDb" xml:space="preserve"><value>Порог тишины (дБ)</value></data>
+  <data name="Audio_MinSilenceDurationMs" xml:space="preserve"><value>Мин. длительность тишины (мс)</value></data>
+  <data name="Audio_SubtitleOptions" xml:space="preserve"><value>Субтитры</value></data>
+  <data name="Audio_ShowOriginalSubtitle" xml:space="preserve"><value>Показывать оригинал</value></data>
+  <data name="Audio_SubtitlePosition" xml:space="preserve"><value>Позиция на экране</value></data>
+  <data name="Audio_SubtitlePositionTop" xml:space="preserve"><value>Сверху</value></data>
+  <data name="Audio_SubtitlePositionBottom" xml:space="preserve"><value>Снизу</value></data>
+
+  <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — локальный движок распознавания. Модели скачиваются автоматически в папку ниже.</value></data>
+  <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Папка моделей:</value></data>
+  <data name="Engine_Whisper_Models" xml:space="preserve"><value>Доступные модели</value></data>
+  <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — локальный движок на основе Kaldi. Модели скачиваются вручную с alphacephei.com — распакуйте zip и укажите путь к папке.</value></data>
+  <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Путь к папке модели:</value></data>
+  <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Открыть страницу загрузок Vosk</value></data>
+  <data name="Engine_Azure_Intro" xml:space="preserve"><value>Azure AI Speech — облачный движок. Требуется подписка (есть бесплатный тариф 5 часов/мес).</value></data>
+  <data name="Engine_Azure_ApiKey" xml:space="preserve"><value>API-ключ:</value></data>
+  <data name="Engine_Azure_Region" xml:space="preserve"><value>Регион:</value></data>
+  <data name="Engine_Download" xml:space="preserve"><value>Скачать</value></data>
+  <data name="Engine_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Engine_Browse" xml:space="preserve"><value>Обзор</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
 </root>
