@@ -1,7 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- GhostLang Light Theme -->
     <Color x:Key="PrimaryColor">#2f98d5</Color>
     <Color x:Key="DarkPrimaryColor">#2680B5</Color>
     <Color x:Key="DangerColor">#DB3340</Color>
@@ -64,4 +63,7 @@
     <SolidColorBrush x:Key="ButtonTextBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="WhiteBrush" Color="#FFFFFF" />
     <Color x:Key="WhiteColor">#FFFFFF</Color>
+
+    <SolidColorBrush x:Key="MandatoryStepBrush" Color="#7C3AED" />
+    <SolidColorBrush x:Key="DisabledStepBrush" Color="#C4C4C4" />
 </ResourceDictionary>

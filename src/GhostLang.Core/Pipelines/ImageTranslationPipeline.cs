@@ -7,11 +7,11 @@ namespace GhostLang.Core.Pipelines;
 
 public class ImageTranslationPipeline(IEnumerable<IPipelineStep> steps) : IImageTranslationPipeline
 {
-    public async Task<TranslationContext> ProcessFrameAsync(byte[] imageBytes, SupportedLanguage targetLanguage, List<SupportedLanguage> sourceLanguage)
+    public async Task<TranslationContext> ProcessFrameAsync(byte[] imageBytes, SupportedLanguage targetLanguage, List<SupportedLanguage> sourceLanguage, CancellationToken ct = default)
     {
         if (targetLanguage is SupportedLanguage.Unknown)
             return new TranslationContext();
-        
+
         var context = new TranslationContext
         {
             OriginalImage = imageBytes,
@@ -22,12 +22,14 @@ public class ImageTranslationPipeline(IEnumerable<IPipelineStep> steps) : IImage
 
         foreach (var step in steps)
         {
+            ct.ThrowIfCancellationRequested();
+
             var stopwatch = Stopwatch.StartNew();
-            
-            await step.ExecuteAsync(context);
-            
+
+            await step.ExecuteAsync(context, ct);
+
             stopwatch.Stop();
-            
+
             context.Metrics.Add(new StepMetric
             {
                 StepName = step.GetType().Name,

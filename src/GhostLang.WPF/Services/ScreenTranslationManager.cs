@@ -22,6 +22,7 @@ public class ScreenTranslationManager(
     private byte[]? _lastFrameHash;
     private byte[]? _lastFrameBytes;
     private int _unchangedCount;
+    private volatile bool _skipNextNewFrame;
 
     private const double MajorChangeThreshold = 0.30;
 
@@ -102,7 +103,6 @@ public class ScreenTranslationManager(
                 return;
             }
 
-            // Hash comparison — exact match skips entirely
             var currentHash = MD5.HashData(imageBytes);
             if (_lastFrameHash != null && currentHash.AsSpan().SequenceEqual(_lastFrameHash))
             {
@@ -111,7 +111,16 @@ public class ScreenTranslationManager(
                 return;
             }
 
-            // Major change detection — clear overlay immediately if >30% pixels differ
+            if (_skipNextNewFrame)
+            {
+                _skipNextNewFrame = false;
+                _lastFrameHash = currentHash;
+                _lastFrameBytes = imageBytes;
+                _unchangedCount = 0;
+                StatusChanged?.Invoke($"Frame #{_frameCount}: baseline (post-render)");
+                return;
+            }
+
             if (_lastFrameBytes != null)
             {
                 var changeRatio = CalculateChangeRatio(_lastFrameBytes, imageBytes);
@@ -140,7 +149,6 @@ public class ScreenTranslationManager(
             sw.Stop();
             _frameCount++;
 
-            // Staleness check: re-capture and compare hash to see if content moved
             var verifyRegion = _region;
             if (verifyRegion != null)
             {
@@ -153,7 +161,7 @@ public class ScreenTranslationManager(
                     if (!verifyHash.AsSpan().SequenceEqual(currentHash))
                     {
                         StatusChanged?.Invoke($"Frame #{_frameCount}: stale ({sw.ElapsedMilliseconds}ms), skip");
-                        _lastFrameHash = null; // force re-process next tick
+                        _lastFrameHash = null;
                         return;
                     }
                 }
@@ -165,6 +173,7 @@ public class ScreenTranslationManager(
             StatusChanged?.Invoke($"Frame #{_frameCount}: {sw.ElapsedMilliseconds}ms, fragments: {fragments}, rendered: {rendered}{mode}");
 
             FrameProcessed?.Invoke(context);
+            _skipNextNewFrame = true;
         }
         catch (Exception ex)
         {
@@ -181,7 +190,6 @@ public class ScreenTranslationManager(
         var minLen = Math.Min(previous.Length, current.Length);
         if (minLen == 0) return 1.0;
 
-        // Sample every 64th byte for speed (~16KB checked on 1MB image)
         const int stride = 64;
         var sampledCount = 0;
         var diffCount = 0;
@@ -193,7 +201,6 @@ public class ScreenTranslationManager(
                 diffCount++;
         }
 
-        // If sizes differ significantly, count that as change
         if (Math.Abs(previous.Length - current.Length) > minLen * 0.1)
             return 1.0;
 

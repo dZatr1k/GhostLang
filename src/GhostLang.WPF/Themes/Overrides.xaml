@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:hc="https://handyorg.github.io/handycontrol">
 
-    <!-- Override HC button styles to force white text -->
     <Style x:Key="ButtonPrimary" TargetType="Button" BasedOn="{StaticResource ButtonPrimary.Small}">
         <Setter Property="Height" Value="Auto" />
         <Setter Property="Padding" Value="15,6" />

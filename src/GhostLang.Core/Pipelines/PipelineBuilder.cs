@@ -1,9 +1,12 @@
 ﻿using System.Text;
 using GhostLang.Core.Pipelines.Steps;
+using GhostLang.Core.Pipelines.Steps.Audio;
+using GhostLang.Core.Pipelines.Steps.Audio.Implementations;
 using GhostLang.Core.Pipelines.Steps.Implementations;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.Erasure;
 using GhostLang.Core.Settings;
+using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Erasure;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.Core.Settings.Translation;
@@ -15,7 +18,8 @@ public class PipelineBuilder(
     IOcrEngineFactory ocrFactory,
     ITranslationCacheService cacheService,
     ITextErasureEngineFactory erasureEngineFactory,
-    ITranslationEngineFactory translationEngineFactory) : IPipelineBuilder
+    ITranslationEngineFactory translationEngineFactory,
+    IAsrEngineFactory asrEngineFactory) : IPipelineBuilder
 {
     public string GetPipelineDescription(AppConfig config)
     {
@@ -73,6 +77,35 @@ public class PipelineBuilder(
         steps.Add(new TextRenderingStep(config.TextRendering));
 
         return new ImageTranslationPipeline(steps);
+    }
+
+    public IAudioTranslationPipeline BuildAudioPipeline(AppConfig config)
+    {
+        var steps = new List<IAudioPipelineStep>
+        {
+            new VoiceActivityDetectionStep(config.VadOptions) { IsEnabled = IsStepEnabled(config, "step.audio.vad") },
+            new AudioPreProcessStep(config.AudioPreProcessOptions) { IsEnabled = IsStepEnabled(config, "step.audio.preprocess") }
+        };
+
+        if (config.ActiveAsrEngine != null)
+        {
+            steps.Add(new SpeechRecognitionStep(asrEngineFactory.Create(config.ActiveAsrEngine)));
+        }
+
+        cacheService.Configure(config.CacheTtlMinutes, config.CacheMaxCharacters);
+        steps.Add(new AudioTranslationCacheCheckStep(cacheService) { IsEnabled = IsStepEnabled(config, "step.audio.cachecheck") });
+
+        steps.Add(new AudioGlossaryTokenizationStep(config.GlossaryRules, config.GlossaryTokenMode) { IsEnabled = IsStepEnabled(config, "step.audio.glossary") });
+
+        cacheService.SetEngineTag(config.ActiveTranslationEngine.GetType().Name);
+        var translationEngine = translationEngineFactory.Create(config.ActiveTranslationEngine);
+        steps.Add(new AudioTranslationStep(translationEngine, cacheService));
+
+        steps.Add(new AudioGlossaryRestorationStep { IsEnabled = IsStepEnabled(config, "step.audio.glossary_restore") });
+
+        steps.Add(new SubtitleRenderingStep());
+
+        return new AudioTranslationPipeline(steps);
     }
 
     private bool IsStepEnabled(AppConfig config, string stepId)

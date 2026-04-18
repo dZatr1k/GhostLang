@@ -7,7 +7,7 @@ public class OcrStep(IOcrEngine ocrEngine) : IMandatoryPipelineStep
 {
     public string StepName => "Text Recognition (OCR)";
 
-    public async Task ExecuteAsync(TranslationContext context)
+    public async Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || context.ProcessedImage == null)
             return;
@@ -21,15 +21,12 @@ public class OcrStep(IOcrEngine ocrEngine) : IMandatoryPipelineStep
     {
         var text = fragment.OriginalText;
 
-        // Too short
         if (string.IsNullOrWhiteSpace(text) || text.Length < 2)
             return false;
 
-        // Bounding box too small
         if (fragment.Bounds.Width < 5 || fragment.Bounds.Height < 5)
             return false;
 
-        // Count letters vs junk
         var letterCount = 0;
         var junkCount = 0;
 
@@ -41,11 +38,9 @@ public class OcrStep(IOcrEngine ocrEngine) : IMandatoryPipelineStep
                 junkCount++;
         }
 
-        // No letters at all
         if (letterCount == 0)
             return false;
 
-        // More than 50% junk symbols
         if (text.Length > 0 && (double)junkCount / text.Length > 0.5)
             return false;
 

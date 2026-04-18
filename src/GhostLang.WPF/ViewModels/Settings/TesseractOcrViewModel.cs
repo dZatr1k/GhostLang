@@ -62,6 +62,25 @@ public partial class TesseractOcrViewModel : ObservableObject, IEngineSettingsVi
         }
     }
 
+    [RelayCommand]
+    private void DeleteModel(LanguageItemViewModel? item)
+    {
+        if (item is null || !item.IsDownloaded)
+            return;
+
+        try
+        {
+            _modelManager.DeleteModel(item.Language, ModelType);
+            item.IsDownloaded = false;
+            item.StatusText = Services.LocalizationService.Instance?["Engine_NotDownloaded"] ?? "Not downloaded";
+            item.DownloadProgress = 0;
+        }
+        catch (Exception ex)
+        {
+            item.StatusText = $"{Services.LocalizationService.Instance?["Misc_Error"]} {ex.Message}";
+        }
+    }
+
     [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task DownloadModelAsync(LanguageItemViewModel item)
     {

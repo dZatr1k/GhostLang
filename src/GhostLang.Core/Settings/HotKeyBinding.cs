@@ -4,11 +4,16 @@ public class HotKeyBinding
 {
     public string ActionId { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
+    public string GroupKey { get; set; } = string.Empty;
     public uint Modifiers { get; set; }
     public uint Key { get; set; }
 
+    public bool IsEmpty => Modifiers == 0 && Key == 0;
+
     public string ToDisplayString()
     {
+        if (IsEmpty) return string.Empty;
+
         var parts = new List<string>();
         if ((Modifiers & 0x0002) != 0) parts.Add("Ctrl");
         if ((Modifiers & 0x0004) != 0) parts.Add("Shift");

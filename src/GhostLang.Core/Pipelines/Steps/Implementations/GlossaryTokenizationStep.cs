@@ -10,7 +10,7 @@ public class GlossaryTokenizationStep(List<GlossaryRule> rules, GlossaryTokenMod
 
     public bool IsEnabled { get; set; }
 
-    public Task ExecuteAsync(TranslationContext context)
+    public Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || !IsEnabled || rules.Count == 0)
             return Task.CompletedTask;

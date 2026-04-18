@@ -11,8 +11,11 @@ public partial class HotKeyBindingViewModel : ObservableObject
     [ObservableProperty] private string _displayName = string.Empty;
     [ObservableProperty] private string _keyDisplayString = string.Empty;
     [ObservableProperty] private bool _isRecording;
+    [ObservableProperty] private string _groupDisplayName = string.Empty;
+    [ObservableProperty] private bool _hasBinding;
 
     public string DisplayNameKey { get; private set; } = string.Empty;
+    public string GroupKey { get; private set; } = string.Empty;
     public uint Modifiers { get; set; }
     public uint VirtualKey { get; set; }
 
@@ -20,17 +23,21 @@ public partial class HotKeyBindingViewModel : ObservableObject
     {
         ActionId = binding.ActionId;
         DisplayNameKey = binding.DisplayName;
+        GroupKey = binding.GroupKey;
         var loc = Services.LocalizationService.Instance;
         DisplayName = loc != null ? loc[DisplayNameKey] : DisplayNameKey;
+        GroupDisplayName = loc != null && !string.IsNullOrEmpty(GroupKey) ? loc[GroupKey] : GroupKey;
         Modifiers = binding.Modifiers;
         VirtualKey = binding.Key;
         KeyDisplayString = binding.ToDisplayString();
+        HasBinding = !binding.IsEmpty;
     }
 
     public HotKeyBinding ToBinding() => new()
     {
         ActionId = ActionId,
         DisplayName = DisplayNameKey,
+        GroupKey = GroupKey,
         Modifiers = Modifiers,
         Key = VirtualKey
     };
@@ -46,6 +53,12 @@ public partial class HotKeyBindingViewModel : ObservableObject
     {
         if (!IsRecording) return;
 
+        if (key == Key.Escape)
+        {
+            ClearBinding();
+            return;
+        }
+
         if (key is Key.LeftCtrl or Key.RightCtrl or Key.LeftShift or Key.RightShift
             or Key.LeftAlt or Key.RightAlt or Key.System)
             return;
@@ -60,6 +73,17 @@ public partial class HotKeyBindingViewModel : ObservableObject
         Modifiers = mod;
         VirtualKey = vk;
         KeyDisplayString = new HotKeyBinding { Modifiers = mod, Key = vk }.ToDisplayString();
+        HasBinding = true;
+        IsRecording = false;
+    }
+
+    [RelayCommand]
+    private void ClearBinding()
+    {
+        Modifiers = 0;
+        VirtualKey = 0;
+        KeyDisplayString = string.Empty;
+        HasBinding = false;
         IsRecording = false;
     }
 

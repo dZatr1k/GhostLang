@@ -9,7 +9,7 @@ public class GlossaryRestorationStep : IOptionalPipelineStep
 
     public string StepName => "Glossary Restoration";
 
-    public Task ExecuteAsync(TranslationContext context)
+    public Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || !IsEnabled || context.GlossaryTokenMap.Count == 0)
             return Task.CompletedTask;

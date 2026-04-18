@@ -80,7 +80,6 @@ public class OcrSpaceEngine(OcrSpaceOptions options) : IOcrEngine
                 if (string.IsNullOrWhiteSpace(text) || line.Words is not { Count: > 0 })
                     continue;
 
-                // Build bounding box from all words in the line
                 var minX = line.Words.Min(w => w.Left);
                 var minY = line.Words.Min(w => w.Top);
                 var maxX = line.Words.Max(w => w.Left + w.Width);

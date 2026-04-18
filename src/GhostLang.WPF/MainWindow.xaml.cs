@@ -54,23 +54,19 @@ public partial class MainWindow : Window
         var targetOpacity = expand ? 1.0 : 0.0;
         var targetMargin = expand ? ExpandedWidth - 42 : 6;
 
-        // Width: animate Border.Width (DoubleAnimation, GPU-friendly)
         var widthAnim = new DoubleAnimation(targetWidth, AnimDuration) { EasingFunction = Easing };
         SidebarBorder.BeginAnimation(WidthProperty, widthAnim);
 
-        // Opacity: labels + app name
         var opacityAnim = new DoubleAnimation(targetOpacity, AnimDuration) { EasingFunction = Easing };
         LabelHome.BeginAnimation(OpacityProperty, opacityAnim);
         LabelSettings.BeginAnimation(OpacityProperty, opacityAnim);
         LabelDebug.BeginAnimation(OpacityProperty, opacityAnim);
         LabelAppName.BeginAnimation(OpacityProperty, opacityAnim);
 
-        // Toggle button position
         var marginAnim = new ThicknessAnimation(
             new Thickness(targetMargin, 0, 0, 0), AnimDuration) { EasingFunction = Easing };
         ToggleSidebarButton.BeginAnimation(MarginProperty, marginAnim);
 
-        // Toggle icon
         ToggleIconPath.Data = (System.Windows.Media.Geometry)FindResource(
             expand ? "PanelOpenGeometry" : "PanelCloseGeometry");
         var loc = LocalizationService.Instance;

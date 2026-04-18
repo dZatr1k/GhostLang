@@ -11,7 +11,9 @@ using GhostLang.WPF.Services;
 using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Pipelines.Models;
 using GhostLang.Core.Services;
+using GhostLang.Core.Services.AudioCapture;
 using GhostLang.Core.Settings;
+using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.WPF.ViewModels.Settings;
 using GhostLang.WPF.Views;
@@ -19,12 +21,21 @@ using Microsoft.Win32;
 
 namespace GhostLang.WPF.ViewModels;
 
+public enum DebugAsrEngineChoice
+{
+    Whisper,
+    Vosk,
+    Azure
+}
+
 public partial class DebugViewModel : ObservableObject
 {
     private readonly IConfigurationService _configService;
     private readonly IPipelineBuilder _pipelineBuilder;
     private readonly IOcrEngineFactory _ocrEngineFactory;
     private readonly IScreenCaptureService _screenCaptureService;
+    private readonly IAudioCaptureServiceFactory _audioCaptureFactory;
+    private readonly IAsrEngineFactory _asrEngineFactory;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ProcessImageCommand))]
     private byte[]? _currentImageBytes;
@@ -38,6 +49,7 @@ public partial class DebugViewModel : ObservableObject
     [ObservableProperty] private bool _isConfigExpanded;
 
     [ObservableProperty] private string _pipelineInfo = "";
+    [ObservableProperty] private bool _isProcessing;
 
     public IEnumerable<SupportedLanguage> AvailableLanguages =>
         Enum.GetValues(typeof(SupportedLanguage)).Cast<SupportedLanguage>();
@@ -45,6 +57,9 @@ public partial class DebugViewModel : ObservableObject
     [ObservableProperty] private double _originalImageWidth;
     [ObservableProperty] private double _originalImageHeight;
     [ObservableProperty] private ObservableCollection<StepMetric> _pipelineMetrics = new();
+
+    public ObservableCollection<AudioFragment> AudioPipelineFragments { get; } = new();
+    public ObservableCollection<StepMetric> AudioPipelineMetrics { get; } = new();
 
     public ObservableCollection<LanguageSelectionItem> SourceLanguages { get; } = new();
 
@@ -56,12 +71,16 @@ public partial class DebugViewModel : ObservableObject
     public ObservableCollection<RenderedFragmentViewModel> RenderedFragments { get; } = new();
 
     public DebugViewModel(IConfigurationService configService, IPipelineBuilder pipelineBuilder,
-        IOcrEngineFactory ocrEngineFactory, IScreenCaptureService screenCaptureService)
+        IOcrEngineFactory ocrEngineFactory, IScreenCaptureService screenCaptureService,
+        IAudioCaptureServiceFactory audioCaptureFactory,
+        IAsrEngineFactory asrEngineFactory)
     {
         _configService = configService;
         _pipelineBuilder = pipelineBuilder;
         _ocrEngineFactory = ocrEngineFactory;
         _screenCaptureService = screenCaptureService;
+        _audioCaptureFactory = audioCaptureFactory;
+        _asrEngineFactory = asrEngineFactory;
 
         LoadCurrentConfiguration();
         InitializeSourceLanguages();
@@ -179,10 +198,17 @@ public partial class DebugViewModel : ObservableObject
 
         var dynamicPipeline = _pipelineBuilder.BuildImagePipeline(config);
 
-        var context =
-            await dynamicPipeline.ProcessFrameAsync(CurrentImageBytes, SelectedTargetLanguage, selectedSourceLangs);
+        IsProcessing = true;
+        TranslationContext context;
+        try
+        {
+            context = await dynamicPipeline.ProcessFrameAsync(CurrentImageBytes, SelectedTargetLanguage, selectedSourceLangs);
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
 
-        // Preprocessed image
         if (context.ProcessedImage is { Length: > 0 })
         {
             var prepFrame = BitmapFrame.Create(new MemoryStream(context.ProcessedImage),
@@ -229,6 +255,144 @@ public partial class DebugViewModel : ObservableObject
     }
 
     private bool CanProcessImage() => CurrentImageBytes != null;
+
+    public IEnumerable<AudioCaptureSource> AudioSources =>
+        Enum.GetValues(typeof(AudioCaptureSource)).Cast<AudioCaptureSource>();
+
+    [ObservableProperty] private AudioCaptureSource _selectedAudioSource = AudioCaptureSource.Microphone;
+
+    public IEnumerable<DebugAsrEngineChoice> AsrEngines =>
+        Enum.GetValues(typeof(DebugAsrEngineChoice)).Cast<DebugAsrEngineChoice>();
+
+    [ObservableProperty] private DebugAsrEngineChoice _selectedAsrEngine = DebugAsrEngineChoice.Whisper;
+    [ObservableProperty] private string _audioTestResultText = string.Empty;
+    [ObservableProperty] private bool _hasAudioTestResult;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RecordAudioTestCommand))]
+    [NotifyCanExecuteChangedFor(nameof(LoadAudioFileCommand))]
+    private bool _isAudioRecording;
+
+    [ObservableProperty] private string _audioInfoText = string.Empty;
+
+    [RelayCommand(CanExecute = nameof(CanRecordAudioTest))]
+    private async Task RecordAudioTestAsync()
+    {
+        IsAudioRecording = true;
+
+        try
+        {
+            using var service = _audioCaptureFactory.Create(SelectedAudioSource);
+            var pcm = await service.CaptureForDurationAsync(TimeSpan.FromSeconds(5));
+
+            var path = Path.Combine(
+                Path.GetTempPath(),
+                $"ghostlang-audio-{SelectedAudioSource}-{DateTime.Now:yyyyMMdd-HHmmss}.wav");
+
+            PcmWavWriter.WritePcm16Mono(path, pcm, service.SampleRate);
+
+            await ProcessAudioPcmAsync(pcm, service.SampleRate, service.ChannelCount, path);
+        }
+        catch (Exception ex)
+        {
+            var template = LocalizationService.Instance?["Debug_AudioTestError"] ?? "Error: {0}";
+            AudioTestResultText = string.Format(template, ex.Message);
+            HasAudioTestResult = true;
+        }
+        finally
+        {
+            IsAudioRecording = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRecordAudioTest))]
+    private async Task LoadAudioFileAsync()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "Audio files (*.wav;*.mp3;*.m4a;*.flac;*.ogg)|*.wav;*.mp3;*.m4a;*.flac;*.ogg|All files (*.*)|*.*"
+        };
+
+        if (dialog.ShowDialog() != true)
+            return;
+
+        IsAudioRecording = true;
+        try
+        {
+            var pcm = await Task.Run(() => AudioFileLoader.LoadAsPcm16Mono16kHz(dialog.FileName));
+            await ProcessAudioPcmAsync(pcm, AudioFileLoader.TargetSampleRate, AudioFileLoader.TargetChannels, dialog.FileName);
+        }
+        catch (Exception ex)
+        {
+            var template = LocalizationService.Instance?["Debug_AudioTestError"] ?? "Error: {0}";
+            AudioTestResultText = string.Format(template, ex.Message);
+            HasAudioTestResult = true;
+        }
+        finally
+        {
+            IsAudioRecording = false;
+        }
+    }
+
+    private async Task ProcessAudioPcmAsync(byte[] pcm, int sampleRate, int channelCount, string sourceLabel)
+    {
+        HasAudioTestResult = false;
+        AudioTestResultText = string.Empty;
+        AudioPipelineFragments.Clear();
+        AudioPipelineMetrics.Clear();
+
+        var durationSeconds = pcm.Length / (double)(sampleRate * channelCount * 2);
+        AudioInfoText = string.Format(
+            LocalizationService.Instance?["Debug_AudioInfo"] ?? "{0:F1}s • {1} Hz • {2} ch",
+            durationSeconds, sampleRate, channelCount);
+
+        var savedTemplate = LocalizationService.Instance?["Debug_AudioTestSaved"] ?? "Saved: {0}";
+        var savedLine = string.Format(savedTemplate, sourceLabel);
+
+        var transcribingLine = LocalizationService.Instance?["Debug_AudioTranscribing"] ?? "Transcribing...";
+        AudioTestResultText = savedLine + "\n\n" + transcribingLine;
+        HasAudioTestResult = true;
+
+        var selectedSourceLangs = SourceLanguages
+            .Where(x => x.IsSelected)
+            .Select(x => x.Language)
+            .ToList();
+
+        var config = _configService.Load();
+        var configuredAsr = config.ActiveAsrEngine;
+        config.ActiveAsrEngine = SelectedAsrEngine switch
+        {
+            DebugAsrEngineChoice.Vosk => configuredAsr as VoskAsrOptions ?? new VoskAsrOptions(),
+            DebugAsrEngineChoice.Azure => configuredAsr as AzureAsrOptions ?? new AzureAsrOptions(),
+            _ => configuredAsr as WhisperAsrOptions ?? new WhisperAsrOptions()
+        };
+
+        var pipeline = _pipelineBuilder.BuildAudioPipeline(config);
+
+        var audioContext = await pipeline.ProcessAsync(
+            pcm, sampleRate, channelCount,
+            SelectedTargetLanguage, selectedSourceLangs);
+
+        foreach (var fragment in audioContext.AudioFragments)
+        {
+            AudioPipelineFragments.Add(fragment);
+        }
+
+        foreach (var metric in audioContext.Metrics)
+        {
+            AudioPipelineMetrics.Add(metric);
+        }
+
+        var summary = audioContext.AudioFragments.Count == 0
+            ? LocalizationService.Instance?["Debug_AudioTranscribedEmpty"] ?? "(no speech detected)"
+            : string.Format(
+                LocalizationService.Instance?["Debug_AudioFragmentCount"] ?? "{0} fragment(s)",
+                audioContext.AudioFragments.Count);
+
+        AudioTestResultText = savedLine + "\n\n" + summary;
+    }
+
+    private bool CanRecordAudioTest() => !IsAudioRecording;
 
     [RelayCommand]
     private void ToggleImageExpanded() => IsImageExpanded = !IsImageExpanded;

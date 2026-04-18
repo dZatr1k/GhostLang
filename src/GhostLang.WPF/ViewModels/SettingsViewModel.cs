@@ -6,9 +6,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Services;
+using GhostLang.Core.Services.Asr;
 using GhostLang.Core.Services.Ocr;
 using GhostLang.Core.Pipelines.Models;
 using GhostLang.Core.Settings;
+using GhostLang.Core.Settings.Asr;
+using GhostLang.Core.Settings.Audio;
 using GhostLang.Core.Settings.Erasure;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.Core.Settings.Translation;
@@ -36,7 +39,64 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private PipelineStepViewModel? _selectedImagePipelineStep;
 
+    public ObservableCollection<PipelineStepViewModel> AudioPipelineSteps { get; } = [];
+
+    [ObservableProperty] private PipelineStepViewModel? _selectedAudioPipelineStep;
+
+    [ObservableProperty] private AudioCaptureSource _selectedAudioCaptureSource = AudioCaptureSource.SystemLoopback;
+
+    public Dictionary<AudioCaptureSource, string> AvailableAudioCaptureSources { get; private set; } = BuildAudioCaptureSources();
+
+    private static Dictionary<AudioCaptureSource, string> BuildAudioCaptureSources()
+    {
+        var l = LocalizationService.Instance;
+        return new Dictionary<AudioCaptureSource, string>
+        {
+            { AudioCaptureSource.Microphone, l?["Audio_SourceMicrophone"] ?? "Microphone" },
+            { AudioCaptureSource.SystemLoopback, l?["Audio_SourceLoopback"] ?? "System audio (loopback)" }
+        };
+    }
+
+    [ObservableProperty] private double _silenceThresholdDb = -40.0;
+    [ObservableProperty] private int _minSilenceDurationMs = 500;
+
+    [ObservableProperty] private bool _showOriginalSubtitle = true;
+    [ObservableProperty] private string _subtitlePosition = "Bottom";
+    [ObservableProperty] private int _subtitleMonitorIndex = -1;
+
+    public Dictionary<string, string> AvailableSubtitlePositions { get; private set; } = BuildSubtitlePositions();
+
+    public Dictionary<int, string> AvailableMonitors { get; private set; } = BuildMonitors();
+
+    private static Dictionary<string, string> BuildSubtitlePositions()
+    {
+        var l = LocalizationService.Instance;
+        return new Dictionary<string, string>
+        {
+            { "Top", l?["Audio_SubtitlePositionTop"] ?? "Top" },
+            { "Bottom", l?["Audio_SubtitlePositionBottom"] ?? "Bottom" }
+        };
+    }
+
+    private static Dictionary<int, string> BuildMonitors()
+    {
+        var result = new Dictionary<int, string>();
+        var l = LocalizationService.Instance;
+        result[-1] = l?["Audio_SubtitleMonitorPrimary"] ?? "Primary monitor (default)";
+
+        var monitors = MonitorEnumeration.EnumerateMonitors();
+        foreach (var m in monitors)
+        {
+            var suffix = m.IsPrimary ? " ★" : "";
+            result[m.Index] = $"#{m.Index + 1}: {m.Bounds.Width}×{m.Bounds.Height}{suffix}";
+        }
+
+        return result;
+    }
+
     public ObservableCollection<FilterViewModel> PreProcessFilters { get; } = [];
+
+    public ObservableCollection<FilterViewModel> AudioPreProcessFilters { get; } = [];
 
     public ObservableCollection<GlossaryRuleViewModel> GlossaryRules { get; } = [];
 
@@ -60,6 +120,9 @@ public partial class SettingsViewModel : ObservableObject
 
     public ObservableCollection<HotKeyBindingViewModel> HotKeyBindings { get; } = [];
 
+    public ObservableCollection<HotKeyBindingViewModel> ImagePipelineHotKeys { get; } = [];
+    public ObservableCollection<HotKeyBindingViewModel> AudioPipelineHotKeys { get; } = [];
+
     [ObservableProperty] private string _selectedTheme = "Dark";
 
     partial void OnSelectedThemeChanged(string value)
@@ -68,7 +131,6 @@ public partial class SettingsViewModel : ObservableObject
 
         _themeService?.Apply(value);
 
-        // Save theme immediately and update snapshot so it doesn't count as unsaved
         var config = _configService.Load();
         config.Theme = value;
         _configService.Save(config);
@@ -95,7 +157,6 @@ public partial class SettingsViewModel : ObservableObject
 
         _localizationService?.Apply(value);
 
-        // Save ALL current settings so the rebuild preserves them
         var config = BuildCurrentConfig();
         config.Language = value;
         _configService.Save(config);
@@ -115,20 +176,16 @@ public partial class SettingsViewModel : ObservableObject
 
     private void RefreshLocalizedContent()
     {
-        // Rebuild dictionaries with new localized strings
         AvailableThemes = BuildThemes();
         OnPropertyChanged(nameof(AvailableThemes));
 
         AvailableTokenModes = BuildTokenModes();
         OnPropertyChanged(nameof(AvailableTokenModes));
 
-        // Rebuild pipeline steps (recreates sub-ViewModels with fresh localized strings)
         CreatePipelineStructure();
 
-        // Reload settings into the new pipeline structure
         LoadAndApplySettings();
 
-        // Reload glossary and hotkey display names
         LoadGlossary();
     }
 
@@ -143,7 +200,8 @@ public partial class SettingsViewModel : ObservableObject
     private readonly LocalizationService? _localizationService;
 
     public SettingsViewModel(IConfigurationService configService, IPipelineRegistry registry,
-        ITesseractModelManager modelManager, GlobalHotKeyService hotKeyService, ThemeService themeService,
+        ITesseractModelManager modelManager, IWhisperModelManager whisperModelManager,
+        GlobalHotKeyService hotKeyService, ThemeService themeService,
         LocalizationService localizationService)
     {
         _configService = configService;
@@ -164,11 +222,12 @@ public partial class SettingsViewModel : ObservableObject
             { typeof(GTranslateOptions), () => new GTranslateSettingsViewModel() },
             { typeof(MyMemoryOptions), () => new MyMemorySettingsViewModel() },
             { typeof(LingvaOptions), () => new LingvaSettingsViewModel() },
-            { typeof(LibreTranslateOptions), () => new LibreTranslateSettingsViewModel() }
+            { typeof(LibreTranslateOptions), () => new LibreTranslateSettingsViewModel() },
+            { typeof(WhisperAsrOptions), () => new WhisperAsrSettingsViewModel(whisperModelManager) },
+            { typeof(VoskAsrOptions), () => new VoskAsrSettingsViewModel() },
+            { typeof(AzureAsrOptions), () => new AzureAsrSettingsViewModel() }
         };
 
-        // Pre-set language/theme fields directly to avoid triggering
-        // OnSelectedLanguageChanged/OnSelectedThemeChanged during init
         var initialConfig = _configService.Load();
         _selectedLanguage = initialConfig.Language;
         _selectedTheme = initialConfig.Theme;
@@ -201,11 +260,17 @@ public partial class SettingsViewModel : ObservableObject
         CacheMaxCharacters = config.CacheMaxCharacters;
 
         HotKeyBindings.Clear();
+        ImagePipelineHotKeys.Clear();
+        AudioPipelineHotKeys.Clear();
         foreach (var hk in config.HotKeys)
         {
             var vm = new HotKeyBindingViewModel();
             vm.LoadFrom(hk);
             HotKeyBindings.Add(vm);
+            if (hk.GroupKey == "HotKeyGroup_AudioPipeline")
+                AudioPipelineHotKeys.Add(vm);
+            else
+                ImagePipelineHotKeys.Add(vm);
         }
 
         GlossaryRules.Clear();
@@ -219,8 +284,6 @@ public partial class SettingsViewModel : ObservableObject
             });
         }
 
-        // Set theme/language LAST so that OnSelectedLanguageChanged
-        // can safely call BuildCurrentConfig() with all data loaded
         SelectedTheme = config.Theme;
         SelectedLanguage = config.Language;
     }
@@ -242,9 +305,19 @@ public partial class SettingsViewModel : ObservableObject
     private void CreatePipelineStructure()
     {
         ImagePipelineSteps.Clear();
-        var stepDescriptors = _registry.GetImagePipelineSteps();
+        AudioPipelineSteps.Clear();
 
-        foreach (var desc in stepDescriptors.OrderBy(d => d.Order))
+        BuildStepsInto(ImagePipelineSteps, _registry.GetImagePipelineSteps());
+        BuildStepsInto(AudioPipelineSteps, _registry.GetAudioPipelineSteps());
+
+        SelectedImagePipelineStep = ImagePipelineSteps.FirstOrDefault();
+        SelectedAudioPipelineStep = AudioPipelineSteps.FirstOrDefault();
+    }
+
+    private void BuildStepsInto(ObservableCollection<PipelineStepViewModel> target,
+        IReadOnlyList<Core.Pipelines.Descriptors.PipelineStepDescriptor> descriptors)
+    {
+        foreach (var desc in descriptors.OrderBy(d => d.Order))
         {
             var loc = LocalizationService.Instance;
             var stepVm = new PipelineStepViewModel
@@ -268,10 +341,31 @@ public partial class SettingsViewModel : ObservableObject
             if (stepVm.AvailableEngines.Any())
                 stepVm.SelectedEngineViewModel = stepVm.AvailableEngines.First();
 
-            ImagePipelineSteps.Add(stepVm);
+            stepVm.PropertyChanged += OnPipelineStepPropertyChanged;
+            target.Add(stepVm);
         }
+    }
 
-        SelectedImagePipelineStep = ImagePipelineSteps.FirstOrDefault();
+    private bool _isSyncingGlossarySteps;
+
+    private void OnPipelineStepPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(PipelineStepViewModel.IsEnabled)) return;
+        if (_isSyncingGlossarySteps) return;
+        if (sender is not PipelineStepViewModel changed) return;
+
+        if (changed.StepId is not ("step.image.glossary" or "step.image.glossary_restore")) return;
+
+        var pairedId = changed.StepId == "step.image.glossary"
+            ? "step.image.glossary_restore"
+            : "step.image.glossary";
+
+        var paired = ImagePipelineSteps.FirstOrDefault(s => s.StepId == pairedId);
+        if (paired == null) return;
+
+        _isSyncingGlossarySteps = true;
+        paired.IsEnabled = changed.IsEnabled;
+        _isSyncingGlossarySteps = false;
     }
 
     private void LoadAndApplySettings()
@@ -299,6 +393,16 @@ public partial class SettingsViewModel : ObservableObject
             { DisplayName = l["Filter_Sharpen"], Description = l["Filter_SharpenDesc"], Option = config.PreProcessOptions.Sharpen, HasParameter = true });
         PreProcessFilters.Add(new FilterViewModel
             { DisplayName = l["Filter_Invert"], Description = l["Filter_InvertDesc"], Option = config.PreProcessOptions.Invert, HasParameter = false });
+
+        AudioPreProcessFilters.Clear();
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_Resample"], Description = l["Filter_Audio_ResampleDesc"], Option = config.AudioPreProcessOptions.Resample16kHz, HasParameter = false });
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_Normalize"], Description = l["Filter_Audio_NormalizeDesc"], Option = config.AudioPreProcessOptions.NormalizeLoudness, HasParameter = false });
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_HighPass"], Description = l["Filter_Audio_HighPassDesc"], Option = config.AudioPreProcessOptions.HighPassFilter, HasParameter = true });
+        AudioPreProcessFilters.Add(new FilterViewModel
+            { DisplayName = l["Filter_Audio_NoiseSuppress"], Description = l["Filter_Audio_NoiseSuppressDesc"], Option = config.AudioPreProcessOptions.NoiseSuppression, HasParameter = false });
 
         foreach (var step in ImagePipelineSteps)
         {
@@ -353,6 +457,31 @@ public partial class SettingsViewModel : ObservableObject
                 }
             }
         }
+
+        foreach (var step in AudioPipelineSteps)
+        {
+            if (step.IsOptional && config.OptionalStepStates != null &&
+                config.OptionalStepStates.TryGetValue(step.StepId, out var state))
+                step.IsEnabled = state;
+
+            if (step.StepId == "step.audio.asr" && config.ActiveAsrEngine != null)
+            {
+                var activeOptionsType = config.ActiveAsrEngine.GetType();
+                var targetEngineVm = step.AvailableEngines.FirstOrDefault(e => e.OptionsType == activeOptionsType);
+                if (targetEngineVm != null)
+                {
+                    targetEngineVm.ApplyOptions(config.ActiveAsrEngine);
+                    step.SelectedEngineViewModel = targetEngineVm;
+                }
+            }
+        }
+
+        SelectedAudioCaptureSource = config.ActiveAudioCaptureSource;
+        SilenceThresholdDb = config.VadOptions.SilenceThresholdDb;
+        MinSilenceDurationMs = config.VadOptions.MinSilenceDurationMs;
+        ShowOriginalSubtitle = config.SubtitleOptions.ShowOriginal;
+        SubtitlePosition = string.IsNullOrWhiteSpace(config.SubtitleOptions.Position) ? "Bottom" : config.SubtitleOptions.Position;
+        SubtitleMonitorIndex = config.SubtitleOptions.MonitorIndex;
     }
 
     private AppConfig BuildCurrentConfig()
@@ -393,6 +522,40 @@ public partial class SettingsViewModel : ObservableObject
             config.PreProcessOptions.Sharpen = PreProcessFilters[7].Option;
             config.PreProcessOptions.Invert = PreProcessFilters[8].Option;
         }
+
+        if (AudioPreProcessFilters.Count >= 4)
+        {
+            config.AudioPreProcessOptions.Resample16kHz = AudioPreProcessFilters[0].Option;
+            config.AudioPreProcessOptions.NormalizeLoudness = AudioPreProcessFilters[1].Option;
+            config.AudioPreProcessOptions.HighPassFilter = AudioPreProcessFilters[2].Option;
+            config.AudioPreProcessOptions.NoiseSuppression = AudioPreProcessFilters[3].Option;
+        }
+
+        foreach (var step in AudioPipelineSteps)
+        {
+            var safeId = string.IsNullOrEmpty(step.StepId) ? step.StepName : step.StepId;
+
+            if (step.IsOptional)
+            {
+                config.OptionalStepStates[safeId] = step.IsEnabled;
+            }
+
+            if (step is { StepId: "step.audio.asr", SelectedEngineViewModel: not null })
+                config.ActiveAsrEngine = (AsrEngineOptions)step.SelectedEngineViewModel.GetOptions();
+        }
+
+        config.ActiveAudioCaptureSource = SelectedAudioCaptureSource;
+        config.VadOptions = new VadOptions
+        {
+            SilenceThresholdDb = SilenceThresholdDb,
+            MinSilenceDurationMs = MinSilenceDurationMs
+        };
+        config.SubtitleOptions = new SubtitleOptions
+        {
+            ShowOriginal = ShowOriginalSubtitle,
+            Position = SubtitlePosition,
+            MonitorIndex = SubtitleMonitorIndex
+        };
 
         config.GlossaryTokenMode = GlossaryTokenMode;
         config.Theme = SelectedTheme;
@@ -437,7 +600,6 @@ public partial class SettingsViewModel : ObservableObject
         }
         catch
         {
-            // ignore serialization errors during editing
         }
     }
 

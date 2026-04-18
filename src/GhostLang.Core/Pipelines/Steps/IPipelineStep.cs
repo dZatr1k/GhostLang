@@ -2,5 +2,5 @@
 
 public interface IPipelineStep
 {
-    Task ExecuteAsync(TranslationContext context);
+    Task ExecuteAsync(TranslationContext context, CancellationToken ct = default);
 }

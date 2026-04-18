@@ -1,8 +1,11 @@
 ﻿using System.Windows;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Services;
+using GhostLang.Core.Services.Asr;
+using GhostLang.Core.Services.AudioCapture;
 using GhostLang.Core.Services.Erasure;
 using GhostLang.Core.Services.Ocr;
+using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Erasure;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.Core.Settings.Translation;
@@ -25,14 +28,17 @@ public partial class App : Application
             .ConfigureServices((context, services) => { ConfigureServices(services); })
             .Build();
 
-        // Force LocalizationService creation BEFORE any XAML parsing (InitializeComponent).
-        // Instance and culture must be set before {svc:Localize} bindings are resolved.
         _host.Services.GetRequiredService<LocalizationService>();
     }
 
     private void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IImageTranslationPipeline, ImageTranslationPipeline>();
+        services.AddSingleton<IAudioTranslationPipeline, AudioTranslationPipeline>();
+        services.AddSingleton<IAsrEngineFactory, AsrEngineFactory>();
+        services.AddSingleton<IAudioCaptureServiceFactory, AudioCaptureServiceFactory>();
+        services.AddSingleton<IWhisperModelManager, WhisperModelManager>();
+        services.AddSingleton<IAudioTranslationManager, AudioTranslationManager>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomeViewModel>();
@@ -50,6 +56,7 @@ public partial class App : Application
         services.AddSingleton<ITranslationEngineFactory, TranslationEngineFactory>();
         services.AddSingleton<IScreenCaptureService, ScreenCaptureService>();
         services.AddSingleton<IScreenTranslationManager, ScreenTranslationManager>();
+        services.AddSingleton<PipelineValidationService>();
         services.AddSingleton<GlobalHotKeyService>();
         services.AddSingleton<ThemeService>();
         services.AddSingleton<LocalizationService>();

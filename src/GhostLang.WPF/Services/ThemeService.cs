@@ -27,7 +27,6 @@ public class ThemeService(IConfigurationService configService)
         var resources = Application.Current.Resources;
         var mergedDicts = resources.MergedDictionaries;
 
-        // Remove Skin, Theme, and Overrides dictionaries
         for (var i = mergedDicts.Count - 1; i >= 0; i--)
         {
             var dict = mergedDicts[i];
@@ -37,7 +36,6 @@ public class ThemeService(IConfigurationService configService)
                 mergedDicts.RemoveAt(i);
         }
 
-        // Re-add in correct order: Skin, Theme, Overrides
         mergedDicts.Insert(0, new ResourceDictionary { Source = new Uri(skinUri, UriKind.Relative) });
         mergedDicts.Insert(1, new ResourceDictionary { Source = new Uri(ThemeUri) });
         mergedDicts.Insert(2, new ResourceDictionary { Source = new Uri("Themes/Overrides.xaml", UriKind.Relative) });

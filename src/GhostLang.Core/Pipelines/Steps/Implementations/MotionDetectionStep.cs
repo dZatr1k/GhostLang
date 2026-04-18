@@ -11,7 +11,7 @@ public class MotionDetectionStep : IOptionalPipelineStep
 
     public string StepName => "Motion Detection";
 
-    public Task ExecuteAsync(TranslationContext context)
+    public Task ExecuteAsync(TranslationContext context, CancellationToken ct = default)
     {
         if (context.IsAborted || !IsEnabled || context.OriginalImage == null)
             return Task.CompletedTask;
