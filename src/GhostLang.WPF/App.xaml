@@ -1,7 +1,34 @@
-﻿<Application x:Class="GhostLang.WPF.App"
+<Application x:Class="GhostLang.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:local="clr-namespace:GhostLang.WPF"
+             xmlns:viewmodels="clr-namespace:GhostLang.WPF.ViewModels"
+             xmlns:views="clr-namespace:GhostLang.WPF.Views">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/SkinDark.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
+                <ResourceDictionary Source="Themes/Overrides.xaml"/>
+                <ResourceDictionary Source="Themes/Tokens.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
+                <views:HomeView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
+                <views:SettingsView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:DebugViewModel}">
+                <views:DebugView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:BenchmarkViewModel}">
+                <views:BenchmarkView />
+            </DataTemplate>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

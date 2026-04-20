@@ -1,0 +1,173 @@
+{
+  "name": "Screen benchmark",
+  "timestampUtc": "2026-04-20T00:42:31.1015165Z",
+  "pipeline": "Screen",
+  "samples": [
+    {
+      "sampleName": "Manga Test #1",
+      "totalLatencyMs": 2418,
+      "characterErrorRate": 1.167464114832536,
+      "wordErrorRate": 3.5,
+      "bleu": 0.005587028145593606,
+      "chrF": 0.08762810948612501,
+      "averageBoundIoU": 0,
+      "predictedFragmentCount": 67,
+      "expectedFragmentCount": 0,
+      "predictedText": "\u5DDD\u56DB\nhi\n\u3044\u3044\n/\u306EW\nNM\u6642\n\u3076 |\u592A\n\u3067    \u5FC5 9\nAN /\n\u3067 \u507D\nNe\n\u3010u\n\u72ECMWZrmm\n\u002B\u3053\n\u3058\u63CF\n\u306A / 2\u6E56\n\u30B8\u30B9\n\u30A2\u30AF\nNM\n\u300Co1\n\u3083\u308C\n\u30B8\u30FC\n\u4EBA\u3060\n\u306D\u3066\n\u79D1\u305B\nN1\nMT\n\u30FC(\n\u8010:\u6700  \u72D7\n\u304B\u308C \u9020$\u306E\n\u3060\u304D \u69CB3\u5F0F\n\u30F3\u30FC\u3078\u3001\n\u3050\u3066A\n\u3089\u3066 \u3067\n\u30D0\u3001\nNN\n\u30FC\u30FC    1\n\u306A\u672C\n\u306A \u3010\n\u30D7\u30EA\n| \u3044\u3072\n\u306A\u4E0D\n/\u3067 \u7406?\u305B\n\u304D \u60F3#\u3063\n\u97073\u30AD\n\u3066 \u308C\u5EA6\n\u3063 \u63FA\u003E\u9707\n\u3060\u306B\n\u30936\n\u305F\u90F7:\u304B\n\u3066 \u306E\n\u308B \u624B\n\u8A71\u3092\u3092 6\n] \u308D\u5927\n\u3046\u4E08\n\u3060\u79FB:\u30B3\n\u3093 \u304C\n\u3058 \u3067\n\u306A\u592B\n\u306B\u7D04\n\u4F4F\u30CD\n\u3092\u306A\n\u30C8\u300F\u56E0\n\u30F3\u30FC\nAl\n\u306E\u4E8C\u3042\nNN\n\u30EC\u30AF)",
+      "expectedText": "\u305D\u3046\u306D\u2026\u2026\n\u30D5\u30D5\u2026\n\u2026\u2026\n\u30AB\u30BF\n\u30AB\u30BF\n\u63FA\u308C\u3066\u308B\u2026\n\u5730\u9707\u3060\u3063\u3066\uFF1F\n\u305D\u308C\u306F\u306A\u3044\u3088\n\u6700\u65B0\u5F0F\u306E\u8010\u9707\u69CB\u9020\u3067\u8A2D\u8A08\u3055\u308C\u3066\u308B\u3093\u3060\u304B\u3089\n\u9707\u5EA66\u307E\u3067\u306A\u3089\u63FA\u308C\u3092\u611F\u3058\u306A\u3044\u3063\u3066\u8A71\u3060\n\u30AD\u30DF\u306E\u624B\u304C\u9707\u3048\u3066\u308B\u3093\u3060\u308D\n\u305B\u3063\u304B\u304F\u30B3\u30CD\u3067\u7406\u60F3\u90F7\u306B\u79FB\u4F4F\u3067\u304D\u305F\u3093\u3060\n\u4E0D\u5B89\u306B\u3055\u305B\u306A\u3044\u3067\u304F\u308C\u3088\n\u3054\u3081\u30FC\u3093\n\u30BA\u30BA\u30FC\u30FC\u30F3\n\u30B0\u30E9\u30B0\u30E9\n\u30AD\u30E3\u30FC\n\u63FA\u308C\u3066\u308B\u3058\u3083\u306D\u30FC\u304B!!!\n\u30EF\u30FC\n\u306A\u3093\u3067!?\n\u3046\u308F\u3042\u3042\u3042\n\u30C7\u30AB\u30A4\u305E!!\n\u30B4\u30B4\u30B4\u30B4\n\u30AE\u30AE\u30AE\u30AE\n\u5D29\u308C\u306A\u3044\u304B!?\n\u672C\u5F53\u306B\u5927\u4E08\u592B\u306A\u3093\u3060\u308D\u3046\u306A!?",
+      "stepMetrics": [
+        {
+          "stepName": "MotionDetectionStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "ImagePreProcessStep",
+          "elapsedMilliseconds": 3
+        },
+        {
+          "stepName": "OcrStep",
+          "elapsedMilliseconds": 594
+        },
+        {
+          "stepName": "TextErasureStep",
+          "elapsedMilliseconds": 221
+        },
+        {
+          "stepName": "TranslationCacheCheckStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "GlossaryTokenizationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TranslationStep",
+          "elapsedMilliseconds": 844
+        },
+        {
+          "stepName": "GlossaryRestorationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TextRenderingStep",
+          "elapsedMilliseconds": 750
+        }
+      ],
+      "hasError": false,
+      "errorMessage": null
+    },
+    {
+      "sampleName": "Game Test #1",
+      "totalLatencyMs": 798,
+      "characterErrorRate": 0.3046875,
+      "wordErrorRate": 0.68,
+      "bleu": 0.06866738382204819,
+      "chrF": 0.5524779143147321,
+      "averageBoundIoU": 0,
+      "predictedFragmentCount": 4,
+      "expectedFragmentCount": 0,
+      "predictedText": "\u201CThey say there i5 2 person) who will fell you How fo,\nSurvive in| this land... ohj wait. That\u2019s me.\nGoo teh Gating Gerri!\nSian",
+      "expectedText": "Ryan\nThey say there is a person who will tell you how to\nsurvive in this land... oh wait. That\u0027s me.\nClose\nHelp\nCrafting\nHousing",
+      "stepMetrics": [
+        {
+          "stepName": "MotionDetectionStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "ImagePreProcessStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "OcrStep",
+          "elapsedMilliseconds": 93
+        },
+        {
+          "stepName": "TextErasureStep",
+          "elapsedMilliseconds": 15
+        },
+        {
+          "stepName": "TranslationCacheCheckStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "GlossaryTokenizationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TranslationStep",
+          "elapsedMilliseconds": 618
+        },
+        {
+          "stepName": "GlossaryRestorationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TextRenderingStep",
+          "elapsedMilliseconds": 71
+        }
+      ],
+      "hasError": false,
+      "errorMessage": null
+    },
+    {
+      "sampleName": "Site #1",
+      "totalLatencyMs": 897,
+      "characterErrorRate": 0.036101083032490974,
+      "wordErrorRate": 0.06578947368421052,
+      "bleu": 0.8930323529877988,
+      "chrF": 0.9352921723983296,
+      "averageBoundIoU": 0,
+      "predictedFragmentCount": 17,
+      "expectedFragmentCount": 0,
+      "predictedText": "\u043C\u043A\u00BB: | \u003C= \u043B\u0435\u043D\u0434\u0438\u043D\u0433: \u043F\u0440\u043E\u0441\u0442\u044B\u043C\u0438\n\u0441\u043B\u043E\u0432\u0430\u043C\u0438 \u043E \u0433\u043B\u0430\u0432\u043D\u043E\u043C\n\u0412\u0441\u0435 \u0441\u0442\u0430\u0442\u044C\u0438\n\u0421\u0435\u0440\u0432\u0435\u0440\u044B\n\u0414\u0438\u0437\u0430\n\u0421\u0430\u0439\u0442\u044B\n\u0411\u0435\u0437\u043E\u043F\u0430\u0441\u043D\u043E\u0441\u0442\u044C\n\u0414\u043E\u043C\u0435\u043D\u044B\n\u0420\u041D\u0420.\n\u041A\u0435\u0439\u0441\u044B \u043A\u043B\u0438\u0435\u043D\u0442\u043E\u0432\n\u0418\u043D\u0442\u0435\u0440\u043D\u0435\u0442-\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441\u0435\u0433\u043E\u0434\u043D\u044F \u043E\u043A\u0440\u0443\u0436\u0435\u043D \u0441\u043E\u0442\u043D\u044F\u043C\u0438 \u0441\u0430\u0439\u0442\u043E\u0432, \u0431\u0430\u043D\u043D\u0435\u0440\u043E\u0432, \u043F\u0438\u0441\u0435\u043C \u0438 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439.\n\u0417\u0430 \u0435\u0433\u043E \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u0445\u043E\u0434\u0438\u0442\u0441\u044F \u0431\u043E\u0440\u043E\u0442\u044C\u0441\u044F \u2014 \u0432\u044B\u0438\u0433\u0440\u044B\u0432\u0430\u0435\u0442 \u0442\u043E\u0442 \u0431\u0438\u0437\u043D\u0435\u0441, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0441\u0442\u0440\u043E \u0438\n\u043F\u043E\u043D\u044F\u0442\u043D\u043E \u0434\u043E\u043D\u0435\u0441\u0442\u0438 \u0441\u0443\u0442\u044C \u0441\u0432\u043E\u0435\u0433\u043E \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F. \u0418\u043C\u0435\u043D\u043D\u043E \u0434\u043B\u044F \u044D\u0442\u043E\u0433\u043E \u0438 \u043F\u043E\u044F\u0432\u0438\u043B\u0441\u044F \u043B\u0435\u043D\u0434\u0438\u043D\u0433. \u041E\u043D\n\u0440\u0435\u0448\u0430\u0435\u0442 \u043A\u043E\u043D\u043A\u0440\u0435\u0442\u043D\u044B\u0435 \u043C\u0430\u0440\u043A\u0435\u0442\u0438\u043D\u0433\u043E\u0432\u044B\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u043F\u043E\u043C\u043E\u0433\u0430\u0435\u0442 \u043F\u0440\u0435\u0432\u0440\u0430\u0442\u0438\u0442\u044C \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u043E\u0433\u043E \u043F\u043E\u0441\u0435\u0442\u0438\u0442\u0435\u043B\u044F\n\u0432 \u043A\u043B\u0438\u0435\u043D\u0442\u0430.\n\u0412 \u0441\u0442\u0430\u0442\u044C\u0435 \u0440\u0430\u0441\u0441\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u043C, \u043F\u043E\u0447\u0435\u043C\u0443 \u043B\u0435\u043D\u0434\u0438\u043D\u0433 \u0432\u0430\u0436\u0435\u043D \u0438 \u043A\u0430\u043A \u0435\u0433\u043E \u0441\u043E\u0437\u0434\u0430\u0442\u044C, \u0447\u0442\u043E\u0431\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0442\u044C \u043C\u0430\u043A\u0441\u0438\u043C\u0443\u043C\n\u0432\u044B\u0433\u043E\u0434\u044B.",
+      "expectedText": "\u0427\u0442\u043E \u0442\u0430\u043A\u043E\u0435 \u043B\u0435\u043D\u0434\u0438\u043D\u0433: \u043F\u0440\u043E\u0441\u0442\u044B\u043C\u0438\n\u0441\u043B\u043E\u0432\u0430\u043C\u0438 \u043E \u0433\u043B\u0430\u0432\u043D\u043E\u043C\n\u0412\u0441\u0435 \u0441\u0442\u0430\u0442\u044C\u0438\n\u0421\u0435\u0440\u0432\u0435\u0440\u044B\n\u0414\u0438\u0437\u0430\u0439\u043D\n\u0421\u0430\u0439\u0442\u044B\n\u0411\u0435\u0437\u043E\u043F\u0430\u0441\u043D\u043E\u0441\u0442\u044C\n\u0414\u043E\u043C\u0435\u043D\u044B\nPHP\n\u041A\u0435\u0439\u0441\u044B \u043A\u043B\u0438\u0435\u043D\u0442\u043E\u0432\n\u0418\u043D\u0442\u0435\u0440\u043D\u0435\u0442-\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044C \u0441\u0435\u0433\u043E\u0434\u043D\u044F \u043E\u043A\u0440\u0443\u0436\u0435\u043D \u0441\u043E\u0442\u043D\u044F\u043C\u0438 \u0441\u0430\u0439\u0442\u043E\u0432, \u0431\u0430\u043D\u043D\u0435\u0440\u043E\u0432, \u043F\u0438\u0441\u0435\u043C \u0438 \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0438\u0439. \u0417\u0430 \u0435\u0433\u043E \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u0445\u043E\u0434\u0438\u0442\u0441\u044F \u0431\u043E\u0440\u043E\u0442\u044C\u0441\u044F \u2014 \u0432\u044B\u0438\u0433\u0440\u044B\u0432\u0430\u0435\u0442 \u0442\u043E\u0442 \u0431\u0438\u0437\u043D\u0435\u0441, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0441\u0442\u0440\u043E \u0438 \u043F\u043E\u043D\u044F\u0442\u043D\u043E \u0434\u043E\u043D\u0435\u0441\u0442\u0438 \u0441\u0443\u0442\u044C \u0441\u0432\u043E\u0435\u0433\u043E \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F. \u0418\u043C\u0435\u043D\u043D\u043E \u0434\u043B\u044F \u044D\u0442\u043E\u0433\u043E \u0438 \u043F\u043E\u044F\u0432\u0438\u043B\u0441\u044F \u043B\u0435\u043D\u0434\u0438\u043D\u0433. \u041E\u043D \u0440\u0435\u0448\u0430\u0435\u0442 \u043A\u043E\u043D\u043A\u0440\u0435\u0442\u043D\u044B\u0435 \u043C\u0430\u0440\u043A\u0435\u0442\u0438\u043D\u0433\u043E\u0432\u044B\u0435 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u043F\u043E\u043C\u043E\u0433\u0430\u0435\u0442 \u043F\u0440\u0435\u0432\u0440\u0430\u0442\u0438\u0442\u044C \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u043E\u0433\u043E \u043F\u043E\u0441\u0435\u0442\u0438\u0442\u0435\u043B\u044F \u0432 \u043A\u043B\u0438\u0435\u043D\u0442\u0430.\n\u0412 \u0441\u0442\u0430\u0442\u044C\u0435 \u0440\u0430\u0441\u0441\u043A\u0430\u0437\u044B\u0432\u0430\u0435\u043C, \u043F\u043E\u0447\u0435\u043C\u0443 \u043B\u0435\u043D\u0434\u0438\u043D\u0433 \u0432\u0430\u0436\u0435\u043D \u0438 \u043A\u0430\u043A \u0435\u0433\u043E \u0441\u043E\u0437\u0434\u0430\u0442\u044C, \u0447\u0442\u043E\u0431\u044B \u043F\u043E\u043B\u0443\u0447\u0430\u0442\u044C \u043C\u0430\u043A\u0441\u0438\u043C\u0443\u043C \u0432\u044B\u0433\u043E\u0434\u044B.",
+      "stepMetrics": [
+        {
+          "stepName": "MotionDetectionStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "ImagePreProcessStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "OcrStep",
+          "elapsedMilliseconds": 226
+        },
+        {
+          "stepName": "TextErasureStep",
+          "elapsedMilliseconds": 32
+        },
+        {
+          "stepName": "TranslationCacheCheckStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "GlossaryTokenizationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TranslationStep",
+          "elapsedMilliseconds": 422
+        },
+        {
+          "stepName": "GlossaryRestorationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TextRenderingStep",
+          "elapsedMilliseconds": 216
+        }
+      ],
+      "hasError": false,
+      "errorMessage": null
+    }
+  ],
+  "averageCer": 0.5027508992883424,
+  "averageWer": 1.4152631578947368,
+  "averageBleu": 0.3224289216518135,
+  "averageChrF": 0.5251327320663955,
+  "averageLatencyMs": 1371,
+  "passedCount": 3,
+  "failedCount": 0
+}

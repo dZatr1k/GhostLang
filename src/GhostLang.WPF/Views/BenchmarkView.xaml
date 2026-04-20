@@ -1,0 +1,122 @@
+<UserControl x:Class="GhostLang.WPF.Views.BenchmarkView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:svc="clr-namespace:GhostLang.WPF.Services"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{DynamicResource SecondaryRegionBrush}"
+                CornerRadius="6" Padding="12,10" Margin="0,0,0,10">
+            <StackPanel>
+                <DockPanel Margin="0,0,0,8">
+                    <TextBlock Text="{svc:Localize Debug_BenchmarkSamplesFolder}"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" Width="130" />
+                    <Button Content="..." Command="{Binding SelectFolderCommand}"
+                            DockPanel.Dock="Right" Width="32" Height="28" Margin="6,0,0,0" />
+                    <TextBox Text="{Binding SamplesPath}"
+                             IsReadOnly="True" VerticalContentAlignment="Center" Height="28" />
+                </DockPanel>
+
+                <TextBlock Text="{Binding ValidationText}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                           FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ValidationText}" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <WrapPanel>
+                    <Button Content="Warm up"
+                            Command="{Binding WarmUpCommand}"
+                            Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="{svc:Localize Debug_BenchmarkRunScreen}"
+                            Command="{Binding RunScreenCommand}"
+                            Style="{StaticResource ButtonPrimary}" Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="{svc:Localize Debug_BenchmarkRunAudio}"
+                            Command="{Binding RunAudioCommand}"
+                            Style="{StaticResource ButtonPrimary}" Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="Ablation · Screen"
+                            Command="{Binding RunScreenBatchCommand}"
+                            Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="Ablation · Audio"
+                            Command="{Binding RunAudioBatchCommand}"
+                            Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="{svc:Localize Debug_BenchmarkCancel}"
+                            Command="{Binding CancelCommand}" Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="{svc:Localize Debug_BenchmarkExport}"
+                            Command="{Binding ExportCommand}" Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="Export CSV"
+                            Command="{Binding ExportCsvCommand}" Padding="12,0" Margin="0,0,8,6" />
+                    <Button Content="Export batch JSONs"
+                            Command="{Binding ExportBatchJsonCommand}" Padding="12,0" Margin="0,0,8,6" />
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Background="{DynamicResource SecondaryRegionBrush}"
+                CornerRadius="6" Padding="12,10" Margin="0,0,0,10">
+            <StackPanel>
+                <ProgressBar Value="{Binding ProgressFraction}" Maximum="1"
+                             Height="20" Margin="0,0,0,8"
+                             Foreground="{DynamicResource PrimaryBrush}"
+                             Background="{DynamicResource BorderBrush}" />
+                <TextBlock Text="{Binding StatusText}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                           FontSize="12" FontFamily="Consolas" Margin="0,0,0,6" />
+                <TextBlock Text="{Binding SummaryText}"
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           FontSize="13" FontWeight="SemiBold"
+                           TextWrapping="Wrap" MinHeight="18" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Grid.Row="2" Text="{svc:Localize Debug_BenchmarkSection}"
+                   Foreground="{DynamicResource SecondaryTextBrush}"
+                   FontSize="12" FontWeight="SemiBold"
+                   Margin="0,0,0,6" />
+
+        <Border Grid.Row="3" Background="{DynamicResource SecondaryRegionBrush}"
+                CornerRadius="6" Padding="4">
+            <DataGrid ItemsSource="{Binding Results}"
+                      AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="Column" CanUserResizeColumns="True"
+                      CanUserReorderColumns="False" CanUserSortColumns="True"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
+                      BorderThickness="0" Background="Transparent" RowBackground="Transparent"
+                      FontSize="12">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{Binding [Debug_BenchmarkColSample], Source={x:Static svc:LocalizationService.Instance}}"
+                                        Binding="{Binding SampleName}" Width="*" />
+                    <DataGridTextColumn Header="{Binding [Debug_BenchmarkColCer], Source={x:Static svc:LocalizationService.Instance}}"
+                                        Binding="{Binding CharacterErrorRate, StringFormat={}{0:P1}}" Width="80" />
+                    <DataGridTextColumn Header="{Binding [Debug_BenchmarkColWer], Source={x:Static svc:LocalizationService.Instance}}"
+                                        Binding="{Binding WordErrorRate, StringFormat={}{0:P1}}" Width="80" />
+                    <DataGridTextColumn Header="{Binding [Debug_BenchmarkColBleu], Source={x:Static svc:LocalizationService.Instance}}"
+                                        Binding="{Binding Bleu, StringFormat={}{0:F3}}" Width="80" />
+                    <DataGridTextColumn Header="{Binding [Debug_BenchmarkColChrF], Source={x:Static svc:LocalizationService.Instance}}"
+                                        Binding="{Binding ChrF, StringFormat={}{0:F3}}" Width="80" />
+                    <DataGridTextColumn Header="{Binding [Debug_BenchmarkColLatency], Source={x:Static svc:LocalizationService.Instance}}"
+                                        Binding="{Binding TotalLatencyMs}" Width="100" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

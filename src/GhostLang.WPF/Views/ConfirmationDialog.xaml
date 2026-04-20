@@ -1,0 +1,35 @@
+<hc:Window x:Class="GhostLang.WPF.Views.ConfirmationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        SizeToContent="Height"
+        Width="460"
+        Background="{DynamicResource RegionBrush}"
+        ShowTitle="True">
+
+    <StackPanel Margin="24,16,24,24">
+        <DockPanel Margin="0,0,0,24">
+            <Path DockPanel.Dock="Left"
+                  Data="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"
+                  Fill="{DynamicResource WarningBrush}"
+                  Width="28" Height="28" Stretch="Uniform"
+                  VerticalAlignment="Top" Margin="0,2,14,0" />
+            <TextBlock x:Name="MessageText"
+                       Foreground="{DynamicResource PrimaryTextBrush}"
+                       TextWrapping="Wrap" FontSize="13"
+                       VerticalAlignment="Center" />
+        </DockPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="YesButton"
+                    Style="{StaticResource ButtonPrimary}"
+                    Click="Yes_Click"
+                    Height="32" Padding="16,0" Margin="0,0,10,0" />
+            <Button x:Name="NoButton"
+                    Click="No_Click"
+                    Height="32" Padding="16,0" />
+        </StackPanel>
+    </StackPanel>
+</hc:Window>
