@@ -5,6 +5,11 @@ namespace GhostLang.Core.Services.Erasure;
 
 public class OpenCvErasureEngine(OpenCvErasureOptions options) : ITextErasureEngine
 {
+
+    private const int SmallTextHeightThreshold = 20;
+
+    private const double DarkBackgroundMeanLuminance = 128.0;
+
     public async Task<byte[]> EraseTextAsync(byte[] imagePatch)
     {
         return await Task.Run(() =>
@@ -16,32 +21,83 @@ public class OpenCvErasureEngine(OpenCvErasureOptions options) : ITextErasureEng
             if (srcMat.Empty())
                 return imagePatch;
 
-            using var grayMat = new Mat();
-            Cv2.CvtColor(srcMat, grayMat, ColorConversionCodes.BGR2GRAY);
+            Mat workingSrc = srcMat;
+            Mat? upscaledSrc = null;
+            var wasUpscaled = srcMat.Rows < SmallTextHeightThreshold || srcMat.Cols < SmallTextHeightThreshold;
+            if (wasUpscaled)
+            {
+                upscaledSrc = new Mat();
+                Cv2.Resize(srcMat, upscaledSrc,
+                    new Size(srcMat.Cols * 2, srcMat.Rows * 2),
+                    interpolation: InterpolationFlags.Cubic);
+                workingSrc = upscaledSrc;
+            }
 
-            var blockSize = options.AdaptiveBlockSize;
-            if (blockSize % 2 == 0) blockSize++;
-            if (blockSize < 3) blockSize = 3;
+            try
+            {
+                using var grayMat = new Mat();
+                Cv2.CvtColor(workingSrc, grayMat, ColorConversionCodes.BGR2GRAY);
 
-            using var binaryMask = new Mat();
-            Cv2.AdaptiveThreshold(grayMat, binaryMask, 255,
-                AdaptiveThresholdTypes.GaussianC,
-                ThresholdTypes.BinaryInv, blockSize, options.AdaptiveConstant);
+                var meanLuminance = Cv2.Mean(grayMat).Val0;
+                var isDarkBackground = meanLuminance < DarkBackgroundMeanLuminance;
 
-            using var closeKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
-            using var closedMask = new Mat();
-            Cv2.MorphologyEx(binaryMask, closedMask, MorphTypes.Close, closeKernel);
+                using var thresholdInput = new Mat();
+                if (isDarkBackground)
+                    Cv2.BitwiseNot(grayMat, thresholdInput);
+                else
+                    grayMat.CopyTo(thresholdInput);
 
-            using var maskMat = new Mat();
-            using var dilateKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
-            Cv2.Dilate(closedMask, maskMat, dilateKernel, iterations: options.DilationIterations);
+                var autoBlockSize = Math.Max(3, workingSrc.Rows / 3);
+                var effectiveBlockSize = Math.Max(options.AdaptiveBlockSize, autoBlockSize);
+                if (effectiveBlockSize % 2 == 0) effectiveBlockSize++;
+                if (effectiveBlockSize < 3) effectiveBlockSize = 3;
 
-            using var dstMat = new Mat();
-            var inpaintMethod = options.UseTeleaAlgorithm ? InpaintTypes.Telea : InpaintTypes.NS;
-            Cv2.Inpaint(srcMat, maskMat, dstMat, options.InpaintRadius, inpaintMethod);
+                using var binaryMask = new Mat();
+                Cv2.AdaptiveThreshold(thresholdInput, binaryMask, 255,
+                    AdaptiveThresholdTypes.GaussianC,
+                    ThresholdTypes.BinaryInv, effectiveBlockSize, options.AdaptiveConstant);
 
-            Cv2.ImEncode(".png", dstMat, out var resultBytes);
-            return resultBytes;
+                using var closeKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
+                using var closedMask = new Mat();
+                Cv2.MorphologyEx(binaryMask, closedMask, MorphTypes.Close, closeKernel);
+
+                using var maskMat = new Mat();
+                using var dilateKernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
+                Cv2.Dilate(closedMask, maskMat, dilateKernel, iterations: options.DilationIterations);
+
+                using var dstMat = new Mat();
+                var inpaintMethod = options.UseTeleaAlgorithm ? InpaintTypes.Telea : InpaintTypes.NS;
+                Cv2.Inpaint(workingSrc, maskMat, dstMat, options.InpaintRadius, inpaintMethod);
+
+                Mat finalResult;
+                Mat? downscaled = null;
+                if (wasUpscaled)
+                {
+                    downscaled = new Mat();
+                    Cv2.Resize(dstMat, downscaled,
+                        new Size(srcMat.Cols, srcMat.Rows),
+                        interpolation: InterpolationFlags.Area);
+                    finalResult = downscaled;
+                }
+                else
+                {
+                    finalResult = dstMat;
+                }
+
+                try
+                {
+                    Cv2.ImEncode(".png", finalResult, out var resultBytes);
+                    return resultBytes;
+                }
+                finally
+                {
+                    downscaled?.Dispose();
+                }
+            }
+            finally
+            {
+                upscaledSrc?.Dispose();
+            }
         });
     }
 }

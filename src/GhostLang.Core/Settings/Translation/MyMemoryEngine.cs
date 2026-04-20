@@ -10,6 +10,8 @@ public class MyMemoryEngine(MyMemoryOptions options) : ITranslationEngine
     private static readonly HttpClient HttpClient = new();
     private const string BaseUrl = "https://api.mymemory.translated.net/get";
 
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
     public async Task<string> TranslateAsync(string text, SupportedLanguage targetLanguage,
         List<SupportedLanguage> sourceLanguages)
     {

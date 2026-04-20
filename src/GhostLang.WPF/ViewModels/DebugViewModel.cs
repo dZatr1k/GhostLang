@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,23 +11,16 @@ using GhostLang.Core.Pipelines;
 using GhostLang.WPF.Services;
 using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Pipelines.Models;
+using GhostLang.Core.Pipelines.Utilities;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.AudioCapture;
 using GhostLang.Core.Settings;
-using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Ocr;
 using GhostLang.WPF.ViewModels.Settings;
 using GhostLang.WPF.Views;
 using Microsoft.Win32;
 
 namespace GhostLang.WPF.ViewModels;
-
-public enum DebugAsrEngineChoice
-{
-    Whisper,
-    Vosk,
-    Azure
-}
 
 public partial class DebugViewModel : ObservableObject
 {
@@ -35,7 +29,7 @@ public partial class DebugViewModel : ObservableObject
     private readonly IOcrEngineFactory _ocrEngineFactory;
     private readonly IScreenCaptureService _screenCaptureService;
     private readonly IAudioCaptureServiceFactory _audioCaptureFactory;
-    private readonly IAsrEngineFactory _asrEngineFactory;
+    private readonly LanguageCapabilityService _capabilityService;
 
     [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(ProcessImageCommand))]
     private byte[]? _currentImageBytes;
@@ -44,69 +38,156 @@ public partial class DebugViewModel : ObservableObject
     [ObservableProperty] private BitmapFrame? _preprocessedImageSource;
 
     [ObservableProperty] private BitmapFrame? _resultImageSource;
-    [ObservableProperty] private bool _isImageExpanded;
-    [ObservableProperty] private bool _isMetricsExpanded;
-    [ObservableProperty] private bool _isConfigExpanded;
 
-    [ObservableProperty] private string _pipelineInfo = "";
+    [ObservableProperty] private FlowDocument _appConfigDocument = new();
+
+    public ObservableCollection<PipelineStepInfo> ScreenPipelineStepsInfo { get; } = new();
+    public ObservableCollection<PipelineStepInfo> AudioPipelineStepsInfo { get; } = new();
+
+    [ObservableProperty] private int _selectedDebugTabIndex;
+
     [ObservableProperty] private bool _isProcessing;
 
-    public IEnumerable<SupportedLanguage> AvailableLanguages =>
-        Enum.GetValues(typeof(SupportedLanguage)).Cast<SupportedLanguage>();
+    [ObservableProperty] private bool _isAppConfigExpanded = true;
+    [ObservableProperty] private bool _isScreenPipelineExpanded;
+    [ObservableProperty] private bool _isAudioPipelineExpanded;
+
+    private bool _isAdjustingAccordion;
+
+    private static readonly JsonSerializerOptions _prettyJson = new() { WriteIndented = true };
+
+    partial void OnSelectedDebugTabIndexChanged(int value)
+    {
+        if (value == 2) RefreshConfiguration();
+    }
+
+    partial void OnIsAppConfigExpandedChanged(bool value)
+    {
+        if (value) CollapseOthers(keepAppConfig: true, keepScreen: false, keepAudio: false);
+    }
+
+    partial void OnIsScreenPipelineExpandedChanged(bool value)
+    {
+        if (value) CollapseOthers(keepAppConfig: false, keepScreen: true, keepAudio: false);
+    }
+
+    partial void OnIsAudioPipelineExpandedChanged(bool value)
+    {
+        if (value) CollapseOthers(keepAppConfig: false, keepScreen: false, keepAudio: true);
+    }
+
+    private void CollapseOthers(bool keepAppConfig, bool keepScreen, bool keepAudio)
+    {
+        if (_isAdjustingAccordion) return;
+        _isAdjustingAccordion = true;
+        try
+        {
+            if (!keepAppConfig) IsAppConfigExpanded = false;
+            if (!keepScreen) IsScreenPipelineExpanded = false;
+            if (!keepAudio) IsAudioPipelineExpanded = false;
+        }
+        finally
+        {
+            _isAdjustingAccordion = false;
+        }
+    }
+
+    public ObservableCollection<SupportedLanguage> AvailableLanguages { get; } = new();
 
     [ObservableProperty] private double _originalImageWidth;
     [ObservableProperty] private double _originalImageHeight;
-    [ObservableProperty] private ObservableCollection<StepMetric> _pipelineMetrics = new();
+
+    public ObservableCollection<StepMetricViewModel> ScreenMetricsView { get; } = new();
+    public ObservableCollection<StepMetricViewModel> AudioMetricsView { get; } = new();
+
+    [ObservableProperty] private long _screenPipelineTotalMs;
+    [ObservableProperty] private long _audioPipelineTotalMs;
 
     public ObservableCollection<AudioFragment> AudioPipelineFragments { get; } = new();
-    public ObservableCollection<StepMetric> AudioPipelineMetrics { get; } = new();
 
-    public ObservableCollection<LanguageSelectionItem> SourceLanguages { get; } = new();
+    public ObservableCollection<SupportedLanguage> SourceLanguages { get; } = new();
 
-    [ObservableProperty] private SupportedLanguage _selectedTargetLanguage = SupportedLanguage.Unknown;
+    [ObservableProperty] private SupportedLanguage _selectedSourceLanguage = SupportedLanguage.English;
+    [ObservableProperty] private SupportedLanguage _selectedTargetLanguage = SupportedLanguage.English;
 
-    public IEnumerable<SupportedLanguage> TargetLanguages =>
-        Enum.GetValues(typeof(SupportedLanguage)).Cast<SupportedLanguage>().Where(l => l != SupportedLanguage.Unknown);
+    public ObservableCollection<SupportedLanguage> TargetLanguages { get; } = new();
 
     public ObservableCollection<RenderedFragmentViewModel> RenderedFragments { get; } = new();
 
     public DebugViewModel(IConfigurationService configService, IPipelineBuilder pipelineBuilder,
         IOcrEngineFactory ocrEngineFactory, IScreenCaptureService screenCaptureService,
-        IAudioCaptureServiceFactory audioCaptureFactory,
-        IAsrEngineFactory asrEngineFactory)
+        IAudioCaptureServiceFactory audioCaptureFactory, ThemeService themeService,
+        LanguageCapabilityService capabilityService)
     {
         _configService = configService;
         _pipelineBuilder = pipelineBuilder;
         _ocrEngineFactory = ocrEngineFactory;
         _screenCaptureService = screenCaptureService;
         _audioCaptureFactory = audioCaptureFactory;
-        _asrEngineFactory = asrEngineFactory;
+        _capabilityService = capabilityService;
 
-        LoadCurrentConfiguration();
-        InitializeSourceLanguages();
+        themeService.ThemeChanged += RefreshConfiguration;
+        _capabilityService.Changed += () =>
+            System.Windows.Application.Current.Dispatcher.Invoke(() => RebuildLanguageLists(initial: false));
+
+        if (LocalizationService.Instance != null)
+            LocalizationService.Instance.PropertyChanged += (_, _) =>
+            {
+                OnPropertyChanged(nameof(SourceLanguages));
+                OnPropertyChanged(nameof(TargetLanguages));
+            };
+
+        RefreshConfiguration();
+        RebuildLanguageLists(initial: true);
     }
 
-    private void InitializeSourceLanguages()
+    private void RebuildLanguageLists(bool initial)
     {
-        var langs = Enum.GetValues(typeof(SupportedLanguage)).Cast<SupportedLanguage>().Where(l => l != SupportedLanguage.Unknown);
-        foreach (var lang in langs)
+        var available = new HashSet<SupportedLanguage>();
+        foreach (var l in _capabilityService.GetScreenLanguages()) available.Add(l);
+        foreach (var l in _capabilityService.GetAudioLanguages()) available.Add(l);
+        if (available.Count == 0)
+            foreach (var l in LanguageCapabilitySets.AllTwenty) available.Add(l);
+
+        SourceLanguages.Clear();
+        AvailableLanguages.Clear();
+        TargetLanguages.Clear();
+        foreach (var lang in Enum.GetValues<SupportedLanguage>())
         {
-            SourceLanguages.Add(new LanguageSelectionItem
-            {
-                Language = lang,
-                DisplayName = lang.ToString(),
-                IsSelected = lang == SupportedLanguage.English
-            });
+            if (lang == SupportedLanguage.Unknown || !available.Contains(lang)) continue;
+            SourceLanguages.Add(lang);
+            AvailableLanguages.Add(lang);
+            TargetLanguages.Add(lang);
+        }
+
+        if (!available.Contains(SelectedSourceLanguage))
+        {
+            SelectedSourceLanguage = available.Contains(SupportedLanguage.English)
+                ? SupportedLanguage.English
+                : available.First();
+        }
+
+        if (!available.Contains(SelectedTargetLanguage))
+        {
+            SelectedTargetLanguage = available.Contains(SupportedLanguage.English)
+                ? SupportedLanguage.English
+                : available.First();
         }
     }
 
-    [RelayCommand]
-    private void LoadCurrentConfiguration()
+    private void RefreshConfiguration()
     {
         var config = _configService.Load();
-        var pipelineSequence = _pipelineBuilder.GetPipelineDescription(config);
-        var jsonConfig = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-        PipelineInfo = $"PIPELINE:\n{pipelineSequence}\n\nCONFIG:\n{jsonConfig}";
+        var json = JsonSerializer.Serialize(config, _prettyJson);
+        AppConfigDocument = JsonSyntaxHighlighter.Build(json);
+
+        ScreenPipelineStepsInfo.Clear();
+        foreach (var info in _pipelineBuilder.DescribeImagePipeline(config))
+            ScreenPipelineStepsInfo.Add(info);
+
+        AudioPipelineStepsInfo.Clear();
+        foreach (var info in _pipelineBuilder.DescribeAudioPipeline(config))
+            AudioPipelineStepsInfo.Add(info);
     }
 
     [RelayCommand]
@@ -156,12 +237,9 @@ public partial class DebugViewModel : ObservableObject
     {
         if (CurrentImageBytes == null) return;
 
-        var selectedSourceLangs = SourceLanguages
-            .Where(x => x.IsSelected)
-            .Select(x => x.Language)
-            .ToList();
+        var selectedSourceLangs = new List<SupportedLanguage> { SelectedSourceLanguage };
 
-        if (!selectedSourceLangs.Any())
+        if (SelectedSourceLanguage == SupportedLanguage.Unknown)
         {
             MessageBox.Show(LocalizationService.Instance?["Debug_SelectSourceLang"] ?? "Select source language",
                 LocalizationService.Instance?["Debug_Warning"] ?? "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -221,11 +299,8 @@ public partial class DebugViewModel : ObservableObject
             PreprocessedImageSource = null;
         }
 
-        PipelineMetrics.Clear();
-        foreach (var metric in context.Metrics)
-        {
-            PipelineMetrics.Add(metric);
-        }
+        RebuildMetrics(ScreenMetricsView, context.Metrics, out var screenTotalMs);
+        ScreenPipelineTotalMs = screenTotalMs;
 
         RenderedFragments.Clear();
 
@@ -248,10 +323,6 @@ public partial class DebugViewModel : ObservableObject
         }
 
         ResultImageSource = RenderCompositeResult();
-
-        var doneMsg = string.Format(LocalizationService.Instance?["Debug_PipelineDone"] ?? "DONE (Fragments: {0}, Aborted: {1})",
-            context.TextFragments?.Count ?? 0, context.IsAborted);
-        PipelineInfo += $"\n\n--- {doneMsg} ---";
     }
 
     private bool CanProcessImage() => CurrentImageBytes != null;
@@ -261,12 +332,9 @@ public partial class DebugViewModel : ObservableObject
 
     [ObservableProperty] private AudioCaptureSource _selectedAudioSource = AudioCaptureSource.Microphone;
 
-    public IEnumerable<DebugAsrEngineChoice> AsrEngines =>
-        Enum.GetValues(typeof(DebugAsrEngineChoice)).Cast<DebugAsrEngineChoice>();
-
-    [ObservableProperty] private DebugAsrEngineChoice _selectedAsrEngine = DebugAsrEngineChoice.Whisper;
     [ObservableProperty] private string _audioTestResultText = string.Empty;
     [ObservableProperty] private bool _hasAudioTestResult;
+    [ObservableProperty] private string _audioRawAsrText = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RecordAudioTestCommand))]
@@ -339,7 +407,8 @@ public partial class DebugViewModel : ObservableObject
         HasAudioTestResult = false;
         AudioTestResultText = string.Empty;
         AudioPipelineFragments.Clear();
-        AudioPipelineMetrics.Clear();
+        AudioMetricsView.Clear();
+        AudioPipelineTotalMs = 0;
 
         var durationSeconds = pcm.Length / (double)(sampleRate * channelCount * 2);
         AudioInfoText = string.Format(
@@ -353,20 +422,9 @@ public partial class DebugViewModel : ObservableObject
         AudioTestResultText = savedLine + "\n\n" + transcribingLine;
         HasAudioTestResult = true;
 
-        var selectedSourceLangs = SourceLanguages
-            .Where(x => x.IsSelected)
-            .Select(x => x.Language)
-            .ToList();
+        var selectedSourceLangs = new List<SupportedLanguage> { SelectedSourceLanguage };
 
         var config = _configService.Load();
-        var configuredAsr = config.ActiveAsrEngine;
-        config.ActiveAsrEngine = SelectedAsrEngine switch
-        {
-            DebugAsrEngineChoice.Vosk => configuredAsr as VoskAsrOptions ?? new VoskAsrOptions(),
-            DebugAsrEngineChoice.Azure => configuredAsr as AzureAsrOptions ?? new AzureAsrOptions(),
-            _ => configuredAsr as WhisperAsrOptions ?? new WhisperAsrOptions()
-        };
-
         var pipeline = _pipelineBuilder.BuildAudioPipeline(config);
 
         var audioContext = await pipeline.ProcessAsync(
@@ -378,10 +436,12 @@ public partial class DebugViewModel : ObservableObject
             AudioPipelineFragments.Add(fragment);
         }
 
-        foreach (var metric in audioContext.Metrics)
-        {
-            AudioPipelineMetrics.Add(metric);
-        }
+        RebuildMetrics(AudioMetricsView, audioContext.Metrics, out var audioTotalMs);
+        AudioPipelineTotalMs = audioTotalMs;
+
+        AudioRawAsrText = System.Text.Json.JsonSerializer.Serialize(
+            audioContext.AudioFragments,
+            new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
 
         var summary = audioContext.AudioFragments.Count == 0
             ? LocalizationService.Instance?["Debug_AudioTranscribedEmpty"] ?? "(no speech detected)"
@@ -394,14 +454,27 @@ public partial class DebugViewModel : ObservableObject
 
     private bool CanRecordAudioTest() => !IsAudioRecording;
 
-    [RelayCommand]
-    private void ToggleImageExpanded() => IsImageExpanded = !IsImageExpanded;
+    private void RebuildMetrics(ObservableCollection<StepMetricViewModel> target,
+        IEnumerable<StepMetric> source, out long totalMs)
+    {
+        target.Clear();
+        var list = source as IList<StepMetric> ?? source.ToList();
+        totalMs = list.Sum(m => m.ElapsedMilliseconds);
+        var maxMs = list.Count > 0 ? list.Max(m => m.ElapsedMilliseconds) : 0;
 
-    [RelayCommand]
-    private void ToggleMetricsExpanded() => IsMetricsExpanded = !IsMetricsExpanded;
-
-    [RelayCommand]
-    private void ToggleConfigExpanded() => IsConfigExpanded = !IsConfigExpanded;
+        for (var i = 0; i < list.Count; i++)
+        {
+            var m = list[i];
+            target.Add(new StepMetricViewModel
+            {
+                Order = i + 1,
+                StepName = m.StepName,
+                ElapsedMilliseconds = m.ElapsedMilliseconds,
+                BarWidth = maxMs > 0 ? m.ElapsedMilliseconds / (double)maxMs : 0,
+                Percentage = totalMs > 0 ? m.ElapsedMilliseconds * 100.0 / totalMs : 0
+            });
+        }
+    }
 
     private BitmapFrame? RenderCompositeResult()
     {

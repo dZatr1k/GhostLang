@@ -2,18 +2,29 @@ using System.Text.Json;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Pipelines.Models;
+using GhostLang.Core.Pipelines.Utilities;
 using Vosk;
 
 namespace GhostLang.Core.Settings.Asr;
 
-public class VoskAsrEngine : IAsrEngine
+public class VoskAsrEngine : IAsrEngine, IDisposable
 {
     private readonly VoskAsrOptions _options;
+
+    private readonly object _cacheLock = new();
+    private Model? _cachedModel;
+    private string? _cachedModelPath;
+    private VoskRecognizer? _cachedRecognizer;
+    private int _cachedSampleRate;
 
     public VoskAsrEngine(VoskAsrOptions options)
     {
         _options = options;
     }
+
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
+    public bool SupportsStreaming => true;
 
     public Task<bool> IsLanguageSupportedAsync(SupportedLanguage language)
     {
@@ -25,42 +36,99 @@ public class VoskAsrEngine : IAsrEngine
         if (context.OriginalAudio is null || context.OriginalAudio.Length == 0)
             return Task.FromResult(new List<AudioFragment>());
 
+        if (string.IsNullOrWhiteSpace(_options.ModelPath))
+        {
+            throw new InvalidOperationException(
+                "Vosk model is not selected. Open Settings → Audio pipeline → ASR → Vosk, " +
+                "unpack a model archive from https://alphacephei.com/vosk/models into the Models folder, " +
+                "click Refresh and pick one from the list.");
+        }
+
         if (!Directory.Exists(_options.ModelPath))
         {
             throw new DirectoryNotFoundException(
                 $"Vosk model directory not found at '{_options.ModelPath}'. " +
-                "Download a Vosk model from https://alphacephei.com/vosk/models (e.g. vosk-model-small-ru-0.22), " +
-                "extract the archive and point VoskAsrOptions.ModelPath to the extracted folder.");
+                "Check the model was fully unpacked and the path is still correct in Settings.");
         }
 
-        Vosk.Vosk.SetLogLevel(0);
+        var requiredFiles = new[] { Path.Combine("am", "final.mdl"), Path.Combine("conf", "model.conf") };
+        foreach (var rel in requiredFiles)
+        {
+            var full = Path.Combine(_options.ModelPath, rel);
+            if (!File.Exists(full))
+            {
+                throw new InvalidOperationException(
+                    $"Vosk model at '{_options.ModelPath}' is incomplete (missing {rel}). " +
+                    "Re-extract the model archive — some tools skip hidden files during unzip.");
+            }
+        }
 
-        var model = new Model(_options.ModelPath);
-        var recognizer = new VoskRecognizer(model, context.SampleRate);
+        Vosk.Vosk.SetLogLevel(-1);
+
+        VoskRecognizer recognizer;
         try
         {
-            recognizer.SetWords(true);
-            recognizer.SetMaxAlternatives(0);
+            recognizer = GetOrCreateRecognizer(context.SampleRate);
+        }
+        catch (Exception ex)
+        {
 
-            const int chunkSize = 8000;
-            var pcm = context.OriginalAudio;
+            Dispose();
+            throw new InvalidOperationException(
+                $"Failed to load Vosk model from '{_options.ModelPath}': {ex.Message}. " +
+                "Try re-downloading the model archive.",
+                ex);
+        }
 
-            for (int offset = 0; offset < pcm.Length; offset += chunkSize)
+        recognizer.SetWords(true);
+        recognizer.SetMaxAlternatives(0);
+
+        var subChunkSize = context.SampleRate;
+        var pcm = context.OriginalAudio;
+
+        for (var offset = 0; offset < pcm.Length; offset += subChunkSize)
+        {
+            var length = Math.Min(subChunkSize, pcm.Length - offset);
+            var buffer = new byte[length];
+            Array.Copy(pcm, offset, buffer, 0, length);
+            recognizer.AcceptWaveform(buffer, length);
+        }
+
+        var resultJson = recognizer.FinalResult();
+        var fragments = ParseVoskResult(resultJson);
+        return Task.FromResult(fragments);
+    }
+
+    private VoskRecognizer GetOrCreateRecognizer(int sampleRate)
+    {
+        lock (_cacheLock)
+        {
+
+            var modelChanged = _cachedModel is null || _cachedModelPath != _options.ModelPath;
+            var recognizerChanged = _cachedRecognizer is null || _cachedSampleRate != sampleRate || modelChanged;
+
+            if (modelChanged)
             {
-                int length = Math.Min(chunkSize, pcm.Length - offset);
-                var buffer = new byte[length];
-                Array.Copy(pcm, offset, buffer, 0, length);
-                recognizer.AcceptWaveform(buffer, length);
+                _cachedRecognizer?.Dispose();
+                _cachedRecognizer = null;
+                _cachedModel?.Dispose();
+                _cachedModel = new Model(_options.ModelPath);
+                _cachedModelPath = _options.ModelPath;
             }
 
-            var resultJson = recognizer.FinalResult();
-            var fragments = ParseVoskResult(resultJson);
-            return Task.FromResult(fragments);
-        }
-        finally
-        {
-            recognizer.Dispose();
-            model.Dispose();
+            if (recognizerChanged)
+            {
+                _cachedRecognizer?.Dispose();
+                _cachedRecognizer = new VoskRecognizer(_cachedModel!, sampleRate);
+                _cachedSampleRate = sampleRate;
+            }
+            else
+            {
+
+                _cachedRecognizer!.Reset();
+            }
+
+            return _cachedRecognizer!;
         }
     }
 
@@ -110,5 +178,17 @@ public class VoskAsrEngine : IAsrEngine
         });
 
         return fragments;
+    }
+
+    public void Dispose()
+    {
+        lock (_cacheLock)
+        {
+            _cachedRecognizer?.Dispose();
+            _cachedRecognizer = null;
+            _cachedModel?.Dispose();
+            _cachedModel = null;
+            _cachedModelPath = null;
+        }
     }
 }

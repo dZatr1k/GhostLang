@@ -23,22 +23,25 @@ public class GlossaryRestorationStep : IOptionalPipelineStep
 
             if (context.GlossaryTokenMode == GlossaryTokenMode.HtmlTag)
             {
-                text = Regex.Replace(text, @"<g\s+id=""(\d+)"">(.*?)</g>", match =>
+
+                text = Regex.Replace(text, @"<g\s+[^>]*?id=[""'](\d+)[""'][^>]*>(.*?)</g>", match =>
                 {
                     var id = match.Groups[1].Value;
-                    return context.GlossaryTokenMap.TryGetValue(id, out var translation)
-                        ? translation
-                        : match.Value;
-                }, RegexOptions.IgnoreCase);
+                    if (context.GlossaryTokenMap.TryGetValue(id, out var translation))
+                        return translation;
+
+                    return match.Groups[2].Value;
+                }, RegexOptions.IgnoreCase | RegexOptions.Singleline);
             }
             else
             {
                 text = Regex.Replace(text, @"<<GL_(\d+)>>", match =>
                 {
                     var id = match.Groups[1].Value;
-                    return context.GlossaryTokenMap.TryGetValue(id, out var translation)
-                        ? translation
-                        : match.Value;
+                    if (context.GlossaryTokenMap.TryGetValue(id, out var translation))
+                        return translation;
+
+                    return string.Empty;
                 }, RegexOptions.IgnoreCase);
             }
 

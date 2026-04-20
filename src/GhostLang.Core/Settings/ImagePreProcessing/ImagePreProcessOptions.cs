@@ -8,7 +8,7 @@ public class ImagePreProcessOptions
     public FilterOption Contrast { get; set; } = new() { Value = 1.5f };
     public FilterOption Binarize { get; set; } = new() { Value = 0.5f };
     public FilterOption Invert { get; set; } = new() { Value = 0f };
-    
+
     public FilterOption Sharpen { get; set; } = new() { IsEnabled = false, Value = 1.0f };
 
     public FilterOption AutoLevel { get; set; } = new() { IsEnabled = false };

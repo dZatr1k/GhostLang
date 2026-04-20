@@ -14,7 +14,7 @@ public class LocalizationService : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string CurrentLanguage { get; private set; } = "ru";
+    public string CurrentLanguage { get; private set; } = "en";
 
     public LocalizationService(IConfigurationService configService)
     {

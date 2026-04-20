@@ -8,49 +8,50 @@ public partial class MainViewModel : ObservableObject
     private readonly HomeViewModel _homeViewModel;
     private readonly SettingsViewModel _settingsViewModel;
     private readonly DebugViewModel _debugViewModel;
+    private readonly BenchmarkViewModel _benchmarkViewModel;
 
     [ObservableProperty]
     private ObservableObject _currentViewModel;
 
-    public bool HasUnsavedSettings => _settingsViewModel.HasUnsavedChanges;
-
     public MainViewModel(HomeViewModel homeViewModel,
         SettingsViewModel settingsViewModel,
-        DebugViewModel debugViewModel)
+        DebugViewModel debugViewModel,
+        BenchmarkViewModel benchmarkViewModel)
     {
         _homeViewModel = homeViewModel;
         _settingsViewModel = settingsViewModel;
         _debugViewModel = debugViewModel;
+        _benchmarkViewModel = benchmarkViewModel;
 
         _currentViewModel = _homeViewModel;
 
-        _homeViewModel.NavigateToSettingsRequested += NavigateSettings;
-
-        _settingsViewModel.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(SettingsViewModel.HasUnsavedChanges))
-                OnPropertyChanged(nameof(HasUnsavedSettings));
-        };
+        _homeViewModel.NavigateToSettingsRequested += NavigateSettingsWithTab;
     }
 
     [RelayCommand]
-    private void NavigateMain()
-    {
-        CurrentViewModel = _homeViewModel;
-        _settingsViewModel.StopChangeTracking();
-    }
+    private void NavigateMain() => CurrentViewModel = _homeViewModel;
 
     [RelayCommand]
-    private void NavigateSettings()
+    private void NavigateSettings() => NavigateSettingsWithTab(null);
+
+    private void NavigateSettingsWithTab(string? target)
     {
         CurrentViewModel = _settingsViewModel;
-        _settingsViewModel.StartChangeTracking();
+        if (target != null)
+            _settingsViewModel.NavigateToTab(target);
     }
 
     [RelayCommand]
-    private void NavigateDebug()
+    private void NavigateDebug() => CurrentViewModel = _debugViewModel;
+
+    [RelayCommand]
+    private void NavigateBenchmark() => CurrentViewModel = _benchmarkViewModel;
+
+    public bool IsAnyPipelineActive => _homeViewModel.IsAnyPipelineActive;
+
+    public async Task ShutdownAsync()
     {
-        CurrentViewModel = _debugViewModel;
-        _settingsViewModel.StopChangeTracking();
+        _settingsViewModel.FlushPendingAutosave();
+        await _homeViewModel.StopAllPipelinesAsync(TimeSpan.FromSeconds(3));
     }
 }

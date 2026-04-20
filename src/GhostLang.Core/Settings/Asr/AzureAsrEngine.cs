@@ -16,6 +16,10 @@ public class AzureAsrEngine : IAsrEngine
         _options = options;
     }
 
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
+    public bool SupportsStreaming => false;
+
     public Task<bool> IsLanguageSupportedAsync(SupportedLanguage language)
     {
         return Task.FromResult(language != SupportedLanguage.Unknown);

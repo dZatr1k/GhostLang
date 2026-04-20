@@ -21,7 +21,8 @@ public class ThemeService(IConfigurationService configService)
 
     public void Apply(string theme)
     {
-        IsDark = theme != "Light";
+        var effective = theme == "System" ? DetectSystemTheme() : theme;
+        IsDark = effective != "Light";
         var skinUri = IsDark ? DarkSkinUri : LightSkinUri;
 
         var resources = Application.Current.Resources;
@@ -45,4 +46,20 @@ public class ThemeService(IConfigurationService configService)
 
     public string LogoFullPath => IsDark ? "/Assets/logo-full-black-theme.svg" : "/Assets/logo-full.svg";
     public string LogoTextPath => IsDark ? "/Assets/logo-text-black-theme.svg" : "/Assets/logo-text.svg";
+
+    private static string DetectSystemTheme()
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            var value = key?.GetValue("AppsUseLightTheme");
+            if (value is int i && i == 1) return "Light";
+            return "Dark";
+        }
+        catch
+        {
+            return "Dark";
+        }
+    }
 }

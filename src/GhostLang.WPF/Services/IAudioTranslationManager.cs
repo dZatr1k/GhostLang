@@ -1,6 +1,7 @@
+using GhostLang.Core.Pipelines;
 using GhostLang.Core.Pipelines.Enums;
 
-namespace GhostLang.Core.Services.AudioCapture;
+namespace GhostLang.WPF.Services;
 
 public interface IAudioTranslationManager
 {
@@ -8,9 +9,11 @@ public interface IAudioTranslationManager
 
     event EventHandler<AudioTranslationSessionEventArgs>? FragmentsReady;
 
-    event EventHandler<string>? StatusChanged;
+    event EventHandler<PipelineStatus>? StatusChanged;
 
     event EventHandler<float>? LevelChanged;
+
+    event EventHandler<long>? DriftChanged;
 
     Task StartAsync(AudioCaptureSource source, SupportedLanguage targetLanguage, List<SupportedLanguage> sourceLanguages);
 

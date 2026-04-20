@@ -9,16 +9,7 @@ namespace GhostLang.Core.Settings.Ocr;
 
 public class AzureVisionOcrEngine(AzureVisionOcrOptions options) : IOcrEngine
 {
-    private static readonly HashSet<SupportedLanguage> SupportedLanguages =
-    [
-        SupportedLanguage.English,
-        SupportedLanguage.Russian,
-        SupportedLanguage.Japanese,
-        SupportedLanguage.Chinese,
-        SupportedLanguage.French,
-        SupportedLanguage.German,
-        SupportedLanguage.Spanish
-    ];
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AzureVisionCore;
 
     public Task<bool> IsLanguageSupportedAsync(SupportedLanguage language)
     {

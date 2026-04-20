@@ -59,7 +59,7 @@ public partial class TextRenderingViewModel : ObservableObject, IEngineSettingsV
     public void ApplyOptions(object options)
     {
         if (options is not TextRenderingOptions opt) return;
-        
+
         SelectedFontFamily = opt.SelectedFontFamily;
         RenderingMode = opt.RenderingMode;
         UseOriginalColor = opt.UseOriginalColor;

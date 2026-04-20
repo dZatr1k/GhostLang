@@ -13,4 +13,6 @@ public partial class WhisperModelItemViewModel : ObservableObject
     [ObservableProperty] private bool _isDownloading;
 
     [ObservableProperty] private string _statusText = string.Empty;
+
+    public CancellationTokenSource? DownloadCts { get; set; }
 }

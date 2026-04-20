@@ -5,7 +5,9 @@ namespace GhostLang.Core.Pipelines.Steps.Implementations;
 
 public class TranslationStep(ITranslationEngine translationEngine, ITranslationCacheService cacheService) : IMandatoryPipelineStep
 {
-    private const string BatchSeparator = "\n---\n";
+
+    private const string BatchSeparatorToken = "\u27EA\u27EB\u27EA\u27EB\u27EA\u27EB";
+    private const string BatchSeparator = "\n" + BatchSeparatorToken + "\n";
 
     public string StepName => "Machine Translation";
 
@@ -19,13 +21,50 @@ public class TranslationStep(ITranslationEngine translationEngine, ITranslationC
 
         if (toTranslate.Count == 0) return;
 
-        if (toTranslate.Count > 1)
+        if (context.SourceLanguage is { Count: 1 } &&
+            context.SourceLanguage[0] == context.TargetLanguage)
         {
-            var batchSuccess = await TryBatchTranslate(toTranslate, context);
-            if (batchSuccess) return;
+            foreach (var fragment in toTranslate)
+                fragment.TranslatedText = fragment.OriginalText;
+            return;
         }
 
-        await TranslateParallel(toTranslate, context);
+        List<IGrouping<string, Models.TextFragment>> groups;
+        List<Models.TextFragment> representatives;
+
+        if (context.TranslationDeduplicationEnabled)
+        {
+            groups = toTranslate.GroupBy(f => f.OriginalText).ToList();
+            representatives = groups.Select(g => g.First()).ToList();
+        }
+        else
+        {
+            groups = new List<IGrouping<string, Models.TextFragment>>();
+            representatives = toTranslate;
+        }
+
+        if (representatives.Count > 1)
+        {
+            var batchSuccess = await TryBatchTranslate(representatives, context);
+            if (batchSuccess)
+            {
+                SpreadToDuplicates(groups);
+                return;
+            }
+        }
+
+        await TranslateParallel(representatives, context);
+        SpreadToDuplicates(groups);
+    }
+
+    private static void SpreadToDuplicates(IEnumerable<IGrouping<string, Models.TextFragment>> groups)
+    {
+        foreach (var g in groups)
+        {
+            var representative = g.First();
+            foreach (var duplicate in g.Skip(1))
+                duplicate.TranslatedText = representative.TranslatedText;
+        }
     }
 
     private async Task<bool> TryBatchTranslate(
@@ -38,10 +77,10 @@ public class TranslationStep(ITranslationEngine translationEngine, ITranslationC
             var batchResult = await translationEngine.TranslateAsync(
                 batchText, context.TargetLanguage, context.SourceLanguage);
 
-            if (string.IsNullOrWhiteSpace(batchResult) || batchResult.StartsWith("[Error") || batchResult.StartsWith("[Ошибка"))
+            if (IsEngineErrorResponse(batchResult))
                 return false;
 
-            var parts = batchResult.Split(["---"], StringSplitOptions.None)
+            var parts = batchResult.Split([BatchSeparatorToken], StringSplitOptions.None)
                 .Select(p => p.Trim())
                 .Where(p => !string.IsNullOrEmpty(p))
                 .ToList();
@@ -68,12 +107,18 @@ public class TranslationStep(ITranslationEngine translationEngine, ITranslationC
     {
         var tasks = fragments.Select(async fragment =>
         {
-            fragment.TranslatedText = await translationEngine.TranslateAsync(
+            var translated = await translationEngine.TranslateAsync(
                 fragment.OriginalText, context.TargetLanguage, context.SourceLanguage);
 
-            cacheService.AddTranslation(fragment.OriginalText, fragment.TranslatedText, context.TargetLanguage);
+            fragment.TranslatedText = translated;
+
+            if (!IsEngineErrorResponse(translated))
+                cacheService.AddTranslation(fragment.OriginalText, translated, context.TargetLanguage);
         });
 
         await Task.WhenAll(tasks);
     }
+
+    private static bool IsEngineErrorResponse(string? text) =>
+        string.IsNullOrWhiteSpace(text) || text.StartsWith("[Error") || text.StartsWith("[Ошибка");
 }

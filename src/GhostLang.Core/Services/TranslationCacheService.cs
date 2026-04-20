@@ -1,15 +1,40 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using GhostLang.Core.Pipelines.Enums;
 
 namespace GhostLang.Core.Services;
 
-public class TranslationCacheService : ITranslationCacheService
+public partial class TranslationCacheService : ITranslationCacheService, IDisposable
 {
+    [GeneratedRegex(@"\s+", RegexOptions.CultureInvariant)]
+    private static partial Regex WhitespaceRegex();
+
     private readonly ConcurrentDictionary<string, CacheEntry> _cache = new();
     private string _currentEngineTag = string.Empty;
     private TimeSpan _ttl = TimeSpan.FromMinutes(60);
     private int _maxCharacters = 10000;
     private int _currentCharacters;
+
+    private const string CacheFileName = "translation-cache.json";
+    private const int SaveDebounceMs = 2000;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = false,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    private readonly string _cacheFilePath = Path.Combine(
+        AppDomain.CurrentDomain.BaseDirectory, CacheFileName);
+    private readonly Timer _saveTimer;
+    private readonly object _saveLock = new();
+    private bool _disposed;
+
+    public TranslationCacheService()
+    {
+        _saveTimer = new Timer(_ => FlushNow(), null, Timeout.Infinite, Timeout.Infinite);
+        TryLoad();
+    }
 
     public bool TryGetTranslation(string originalText, SupportedLanguage targetLanguage, out string? translatedText)
     {
@@ -46,6 +71,7 @@ public class TranslationCacheService : ITranslationCacheService
         if (_cache.ContainsKey(key))
         {
             _cache[key] = new CacheEntry(translatedText, charCount);
+            ScheduleSave();
             return;
         }
 
@@ -58,6 +84,7 @@ public class TranslationCacheService : ITranslationCacheService
 
         _cache[key] = new CacheEntry(translatedText, charCount);
         Interlocked.Add(ref _currentCharacters, charCount);
+        ScheduleSave();
     }
 
     public void SetEngineTag(string engineTag)
@@ -78,15 +105,128 @@ public class TranslationCacheService : ITranslationCacheService
     {
         _cache.Clear();
         _currentCharacters = 0;
+        ScheduleSave();
     }
 
     private static string GenerateKey(string originalText, SupportedLanguage targetLanguage)
     {
-        return $"{targetLanguage}_{originalText.Trim().ToLowerInvariant()}";
+
+        var normalized = WhitespaceRegex().Replace(originalText.Trim(), " ").ToLowerInvariant();
+        return $"{targetLanguage}_{normalized}";
     }
 
-    private record CacheEntry(string TranslatedText, int CharCount)
+    private void ScheduleSave()
     {
-        public DateTime CreatedAt { get; } = DateTime.UtcNow;
+        if (_disposed) return;
+
+        _saveTimer.Change(SaveDebounceMs, Timeout.Infinite);
+    }
+
+    private void FlushNow()
+    {
+        if (_disposed) return;
+        lock (_saveLock)
+        {
+            try
+            {
+
+                var snapshot = new CacheFile
+                {
+                    EngineTag = _currentEngineTag,
+                    Entries = _cache.ToArray()
+                        .Select(kv => new PersistedEntry
+                        {
+                            Key = kv.Key,
+                            TranslatedText = kv.Value.TranslatedText,
+                            CharCount = kv.Value.CharCount,
+                            CreatedAtUtc = kv.Value.CreatedAt
+                        })
+                        .ToList()
+                };
+
+                var json = JsonSerializer.Serialize(snapshot, JsonOptions);
+
+                var tempPath = _cacheFilePath + ".tmp";
+                File.WriteAllText(tempPath, json);
+                File.Move(tempPath, _cacheFilePath, overwrite: true);
+            }
+            catch
+            {
+
+            }
+        }
+    }
+
+    private void TryLoad()
+    {
+        if (!File.Exists(_cacheFilePath)) return;
+
+        try
+        {
+            var json = File.ReadAllText(_cacheFilePath);
+            var snapshot = JsonSerializer.Deserialize<CacheFile>(json, JsonOptions);
+            if (snapshot is null) return;
+
+            _currentEngineTag = snapshot.EngineTag ?? string.Empty;
+
+            var cutoff = DateTime.UtcNow - _ttl;
+            long total = 0;
+            foreach (var persisted in snapshot.Entries ?? new List<PersistedEntry>())
+            {
+                if (string.IsNullOrEmpty(persisted.Key) || string.IsNullOrEmpty(persisted.TranslatedText))
+                    continue;
+
+                if (persisted.CreatedAtUtc < cutoff) continue;
+
+                var entry = new CacheEntry(persisted.TranslatedText, persisted.CharCount)
+                {
+                    CreatedAt = persisted.CreatedAtUtc
+                };
+                _cache[persisted.Key] = entry;
+                total += persisted.CharCount;
+            }
+
+            _currentCharacters = (int)Math.Min(int.MaxValue, total);
+        }
+        catch
+        {
+
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        _saveTimer.Dispose();
+
+        FlushNow();
+    }
+
+    private class CacheEntry
+    {
+        public string TranslatedText { get; }
+        public int CharCount { get; }
+        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+
+        public CacheEntry(string translatedText, int charCount)
+        {
+            TranslatedText = translatedText;
+            CharCount = charCount;
+        }
+    }
+
+    private class PersistedEntry
+    {
+        public string? Key { get; set; }
+        public string? TranslatedText { get; set; }
+        public int CharCount { get; set; }
+        public DateTime CreatedAtUtc { get; set; }
+    }
+
+    private class CacheFile
+    {
+        public string? EngineTag { get; set; }
+        public List<PersistedEntry>? Entries { get; set; }
     }
 }

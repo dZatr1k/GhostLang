@@ -6,6 +6,20 @@ using GhostLang.Core.Settings;
 
 namespace GhostLang.WPF.Services;
 
+public enum HotKeyConflictKind
+{
+    DuplicateInApp,
+    SystemOwned
+}
+
+public record HotKeyConflict(string ActionId, string Combination, HotKeyConflictKind Kind);
+
+public class HotKeyReloadResult
+{
+    public List<HotKeyConflict> Conflicts { get; } = new();
+    public bool HasConflicts => Conflicts.Count > 0;
+}
+
 public class GlobalHotKeyService(IConfigurationService configService) : IDisposable
 {
     [DllImport("user32.dll")]
@@ -18,14 +32,19 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
     private HwndSource? _source;
     private readonly Dictionary<int, string> _idToAction = new();
     private int _nextId = 9001;
+    private bool _isSuspended;
+
+    public HotKeyReloadResult LastReloadResult { get; private set; } = new();
 
     public event Action? SelectRegionRequested;
     public event Action? ToggleVisibility;
     public event Action<int, int>? MoveRequested;
     public event Action<int, int>? ResizeRequested;
-    public event Action? BindingsReloaded;
+    public event Action<HotKeyReloadResult>? BindingsReloaded;
     public event Action? StartStopAudioRequested;
     public event Action? ToggleSubtitleVisibilityRequested;
+    public event Action? ScreenStartRequested;
+    public event Action? ScreenStopRequested;
 
     public void Register(Window window)
     {
@@ -36,20 +55,53 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
         ReloadBindings();
     }
 
-    public void ReloadBindings()
+    public HotKeyReloadResult ReloadBindings()
     {
         UnregisterAll();
 
-        var config = configService.Load();
-        foreach (var binding in config.HotKeys)
+        var result = new HotKeyReloadResult();
+
+        if (_hwnd == IntPtr.Zero)
         {
-            if (binding.IsEmpty) continue;
-            var id = _nextId++;
-            if (RegisterHotKey(_hwnd, id, binding.Modifiers, binding.Key))
-                _idToAction[id] = binding.ActionId;
+            LastReloadResult = result;
+            BindingsReloaded?.Invoke(result);
+            return result;
         }
 
-        BindingsReloaded?.Invoke();
+        var config = configService.Load();
+        var nonEmpty = config.HotKeys.Where(b => !b.IsEmpty).ToList();
+
+        var duplicates = new HashSet<HotKeyBinding>();
+        foreach (var group in nonEmpty.GroupBy(b => (b.Modifiers, b.Key)).Where(g => g.Count() > 1))
+        {
+            foreach (var member in group)
+            {
+                duplicates.Add(member);
+                result.Conflicts.Add(new HotKeyConflict(member.ActionId, member.ToDisplayString(), HotKeyConflictKind.DuplicateInApp));
+            }
+        }
+
+        if (!_isSuspended)
+        {
+            foreach (var binding in nonEmpty)
+            {
+                if (duplicates.Contains(binding)) continue;
+
+                var id = _nextId++;
+                if (RegisterHotKey(_hwnd, id, binding.Modifiers, binding.Key))
+                {
+                    _idToAction[id] = binding.ActionId;
+                }
+                else
+                {
+                    result.Conflicts.Add(new HotKeyConflict(binding.ActionId, binding.ToDisplayString(), HotKeyConflictKind.SystemOwned));
+                }
+            }
+        }
+
+        LastReloadResult = result;
+        BindingsReloaded?.Invoke(result);
+        return result;
     }
 
     private void UnregisterAll()
@@ -63,6 +115,18 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
     {
         UnregisterAll();
         _source?.RemoveHook(WndProc);
+    }
+
+    public void SuspendBindings()
+    {
+        _isSuspended = true;
+        UnregisterAll();
+    }
+
+    public void ResumeBindings()
+    {
+        _isSuspended = false;
+        ReloadBindings();
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -90,6 +154,8 @@ public class GlobalHotKeyService(IConfigurationService configService) : IDisposa
             case "resize_right": ResizeRequested?.Invoke(step, 0); break;
             case "start_stop_audio": StartStopAudioRequested?.Invoke(); break;
             case "toggle_subtitle_visibility": ToggleSubtitleVisibilityRequested?.Invoke(); break;
+            case "screen_start": ScreenStartRequested?.Invoke(); break;
+            case "screen_stop": ScreenStopRequested?.Invoke(); break;
             default: handled = false; break;
         }
 

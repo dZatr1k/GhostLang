@@ -27,8 +27,6 @@ public partial class TesseractOcrViewModel : ObservableObject, IEngineSettingsVi
         };
     }
 
-    public ObservableCollection<LanguageSelectionItem> AvailableLanguages { get; } = new();
-    
     public TesseractOcrViewModel(ITesseractModelManager modelManager)
     {
         _modelManager = modelManager;
@@ -85,8 +83,8 @@ public partial class TesseractOcrViewModel : ObservableObject, IEngineSettingsVi
     private async Task DownloadModelAsync(LanguageItemViewModel item)
     {
         if (item == null || item.IsDownloading) return;
-        using var cts = new CancellationTokenSource();
-        var ct = cts.Token;
+        var cts = new CancellationTokenSource();
+        item.DownloadCts = cts;
 
         item.IsDownloading = true;
         item.StatusText = Services.LocalizationService.Instance?["Engine_Downloading"] ?? "Downloading...";
@@ -95,7 +93,7 @@ public partial class TesseractOcrViewModel : ObservableObject, IEngineSettingsVi
         try
         {
             var progress = new Progress<double>(value => item.DownloadProgress = value);
-            await _modelManager.DownloadModelAsync(item.Language, ModelType, progress, ct);
+            await _modelManager.DownloadModelAsync(item.Language, ModelType, progress, cts.Token);
 
             item.IsDownloaded = true;
             item.StatusText = Services.LocalizationService.Instance?["Engine_Downloaded"] ?? "Downloaded";
@@ -111,7 +109,15 @@ public partial class TesseractOcrViewModel : ObservableObject, IEngineSettingsVi
         finally
         {
             item.IsDownloading = false;
+            item.DownloadCts = null;
+            cts.Dispose();
         }
+    }
+
+    [RelayCommand]
+    private void CancelDownload(LanguageItemViewModel? item)
+    {
+        item?.DownloadCts?.Cancel();
     }
 
     public void ApplyOptions(object options)
@@ -120,7 +126,7 @@ public partial class TesseractOcrViewModel : ObservableObject, IEngineSettingsVi
         {
             ModelType = opt.ModelType;
             CheckAllModelsStatus();
-            
+
             foreach (var item in Languages) item.IsSelected = false;
 
             foreach (var lang in opt.SourceLanguages)

@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using GhostLang.WPF.Services;
 using GhostLang.WPF.ViewModels;
+using GhostLang.WPF.Views;
 
 namespace GhostLang.WPF;
 
@@ -11,6 +13,7 @@ public partial class MainWindow : Window
     private readonly GlobalHotKeyService _hotKeyService;
     private readonly MainViewModel _viewModel;
     private bool _sidebarExpanded;
+    private bool _closeConfirmed;
 
     private const double CollapsedWidth = 48;
     private const double ExpandedWidth = 200;
@@ -25,10 +28,53 @@ public partial class MainWindow : Window
         _hotKeyService = hotKeyService;
 
         SourceInitialized += (_, _) => _hotKeyService.Register(this);
+        Closing += OnClosing;
         Closed += (_, _) => _hotKeyService.Dispose();
 
         UpdateSidebarLogo(themeService);
         themeService.ThemeChanged += () => UpdateSidebarLogo(themeService);
+    }
+
+    private void OnClosing(object? sender, CancelEventArgs e)
+    {
+        if (_closeConfirmed) return;
+
+        if (_viewModel.IsAnyPipelineActive)
+        {
+            var loc = LocalizationService.Instance;
+            var title = loc?["Shutdown_Title"] ?? "Confirm exit";
+            var message = loc?["Shutdown_ActivePipelineMessage"]
+                          ?? "Translation is active. Exit will stop it. Continue?";
+            var yesText = loc?["Shutdown_ExitButton"] ?? "Exit";
+            var noText = loc?["Shutdown_CancelButton"] ?? "Cancel";
+
+            var dialog = new ConfirmationDialog(title, message, yesText, noText)
+            {
+                Owner = this
+            };
+            dialog.ShowDialog();
+
+            if (!dialog.Confirmed)
+            {
+                e.Cancel = true;
+                return;
+            }
+        }
+
+        e.Cancel = true;
+        _ = Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                await _viewModel.ShutdownAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Shutdown error: {ex.Message}");
+            }
+            _closeConfirmed = true;
+            Close();
+        });
     }
 
     private void UpdateSidebarLogo(ThemeService themeService)
@@ -61,6 +107,7 @@ public partial class MainWindow : Window
         LabelHome.BeginAnimation(OpacityProperty, opacityAnim);
         LabelSettings.BeginAnimation(OpacityProperty, opacityAnim);
         LabelDebug.BeginAnimation(OpacityProperty, opacityAnim);
+        LabelBenchmark.BeginAnimation(OpacityProperty, opacityAnim);
         LabelAppName.BeginAnimation(OpacityProperty, opacityAnim);
 
         var marginAnim = new ThicknessAnimation(
@@ -81,6 +128,9 @@ public partial class MainWindow : Window
 
     private void NavDebug_Click(object sender, RoutedEventArgs e)
         => _viewModel.NavigateDebugCommand.Execute(null);
+
+    private void NavBenchmark_Click(object sender, RoutedEventArgs e)
+        => _viewModel.NavigateBenchmarkCommand.Execute(null);
 
     private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
         => WindowState = WindowState.Minimized;

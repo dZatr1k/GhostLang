@@ -6,8 +6,8 @@ public class MotionDetectionStep : IOptionalPipelineStep
 {
     public bool IsEnabled { get; set; } = true;
 
-    private static byte[]? _previousFrameHash;
-    private static readonly object HashLock = new();
+    private byte[]? _previousFrameHash;
+    private readonly object _hashLock = new();
 
     public string StepName => "Motion Detection";
 
@@ -18,7 +18,7 @@ public class MotionDetectionStep : IOptionalPipelineStep
 
         var currentHash = MD5.HashData(context.OriginalImage);
 
-        lock (HashLock)
+        lock (_hashLock)
         {
             if (_previousFrameHash != null && currentHash.AsSpan().SequenceEqual(_previousFrameHash))
             {
@@ -32,9 +32,9 @@ public class MotionDetectionStep : IOptionalPipelineStep
         return Task.CompletedTask;
     }
 
-    public static void ResetState()
+    public void Reset()
     {
-        lock (HashLock)
+        lock (_hashLock)
         {
             _previousFrameHash = null;
         }

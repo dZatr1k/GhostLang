@@ -34,13 +34,13 @@
   <data name="Nav_Settings" xml:space="preserve"><value>Настройки</value></data>
   <data name="Nav_SettingsUnsaved" xml:space="preserve"><value>Настройки *</value></data>
   <data name="Nav_Debug" xml:space="preserve"><value>Дебаг</value></data>
+  <data name="Nav_Benchmark" xml:space="preserve"><value>Бенчмарк</value></data>
   <data name="Nav_ExpandPanel" xml:space="preserve"><value>Развернуть панель</value></data>
   <data name="Nav_CollapsePanel" xml:space="preserve"><value>Свернуть панель</value></data>
 
   <data name="Home_Subtitle" xml:space="preserve"><value>Мультимодальный потоковый переводчик</value></data>
   <data name="Home_CaptureTitle" xml:space="preserve"><value>Захват области экрана</value></data>
-  <data name="Home_SourceLanguages" xml:space="preserve"><value>Исходные языки</value></data>
-  <data name="Home_SourceLanguagesPlaceholder" xml:space="preserve"><value>Выберите языки...</value></data>
+  <data name="Home_SourceLanguage" xml:space="preserve"><value>Исходный язык</value></data>
   <data name="Home_TargetLanguage" xml:space="preserve"><value>Целевой язык перевода</value></data>
   <data name="Home_SelectRegion" xml:space="preserve"><value>Выделить область экрана</value></data>
   <data name="Home_Status" xml:space="preserve"><value>Статус:</value></data>
@@ -48,25 +48,74 @@
 
   <data name="Home_ScreenTranslation" xml:space="preserve"><value>Перевод экрана</value></data>
   <data name="Home_AudioTranslation" xml:space="preserve"><value>Перевод аудио</value></data>
+  <data name="Home_AudioDriftWarning" xml:space="preserve"><value> · ⚠ Отставание {0:F0}с</value></data>
+  <data name="Home_AudioDriftCritical" xml:space="preserve"><value> · 🔴 Отставание {0:F0}с</value></data>
+  <data name="Home_AudioDriftCriticalGrowl" xml:space="preserve"><value>Перевод отстаёт на {0:F0}с, старое аудио отбрасывается</value></data>
   <data name="Home_CaptureAudio" xml:space="preserve"><value>Захват аудио</value></data>
   <data name="Home_AudioComingSoon" xml:space="preserve"><value>В разработке</value></data>
 
-  <data name="Work_Start" xml:space="preserve"><value>▶ Старт</value></data>
-  <data name="Work_Stop" xml:space="preserve"><value>■ Стоп</value></data>
+  <data name="Work_Start" xml:space="preserve"><value>Старт</value></data>
+  <data name="Work_Stop" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Work_MoreMenu" xml:space="preserve"><value>Дополнительно</value></data>
+  <data name="Work_Copy" xml:space="preserve"><value>Копировать перевод</value></data>
+  <data name="Work_SaveFrame" xml:space="preserve"><value>Сохранить кадр...</value></data>
+  <data name="Work_Refresh" xml:space="preserve"><value>Обновить сейчас</value></data>
+  <data name="Work_SwitchLanguage" xml:space="preserve"><value>Сменить язык перевода</value></data>
+  <data name="Work_ToggleOriginal" xml:space="preserve"><value>Показать оригинал</value></data>
   <data name="Work_Stopped" xml:space="preserve"><value>Остановлен</value></data>
   <data name="Work_Running" xml:space="preserve"><value>Работает...</value></data>
 
-  <data name="Region_Hint" xml:space="preserve"><value>Выделите область экрана для перевода.  ESC — отмена.</value></data>
+  <data name="Region_Hint" xml:space="preserve"><value>Выделите область экрана для перевода.  ESC - отмена.</value></data>
 
-  <data name="Settings_TabGeneral" xml:space="preserve"><value>Основные</value></data>
-  <data name="Settings_TabImagePipeline" xml:space="preserve"><value>Пайплайн Изображений</value></data>
+  <data name="Settings_TabAppearance" xml:space="preserve"><value>Оформление</value></data>
+  <data name="Settings_TabScreen" xml:space="preserve"><value>Экран</value></data>
+  <data name="Settings_TabPipelines" xml:space="preserve"><value>Пайплайны</value></data>
   <data name="Settings_TabHotKeys" xml:space="preserve"><value>Горячие клавиши</value></data>
-  <data name="Settings_TabAudio" xml:space="preserve"><value>Пайплайн Аудио</value></data>
+  <data name="Settings_TabCaptureAudio" xml:space="preserve"><value>Захват &amp; Аудио</value></data>
+  <data name="Settings_TabOverlay" xml:space="preserve"><value>Оверлей</value></data>
+  <data name="Audio_SubtitlePositionTopLeft" xml:space="preserve"><value>Сверху слева</value></data>
+  <data name="Audio_SubtitlePositionTopRight" xml:space="preserve"><value>Сверху справа</value></data>
+  <data name="Audio_SubtitlePositionBottomLeft" xml:space="preserve"><value>Снизу слева</value></data>
+  <data name="Audio_SubtitlePositionBottomRight" xml:space="preserve"><value>Снизу справа</value></data>
+  <data name="Settings_TabAudio" xml:space="preserve"><value>Аудио</value></data>
   <data name="Settings_AudioPlaceholder" xml:space="preserve"><value>Тестирование звука (В разработке)</value></data>
   <data name="Settings_Save" xml:space="preserve"><value>Сохранить</value></data>
   <data name="Settings_SaveUnsaved" xml:space="preserve"><value>Сохранить *</value></data>
   <data name="Settings_SavedSuccess" xml:space="preserve"><value>Настройки сохранены!</value></data>
+  <data name="Settings_AutosaveSaved" xml:space="preserve"><value>Сохранено</value></data>
   <data name="Settings_SaveError" xml:space="preserve"><value>Ошибка сохранения:</value></data>
+  <data name="Settings_HotKeyConflict" xml:space="preserve"><value>Конфликт горячих клавиш: {0}</value></data>
+  <data name="Settings_SharedNote" xml:space="preserve"><value>Общие настройки - применяются к обоим пайплайнам (Экран и Аудио). Включение/выключение шага - независимое для каждого пайплайна.</value></data>
+  <data name="HotKey_ScreenStart" xml:space="preserve"><value>Запустить перевод</value></data>
+  <data name="HotKey_ScreenStop" xml:space="preserve"><value>Остановить перевод</value></data>
+  <data name="HotKeyHelp_SelectRegion" xml:space="preserve"><value>Открывает выбор области экрана - курсор крестом, обведите регион для перевода.</value></data>
+  <data name="HotKeyHelp_ScreenStart" xml:space="preserve"><value>Запускает цикл перевода уже выбранной области (аналог кнопки Start в плавающем окне).</value></data>
+  <data name="HotKeyHelp_ScreenStop" xml:space="preserve"><value>Останавливает активный перевод экрана (окно остаётся, можно снова запустить).</value></data>
+  <data name="HotKeyHelp_ToggleVisibility" xml:space="preserve"><value>Скрывает/показывает плавающую рамку поверх области (перевод продолжает работать).</value></data>
+  <data name="HotKeyHelp_MoveUp" xml:space="preserve"><value>Сдвигает область перевода на 10 пикселей вверх.</value></data>
+  <data name="HotKeyHelp_MoveDown" xml:space="preserve"><value>Сдвигает область перевода на 10 пикселей вниз.</value></data>
+  <data name="HotKeyHelp_MoveLeft" xml:space="preserve"><value>Сдвигает область перевода на 10 пикселей влево.</value></data>
+  <data name="HotKeyHelp_MoveRight" xml:space="preserve"><value>Сдвигает область перевода на 10 пикселей вправо.</value></data>
+  <data name="HotKeyHelp_ResizeUp" xml:space="preserve"><value>Уменьшает высоту области перевода на 10 пикселей.</value></data>
+  <data name="HotKeyHelp_ResizeDown" xml:space="preserve"><value>Увеличивает высоту области перевода на 10 пикселей.</value></data>
+  <data name="HotKeyHelp_ResizeLeft" xml:space="preserve"><value>Уменьшает ширину области перевода на 10 пикселей.</value></data>
+  <data name="HotKeyHelp_ResizeRight" xml:space="preserve"><value>Увеличивает ширину области перевода на 10 пикселей.</value></data>
+  <data name="HotKeyHelp_StartStopAudio" xml:space="preserve"><value>Запускает или останавливает перевод звука в зависимости от текущего состояния.</value></data>
+  <data name="HotKeyHelp_ToggleSubtitleVisibility" xml:space="preserve"><value>Скрывает или показывает плавающие субтитры (перевод продолжает работать в фоне).</value></data>
+  <data name="Settings_HotKeyConflictTooltip" xml:space="preserve"><value>Эта комбинация занята другим действием или системой.</value></data>
+  <data name="Shutdown_Title" xml:space="preserve"><value>Подтверждение выхода</value></data>
+  <data name="Shutdown_ActivePipelineMessage" xml:space="preserve"><value>Перевод сейчас активен. Выход остановит его. Продолжить?</value></data>
+  <data name="Shutdown_ExitButton" xml:space="preserve"><value>Выйти</value></data>
+  <data name="Shutdown_CancelButton" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Home_TranslateFrom" xml:space="preserve"><value>Перевод с:</value></data>
+  <data name="Home_TranslateTo" xml:space="preserve"><value>на:</value></data>
+  <data name="Validation_NoAsrEngine" xml:space="preserve"><value>Движок распознавания речи не настроен.</value></data>
+  <data name="Validation_WhisperNoModel" xml:space="preserve"><value>Модель Whisper не выбрана.</value></data>
+  <data name="Validation_WhisperModelNotDownloaded" xml:space="preserve"><value>Модель Whisper не скачана: {0}</value></data>
+  <data name="Validation_VoskNoPath" xml:space="preserve"><value>Путь к модели Vosk не указан.</value></data>
+  <data name="Validation_VoskPathMissing" xml:space="preserve"><value>Папка с моделью Vosk не найдена: {0}</value></data>
+  <data name="Validation_AzureAsrNoApiKey" xml:space="preserve"><value>API-ключ Azure Speech не указан.</value></data>
+  <data name="Validation_AzureAsrNoRegion" xml:space="preserve"><value>Регион Azure Speech не указан.</value></data>
   <data name="Settings_SelectEngine" xml:space="preserve"><value>Выберите движок обработки:</value></data>
 
   <data name="General_Appearance" xml:space="preserve"><value>Оформление</value></data>
@@ -77,7 +126,7 @@
   <data name="General_Language" xml:space="preserve"><value>Язык интерфейса:</value></data>
 
   <data name="Engine_TranslationProvider" xml:space="preserve"><value>Провайдер перевода:</value></data>
-  <data name="Engine_GTranslateHint" xml:space="preserve"><value>Google — универсальный. Yandex — хорош для ru↔en. Bing/Microsoft — альтернатива.</value></data>
+  <data name="Engine_GTranslateHint" xml:space="preserve"><value>Google - универсальный. Yandex - хорош для ru↔en. Bing/Microsoft - альтернатива.</value></data>
   <data name="Engine_GTranslateInfo" xml:space="preserve"><value>Бесплатный веб-шлюз без API-ключа. При частых запросах возможен Rate Limit.</value></data>
   <data name="Engine_MyMemoryEmailHint" xml:space="preserve"><value>Без email: ~100 запросов/день. С email: ~10 000.</value></data>
   <data name="Engine_MyMemoryKeyHint" xml:space="preserve"><value>PRO-ключ для неограниченного доступа.</value></data>
@@ -87,11 +136,12 @@
   <data name="Engine_WindowsOcrInfo" xml:space="preserve"><value>Использует встроенный Windows OCR. Не требует загрузки моделей.</value></data>
   <data name="Engine_WindowsOcrLanguageHint" xml:space="preserve"><value>Для добавления языков: Параметры → Время и язык → Язык и регион → Добавить язык.</value></data>
   <data name="Engine_ModelType" xml:space="preserve"><value>Тип модели:</value></data>
-  <data name="Engine_ModelTypeHint" xml:space="preserve"><value>Fast (~15 МБ) — быстрее. Best (~30 МБ) — точнее, медленнее в ~2-3 раза.</value></data>
+  <data name="Engine_ModelTypeHint" xml:space="preserve"><value>Fast (~15 МБ) - быстрее. Best (~30 МБ) - точнее, медленнее в ~2-3 раза.</value></data>
   <data name="Engine_LanguagePacks" xml:space="preserve"><value>Языковые пакеты</value></data>
   <data name="Engine_Download" xml:space="preserve"><value>Скачать</value></data>
   <data name="Engine_Downloaded" xml:space="preserve"><value>Скачано</value></data>
   <data name="Engine_Downloading" xml:space="preserve"><value>Скачивание...</value></data>
+  <data name="Engine_Cancel" xml:space="preserve"><value>Отмена</value></data>
   <data name="Engine_Done" xml:space="preserve"><value>Готово</value></data>
   <data name="Engine_Loading" xml:space="preserve"><value>Загрузка</value></data>
   <data name="Engine_UseProxy" xml:space="preserve"><value>Использовать прокси</value></data>
@@ -99,28 +149,28 @@
   <data name="Rendering_Font" xml:space="preserve"><value>Шрифт:</value></data>
   <data name="Rendering_FontHint" xml:space="preserve"><value>Системный шрифт для отрисовки переведённого текста.</value></data>
   <data name="Rendering_FitMode" xml:space="preserve"><value>Режим вписывания:</value></data>
-  <data name="Rendering_FitModeHint" xml:space="preserve"><value>Сжатие — уменьшает ширину. Фиксированная высота — масштаб только по высоте.</value></data>
+  <data name="Rendering_FitModeHint" xml:space="preserve"><value>Сжатие - уменьшает ширину. Фиксированная высота - масштаб только по высоте.</value></data>
   <data name="Rendering_AutoColor" xml:space="preserve"><value>Автоопределение цвета текста</value></data>
-  <data name="Rendering_AutoColorHint" xml:space="preserve"><value>Определяет доминантный цвет из оригинала. Если выключено — используется цвет ниже.</value></data>
+  <data name="Rendering_AutoColorHint" xml:space="preserve"><value>Определяет доминантный цвет из оригинала. Если выключено - используется цвет ниже.</value></data>
   <data name="Rendering_Compress" xml:space="preserve"><value>Сжатие по ширине</value></data>
   <data name="Rendering_MatchHeight" xml:space="preserve"><value>Фиксированная высота</value></data>
 
   <data name="Erasure_SolidColorHint" xml:space="preserve"><value>Область текста заливается указанным цветом. Подходит для однотонного фона.</value></data>
   <data name="Erasure_MaskAggression" xml:space="preserve"><value>Агрессивность маски:</value></data>
-  <data name="Erasure_MaskHint" xml:space="preserve"><value>Расширяет маску текста. Больше — чище, но может задеть фон.</value></data>
+  <data name="Erasure_MaskHint" xml:space="preserve"><value>Расширяет маску текста. Больше - чище, но может задеть фон.</value></data>
   <data name="Erasure_InpaintRadius" xml:space="preserve"><value>Радиус захвата фона:</value></data>
   <data name="Erasure_InpaintHint" xml:space="preserve"><value>Сколько пикселей вокруг маски учитывается для восстановления.</value></data>
   <data name="Erasure_TeleaAlgorithm" xml:space="preserve"><value>Алгоритм Telea (иначе Navier-Stokes)</value></data>
-  <data name="Erasure_TeleaHint" xml:space="preserve"><value>Telea — быстрый, для мелкого текста. Navier-Stokes — точнее на сложных фонах.</value></data>
+  <data name="Erasure_TeleaHint" xml:space="preserve"><value>Telea - быстрый, для мелкого текста. Navier-Stokes - точнее на сложных фонах.</value></data>
   <data name="Erasure_AdaptiveBlockSize" xml:space="preserve"><value>Размер блока адаптивного порога</value></data>
-  <data name="Erasure_AdaptiveBlockSizeHint" xml:space="preserve"><value>Размер окрестности для определения порога. Меньшие значения точнее выделяют мелкий текст, большие — лучше для крупного.</value></data>
+  <data name="Erasure_AdaptiveBlockSizeHint" xml:space="preserve"><value>Размер окрестности для определения порога. Меньшие значения точнее выделяют мелкий текст, большие - лучше для крупного.</value></data>
   <data name="Erasure_AdaptiveConstant" xml:space="preserve"><value>Константа порога</value></data>
   <data name="Erasure_AdaptiveConstantHint" xml:space="preserve"><value>Вычитается из среднего значения. Меньшие значения захватывают больше текстовых пикселей, но могут зацепить фон.</value></data>
 
   <data name="Cache_TtlHint" xml:space="preserve"><value>Записи старше этого времени удаляются. По умолчанию 60 мин.</value></data>
   <data name="Cache_MaxCharsHint" xml:space="preserve"><value>Суммарный объём кэша. При превышении удаляются старые записи. По умолчанию 10 000.</value></data>
 
-  <data name="Glossary_Info" xml:space="preserve"><value>Слова из глоссария заменяются на ваш перевод. Варианты форм — падежи через запятую.</value></data>
+  <data name="Glossary_Info" xml:space="preserve"><value>Слова из глоссария заменяются на ваш перевод. Варианты форм - падежи через запятую.</value></data>
   <data name="Glossary_Example" xml:space="preserve"><value>Пример: Слайм → Green Monster  |  Слайма, Слайму, Слаймов</value></data>
   <data name="Glossary_TokenMode" xml:space="preserve"><value>Способ токенизации:</value></data>
   <data name="Glossary_Original" xml:space="preserve"><value>Оригинал</value></data>
@@ -148,20 +198,38 @@
   <data name="Filter_InvertDesc" xml:space="preserve"><value>Инвертирует цвета. Полезно для светлого текста на тёмном фоне.</value></data>
   <data name="Filter_Value" xml:space="preserve"><value>Значение:</value></data>
 
-  <data name="Debug_PipelineOcr" xml:space="preserve"><value>Пайплайн OCR</value></data>
+  <data name="Debug_PipelineScreen" xml:space="preserve"><value>Экран</value></data>
+  <data name="Debug_PipelineAudio" xml:space="preserve"><value>Аудио</value></data>
+  <data name="Debug_TabTranscript" xml:space="preserve"><value>Транскрипт</value></data>
+  <data name="Debug_TabRawAsr" xml:space="preserve"><value>Сырой ASR</value></data>
   <data name="Debug_LoadImage" xml:space="preserve"><value>Загрузить картинку</value></data>
   <data name="Debug_SelectRegion" xml:space="preserve"><value>Выделить область</value></data>
   <data name="Debug_Process" xml:space="preserve"><value>Обработать</value></data>
   <data name="Debug_Processing" xml:space="preserve"><value>Обработка...</value></data>
-  <data name="Debug_RefreshConfig" xml:space="preserve"><value>Обновить конфиг</value></data>
-  <data name="Debug_SourceLanguages" xml:space="preserve"><value>Исходные языки:</value></data>
+  <data name="Debug_SourceLanguages" xml:space="preserve"><value>Исходный язык:</value></data>
   <data name="Debug_TargetLanguage" xml:space="preserve"><value>Целевой язык:</value></data>
   <data name="Debug_Original" xml:space="preserve"><value>Оригинал</value></data>
   <data name="Debug_Preprocessed" xml:space="preserve"><value>После препроцессинга</value></data>
   <data name="Debug_Result" xml:space="preserve"><value>Результат</value></data>
   <data name="Debug_Metrics" xml:space="preserve"><value>Метрики</value></data>
-  <data name="Debug_Configuration" xml:space="preserve"><value>Конфигурация</value></data>
-  <data name="Debug_ConfigNotLoaded" xml:space="preserve"><value>Конфигурация не загружена</value></data>
+  <data name="Debug_Total" xml:space="preserve"><value>Итого</value></data>
+  <data name="Debug_BenchmarkSection" xml:space="preserve"><value>Benchmark</value></data>
+  <data name="Debug_BenchmarkSelectFolder" xml:space="preserve"><value>Выбрать папку...</value></data>
+  <data name="Debug_BenchmarkRunScreen" xml:space="preserve"><value>Запуск Screen</value></data>
+  <data name="Debug_BenchmarkRunAudio" xml:space="preserve"><value>Запуск Audio</value></data>
+  <data name="Debug_BenchmarkCancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Debug_BenchmarkExport" xml:space="preserve"><value>Экспорт JSON</value></data>
+  <data name="Debug_BenchmarkSamplesFolder" xml:space="preserve"><value>Папка samples:</value></data>
+  <data name="Debug_BenchmarkColCer" xml:space="preserve"><value>CER</value></data>
+  <data name="Debug_BenchmarkColWer" xml:space="preserve"><value>WER</value></data>
+  <data name="Debug_BenchmarkColBleu" xml:space="preserve"><value>BLEU</value></data>
+  <data name="Debug_BenchmarkColChrF" xml:space="preserve"><value>chrF</value></data>
+  <data name="Debug_BenchmarkColLatency" xml:space="preserve"><value>Latency (ms)</value></data>
+  <data name="Debug_BenchmarkColSample" xml:space="preserve"><value>Sample</value></data>
+  <data name="Debug_TabConfiguration" xml:space="preserve"><value>Конфигурация</value></data>
+  <data name="Debug_ConfigAppTitle" xml:space="preserve"><value>Конфигурация приложения</value></data>
+  <data name="Debug_ConfigScreenPipelineTitle" xml:space="preserve"><value>Пайплайн экрана</value></data>
+  <data name="Debug_ConfigAudioPipelineTitle" xml:space="preserve"><value>Пайплайн аудио</value></data>
   <data name="Debug_SelectSourceLang" xml:space="preserve"><value>Пожалуйста, выберите хотя бы один исходный язык для OCR.</value></data>
   <data name="Debug_Warning" xml:space="preserve"><value>Внимание</value></data>
 
@@ -175,7 +243,7 @@
   <data name="Debug_Collapse" xml:space="preserve"><value>Свернуть</value></data>
 
   <data name="Step_MotionDetection" xml:space="preserve"><value>Обнаружение движения</value></data>
-  <data name="Step_MotionDetectionDesc" xml:space="preserve"><value>Сравнивает текущий кадр с предыдущим. Если изменений нет — пайплайн прерывается для экономии ресурсов.</value></data>
+  <data name="Step_MotionDetectionDesc" xml:space="preserve"><value>Сравнивает текущий кадр с предыдущим. Если изменений нет - пайплайн прерывается для экономии ресурсов.</value></data>
   <data name="Step_Preprocessing" xml:space="preserve"><value>Препроцессинг изображения</value></data>
   <data name="Step_PreprocessingDesc" xml:space="preserve"><value>Применяет фильтры к изображению перед OCR для повышения качества распознавания.</value></data>
   <data name="Step_Ocr" xml:space="preserve"><value>Распознавание текста</value></data>
@@ -193,13 +261,13 @@
   <data name="Step_Rendering" xml:space="preserve"><value>Отрисовка перевода</value></data>
   <data name="Step_RenderingDesc" xml:space="preserve"><value>Рисует переведённый текст поверх очищенной области изображения.</value></data>
 
-  <data name="HotKeyGroup_ImagePipeline" xml:space="preserve"><value>Перевод экрана</value></data>
-  <data name="HotKeyGroup_AudioPipeline" xml:space="preserve"><value>Перевод аудио</value></data>
+  <data name="HotKeyGroup_Screen" xml:space="preserve"><value>Перевод экрана</value></data>
+  <data name="HotKeyGroup_Audio" xml:space="preserve"><value>Перевод аудио</value></data>
   <data name="HotKey_AudioComingSoon" xml:space="preserve"><value>Горячие клавиши будут доступны после реализации аудио пайплайна</value></data>
   <data name="HotKey_StartStopAudio" xml:space="preserve"><value>Старт / Стоп</value></data>
   <data name="HotKey_ToggleSubtitleVisibility" xml:space="preserve"><value>Скрыть субтитры</value></data>
 
-  <data name="Home_SelectRegionHint" xml:space="preserve"><value>Горячая клавиша: {0}</value></data>
+  <data name="Home_HotKeyHint" xml:space="preserve"><value>Горячая клавиша: {0}</value></data>
   <data name="HotKey_SelectRegion" xml:space="preserve"><value>Выделить область экрана</value></data>
   <data name="HotKey_ToggleVisibility" xml:space="preserve"><value>Скрыть/показать окно</value></data>
   <data name="HotKey_MoveUp" xml:space="preserve"><value>Переместить вверх</value></data>
@@ -213,14 +281,15 @@
 
   <data name="General_ThemeDark" xml:space="preserve"><value>Тёмная</value></data>
   <data name="General_ThemeLight" xml:space="preserve"><value>Светлая</value></data>
+  <data name="General_ThemeSystem" xml:space="preserve"><value>Как в системе</value></data>
 
   <data name="Engine_ProviderGoogle" xml:space="preserve"><value>Google Translate</value></data>
   <data name="Engine_ProviderYandex" xml:space="preserve"><value>Yandex Translate</value></data>
   <data name="Engine_ProviderBing" xml:space="preserve"><value>Bing Translator</value></data>
   <data name="Engine_ProviderMicrosoft" xml:space="preserve"><value>Microsoft Translator</value></data>
 
-  <data name="Engine_ModelFast" xml:space="preserve"><value>Fast — быстрее, легче</value></data>
-  <data name="Engine_ModelBest" xml:space="preserve"><value>Best — точнее, медленнее</value></data>
+  <data name="Engine_ModelFast" xml:space="preserve"><value>Fast - быстрее, легче</value></data>
+  <data name="Engine_ModelBest" xml:space="preserve"><value>Best - точнее, медленнее</value></data>
 
   <data name="Glossary_ModePlaceholder" xml:space="preserve"><value>Placeholder</value></data>
   <data name="Glossary_ModeHtmlTag" xml:space="preserve"><value>HTML Tag</value></data>
@@ -228,9 +297,9 @@
   <data name="Engine_OcrSpaceInfo" xml:space="preserve"><value>Облачный OCR. Бесплатно: 25 000 запросов/мес. Не требует привязки карты.</value></data>
   <data name="Engine_OcrSpaceApiKeyHint" xml:space="preserve"><value>API-ключ с сайта ocr.space. Для тестирования можно использовать ключ «helloworld».</value></data>
   <data name="Engine_OcrSpaceEngineLabel" xml:space="preserve"><value>OCR-движок:</value></data>
-  <data name="Engine_OcrSpaceEngineHint" xml:space="preserve"><value>Engine 1 — быстрый, поддерживает CJK. Engine 2 — авто-определение языка, лучше на сложных фонах.</value></data>
-  <data name="Engine_OcrSpaceEngine1" xml:space="preserve"><value>Engine 1 — быстрый, азиатские языки</value></data>
-  <data name="Engine_OcrSpaceEngine2" xml:space="preserve"><value>Engine 2 — авто-определение, латиница + китайский</value></data>
+  <data name="Engine_OcrSpaceEngineHint" xml:space="preserve"><value>Engine 1 - быстрый, поддерживает CJK. Engine 2 - авто-определение языка, лучше на сложных фонах.</value></data>
+  <data name="Engine_OcrSpaceEngine1" xml:space="preserve"><value>Engine 1 - быстрый, азиатские языки</value></data>
+  <data name="Engine_OcrSpaceEngine2" xml:space="preserve"><value>Engine 2 - авто-определение, латиница + китайский</value></data>
 
   <data name="Engine_AzureEndpointHint" xml:space="preserve"><value>Endpoint вашего ресурса Azure Computer Vision (например, https://myresource.cognitiveservices.azure.com).</value></data>
   <data name="Engine_AzureApiKeyHint" xml:space="preserve"><value>Ключ доступа из раздела «Keys and Endpoint» в Azure Portal.</value></data>
@@ -306,28 +375,41 @@
   <data name="Audio_SubtitlePositionBottom" xml:space="preserve"><value>Снизу</value></data>
   <data name="Audio_SubtitleMonitor" xml:space="preserve"><value>Монитор</value></data>
   <data name="Audio_SubtitleMonitorPrimary" xml:space="preserve"><value>Основной (по умолчанию)</value></data>
+  <data name="Audio_SubtitleDurationSection" xml:space="preserve"><value>Длительность показа</value></data>
+  <data name="Audio_SubtitleMinDuration" xml:space="preserve"><value>Минимальная длительность</value></data>
+  <data name="Audio_SubtitleMaxDuration" xml:space="preserve"><value>Максимальная длительность</value></data>
+  <data name="Audio_SubtitleMaxChars" xml:space="preserve"><value>Ранее скрытие при накоплении (символов)</value></data>
 
-  <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — локальный движок распознавания. Модели скачиваются автоматически в папку ниже.</value></data>
+  <data name="Overlay_RecordingSection" xml:space="preserve"><value>Режим записи</value></data>
+  <data name="Overlay_RecordingMode" xml:space="preserve"><value>Включить режим записи экрана</value></data>
+  <data name="Overlay_RecordingHint" xml:space="preserve"><value>Когда включено - оверлей перевода виден при захвате экрана (OBS, запись видео). Когда выключено - оверлей исключён из захвата. Учтите: в режиме записи перевод может мигать из-за особенностей захвата экрана.</value></data>
+
+  <data name="Overlay_ScreenSection" xml:space="preserve"><value>Оверлей экрана</value></data>
+  <data name="Overlay_MajorChangeThreshold" xml:space="preserve"><value>Чувствительность очистки</value></data>
+  <data name="Overlay_MajorChangeHint" xml:space="preserve"><value>Какой процент пикселей должен измениться между кадрами, чтобы оверлей очистился (смена сцены, скролл). Ниже - чаще очищается (реагирует на анимации), выше - реже (может остаться старый перевод после небольших изменений). Для фильтрации шума требуется 2 подряд кадра с изменениями выше порога.</value></data>
+
+  <data name="Overlay_PreviewSection" xml:space="preserve"><value>Предварительный просмотр</value></data>
+  <data name="Overlay_PreviewSampleOriginal" xml:space="preserve"><value>Hello, world!</value></data>
+  <data name="Overlay_PreviewSampleTranslated" xml:space="preserve"><value>Привет, мир!</value></data>
+
+  <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper - локальный движок распознавания. Модели скачиваются автоматически в папку ниже.</value></data>
   <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Папка моделей:</value></data>
   <data name="Engine_Whisper_ActiveModel" xml:space="preserve"><value>Активная модель:</value></data>
   <data name="Engine_Whisper_Models" xml:space="preserve"><value>Доступные модели</value></data>
   <data name="Engine_NotDownloaded" xml:space="preserve"><value>Не скачана</value></data>
 
-  <data name="Filter_Audio_Resample" xml:space="preserve"><value>Ресэмплинг 16 kHz</value></data>
-  <data name="Filter_Audio_ResampleDesc" xml:space="preserve"><value>Приводит частоту дискретизации к 16 kHz (требование Whisper и большинства ASR-движков).</value></data>
   <data name="Filter_Audio_Normalize" xml:space="preserve"><value>Нормализация громкости</value></data>
   <data name="Filter_Audio_NormalizeDesc" xml:space="preserve"><value>Выравнивает пиковую громкость сигнала до заданного уровня (улучшает распознавание тихой речи).</value></data>
   <data name="Filter_Audio_HighPass" xml:space="preserve"><value>Высокочастотный фильтр</value></data>
   <data name="Filter_Audio_HighPassDesc" xml:space="preserve"><value>Срезает низкочастотный шум (гул вентиляторов, сетевой гул 50 Гц) на заданной частоте среза (Гц).</value></data>
   <data name="Filter_Audio_NoiseSuppress" xml:space="preserve"><value>Шумоподавление</value></data>
   <data name="Filter_Audio_NoiseSuppressDesc" xml:space="preserve"><value>Подавляет фоновый шум (клавиатура, шум улицы). Требует вычислительных ресурсов.</value></data>
-  <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — локальный движок на основе Kaldi. Модели скачиваются вручную с alphacephei.com — распакуйте zip и укажите путь к папке.</value></data>
+  <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk - локальный движок на основе Kaldi. Модели скачиваются вручную с alphacephei.com - распакуйте zip и укажите путь к папке.</value></data>
   <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Путь к папке модели:</value></data>
   <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Открыть страницу загрузок Vosk</value></data>
-  <data name="Engine_Azure_Intro" xml:space="preserve"><value>Azure AI Speech — облачный движок. Требуется подписка (есть бесплатный тариф 5 часов/мес).</value></data>
+  <data name="Engine_Azure_Intro" xml:space="preserve"><value>Azure AI Speech - облачный движок. Требуется подписка (есть бесплатный тариф 5 часов/мес).</value></data>
   <data name="Engine_Azure_ApiKey" xml:space="preserve"><value>API-ключ:</value></data>
   <data name="Engine_Azure_Region" xml:space="preserve"><value>Регион:</value></data>
-  <data name="Engine_Download" xml:space="preserve"><value>Скачать</value></data>
   <data name="Engine_Delete" xml:space="preserve"><value>Удалить</value></data>
   <data name="Engine_Browse" xml:space="preserve"><value>Обзор</value></data>
 
@@ -356,4 +438,46 @@
   <data name="Step_Audio_Rendering" xml:space="preserve"><value>Рендер субтитров</value></data>
   <data name="Step_Audio_RenderingDesc" xml:space="preserve"><value>Передаёт готовые фрагменты в окно субтитров поверх экрана.</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Ошибка: {0}</value></data>
+  <data name="Language_English" xml:space="preserve"><value>Английский</value></data>
+  <data name="Language_Russian" xml:space="preserve"><value>Русский</value></data>
+  <data name="Language_Spanish" xml:space="preserve"><value>Испанский</value></data>
+  <data name="Language_German" xml:space="preserve"><value>Немецкий</value></data>
+  <data name="Language_French" xml:space="preserve"><value>Французский</value></data>
+  <data name="Language_Japanese" xml:space="preserve"><value>Японский</value></data>
+  <data name="Language_ChineseSimplified" xml:space="preserve"><value>Китайский (упрощённый)</value></data>
+  <data name="Language_ChineseTraditional" xml:space="preserve"><value>Китайский (традиционный)</value></data>
+  <data name="Language_Italian" xml:space="preserve"><value>Итальянский</value></data>
+  <data name="Language_Portuguese" xml:space="preserve"><value>Португальский</value></data>
+  <data name="Language_Polish" xml:space="preserve"><value>Польский</value></data>
+  <data name="Language_Korean" xml:space="preserve"><value>Корейский</value></data>
+  <data name="Language_Arabic" xml:space="preserve"><value>Арабский</value></data>
+  <data name="Language_Turkish" xml:space="preserve"><value>Турецкий</value></data>
+  <data name="Language_Ukrainian" xml:space="preserve"><value>Украинский</value></data>
+  <data name="Language_Dutch" xml:space="preserve"><value>Нидерландский</value></data>
+  <data name="Language_Vietnamese" xml:space="preserve"><value>Вьетнамский</value></data>
+  <data name="Language_Hindi" xml:space="preserve"><value>Хинди</value></data>
+  <data name="Language_Thai" xml:space="preserve"><value>Тайский</value></data>
+  <data name="Language_Hebrew" xml:space="preserve"><value>Иврит</value></data>
+  <data name="Home_TargetUnsupportedGrowl" xml:space="preserve"><value>Целевой язык {0} не поддерживается текущими движками — переключено на {1}.</value></data>
+  <data name="Audio_VadProvider" xml:space="preserve"><value>Алгоритм VAD</value></data>
+  <data name="Audio_SpeechProbabilityThreshold" xml:space="preserve"><value>Порог вероятности речи (Silero)</value></data>
+  <data name="Audio_SileroModel" xml:space="preserve"><value>Модель Silero:</value></data>
+  <data name="Misc_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Engine_Vosk_ModelsRoot" xml:space="preserve"><value>Корневая папка моделей</value></data>
+  <data name="Engine_Vosk_OpenFolder" xml:space="preserve"><value>Открыть папку</value></data>
+  <data name="Engine_Vosk_Refresh" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Engine_Vosk_Select" xml:space="preserve"><value>Выбрать</value></data>
+  <data name="Engine_Vosk_RootMissing" xml:space="preserve"><value>Папка не существует — будет создана при открытии.</value></data>
+  <data name="Engine_Vosk_NoModels" xml:space="preserve"><value>Не найдено вложенных папок с моделями. Распакуйте архив Vosk сюда.</value></data>
+  <data name="Engine_Vosk_DetectedSummary" xml:space="preserve"><value>Найдено: {0} валидных / {1} всего.</value></data>
+  <data name="Validation_VoskNoModelSelected" xml:space="preserve"><value>Модель Vosk не выбрана. Откройте настройки Vosk и выберите модель из списка.</value></data>
+  <data name="Validation_VoskModelIncomplete" xml:space="preserve"><value>Модель Vosk неполная (отсутствует {0}).</value></data>
+  <data name="Overlay_AdaptiveFps" xml:space="preserve"><value>Адаптивная частота захвата</value></data>
+  <data name="Overlay_FastIntervalMs" xml:space="preserve"><value>Быстрый интервал (контент меняется)</value></data>
+  <data name="Overlay_SlowIntervalMs" xml:space="preserve"><value>Медленный интервал (контент стабилен)</value></data>
+  <data name="Overlay_AdaptiveFpsHint" xml:space="preserve"><value>Быстрый интервал используется когда регион меняется (видео, игры). После нескольких неизменных кадров таймер переключается на медленный интервал, экономя CPU на статичном контенте (манга, документы).</value></data>
+  <data name="Audio_LoopbackResamplerQuality" xml:space="preserve"><value>Качество ресэмплера loopback</value></data>
+  <data name="Audio_LoopbackResamplerQualityHint" xml:space="preserve"><value>Выше = меньше артефактов алиасинга ценой CPU. Рекомендуется 60; снижайте до 30-40 только если захват заикается на слабом железе.</value></data>
+  <data name="Engine_Whisper_GpuRuntime" xml:space="preserve"><value>GPU-runtime</value></data>
+  <data name="Engine_Whisper_GpuRuntimeHint" xml:space="preserve"><value>Auto выбирает Vulkan если GPU поддерживает, иначе CPU. Принудительно Vulkan если GPU-драйвер работает, но Auto всё равно использует CPU. CPU — отключить GPU (отладка или нестабильный драйвер). Смена применяется на следующем Start.</value></data>
 </root>

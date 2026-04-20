@@ -9,5 +9,5 @@ namespace GhostLang.Core.Settings.Ocr;
 [JsonDerivedType(typeof(OcrSpaceOptions), "OcrSpace")]
 public abstract class OcrEngineOptions
 {
-    
+
 }

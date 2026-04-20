@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name (e.g. v0.1.0)'
+        required: true
+        type: string
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_PATH: 'src/GhostLang.sln'
+  WPF_PROJECT: 'src/GhostLang.WPF/GhostLang.WPF.csproj'
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION="${TAG#v}"
+          echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} -c Release --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION_PATH }} -c Release --no-build --verbosity minimal
+
+      - name: Publish (win-x64, self-contained)
+        run: >
+          dotnet publish ${{ env.WPF_PROJECT }}
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=false
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish/win-x64
+
+      - name: Zip application
+        shell: pwsh
+        run: |
+          $zip = "GhostLang-${{ steps.tag.outputs.tag }}-win-x64.zip"
+          Compress-Archive -Path publish/win-x64/* -DestinationPath $zip
+          echo "APP_ZIP=$zip" >> $env:GITHUB_ENV
+
+      - name: Zip benchmark samples
+        if: hashFiles('src/tests/samples/**') != ''
+        shell: pwsh
+        run: |
+          $zip = "GhostLang-samples-${{ steps.tag.outputs.tag }}.zip"
+          Compress-Archive -Path src/tests/samples/* -DestinationPath $zip
+          echo "SAMPLES_ZIP=$zip" >> $env:GITHUB_ENV
+
+      - name: Zip benchmark results
+        if: hashFiles('src/tests/results/**') != ''
+        shell: pwsh
+        run: |
+          $zip = "GhostLang-results-${{ steps.tag.outputs.tag }}.zip"
+          Compress-Archive -Path src/tests/results/* -DestinationPath $zip
+          echo "RESULTS_ZIP=$zip" >> $env:GITHUB_ENV
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: GhostLang ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(steps.tag.outputs.tag, '-beta') || contains(steps.tag.outputs.tag, '-rc') || contains(steps.tag.outputs.tag, '-alpha') }}
+          files: |
+            ${{ env.APP_ZIP }}
+            ${{ env.SAMPLES_ZIP }}
+            ${{ env.RESULTS_ZIP }}

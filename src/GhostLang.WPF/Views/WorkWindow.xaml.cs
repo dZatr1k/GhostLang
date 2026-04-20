@@ -1,5 +1,8 @@
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Services;
 using GhostLang.WPF.Services;
 
@@ -13,7 +16,11 @@ public partial class WorkWindow : Window
 
     public event Action? StartRequested;
     public event Action? StopRequested;
-    public event Action<bool>? RecordingModeChanged;
+    public event Action? CopyTranslatedTextRequested;
+    public event Action? SaveCurrentFrameRequested;
+    public event Action? ForceRefreshRequested;
+    public event Action<SupportedLanguage>? SwitchTargetLanguageRequested;
+    public event Action<bool>? ToggleOriginalVisibilityRequested;
 
     public bool IsRunning { get; private set; }
 
@@ -30,8 +37,87 @@ public partial class WorkWindow : Window
         InitializeComponent();
         _region = region;
         PositionFromRegion();
+        PopulateLanguageSubmenu();
 
         SourceInitialized += (_, _) => WindowCaptureExclusion.ExcludeFromCapture(this);
+
+        OverflowMenu.Opened += (_, _) => WindowCaptureExclusion.ExcludeFromCapture(OverflowMenu);
+        OverflowTooltip.Opened += (_, _) => WindowCaptureExclusion.ExcludeFromCapture(OverflowTooltip);
+
+        Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(OverflowMenu, OnMouseDownOutsideOverflowMenu);
+    }
+
+    private bool _suppressNextOverflowClick;
+
+    private void OnMouseDownOutsideOverflowMenu(object sender, MouseButtonEventArgs e)
+    {
+        var pos = Mouse.GetPosition(OverflowButton);
+        var bounds = new Rect(0, 0, OverflowButton.ActualWidth, OverflowButton.ActualHeight);
+        if (bounds.Contains(pos))
+            _suppressNextOverflowClick = true;
+    }
+
+    private void PopulateLanguageSubmenu()
+    {
+        SwitchLangMenuItem.Items.Clear();
+        foreach (var lang in Enum.GetValues<SupportedLanguage>()
+                     .Where(l => l != SupportedLanguage.Unknown))
+        {
+            var item = new MenuItem
+            {
+                Header = lang.ToString(),
+                IsCheckable = true,
+                Tag = lang
+            };
+            item.Click += SwitchLang_Click;
+            SwitchLangMenuItem.Items.Add(item);
+        }
+    }
+
+    public void SetCurrentTargetLanguage(SupportedLanguage current)
+    {
+        foreach (var item in SwitchLangMenuItem.Items.OfType<MenuItem>())
+        {
+            item.IsChecked = item.Tag is SupportedLanguage l && l == current;
+        }
+    }
+
+    private void OverflowButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_suppressNextOverflowClick)
+        {
+            _suppressNextOverflowClick = false;
+            return;
+        }
+
+        if (sender is Button btn && btn.ContextMenu != null)
+        {
+            btn.ContextMenu.PlacementTarget = btn;
+            btn.ContextMenu.IsOpen = true;
+        }
+    }
+
+    private void Copy_Click(object sender, RoutedEventArgs e)
+        => CopyTranslatedTextRequested?.Invoke();
+
+    private void SaveFrame_Click(object sender, RoutedEventArgs e)
+        => SaveCurrentFrameRequested?.Invoke();
+
+    private void Refresh_Click(object sender, RoutedEventArgs e)
+        => ForceRefreshRequested?.Invoke();
+
+    private void SwitchLang_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem { Tag: SupportedLanguage lang }) return;
+        foreach (var item in SwitchLangMenuItem.Items.OfType<MenuItem>())
+            item.IsChecked = ReferenceEquals(item, sender);
+        SwitchTargetLanguageRequested?.Invoke(lang);
+    }
+
+    private void ToggleOriginal_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem mi)
+            ToggleOriginalVisibilityRequested?.Invoke(mi.IsChecked);
     }
 
     private void PositionFromRegion()
@@ -54,50 +140,39 @@ public partial class WorkWindow : Window
         _region.Height = (int)((Height - ToolbarHeight) * scaleY);
     }
 
-    private void StartButton_Click(object sender, RoutedEventArgs e)
+    private void StartButton_Click(object sender, RoutedEventArgs e) => RequestStart();
+
+    private void StopButton_Click(object sender, RoutedEventArgs e) => RequestStop();
+
+    public void RequestStart()
     {
-        IsRunning = true;
-        StartButton.IsEnabled = false;
-        StopButton.IsEnabled = true;
-        StatusLabel.Text = "Running...";
-        StatusLabel.Foreground = FindResource("SuccessBrush") as System.Windows.Media.Brush;
+        if (IsRunning) return;
+        SetRunningUi(true);
         StartRequested?.Invoke();
     }
 
-    private void StopButton_Click(object sender, RoutedEventArgs e)
+    public void RequestStop()
     {
-        IsRunning = false;
-        StartButton.IsEnabled = true;
-        StopButton.IsEnabled = false;
-        StatusLabel.Text = "Stopped";
-        StatusLabel.Foreground = FindResource("SecondaryTextBrush") as System.Windows.Media.Brush;
+        if (!IsRunning) return;
+        SetRunningUi(false);
         StopRequested?.Invoke();
+    }
+
+    private void SetRunningUi(bool running)
+    {
+        IsRunning = running;
+        StartButton.IsEnabled = !running;
+        StopButton.IsEnabled = running;
+        StatusLabel.Text = running ? "Running..." : "Stopped";
+        StatusLabel.Foreground = running
+            ? FindResource("SuccessBrush") as System.Windows.Media.Brush
+            : FindResource("SecondaryTextBrush") as System.Windows.Media.Brush;
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         StopRequested?.Invoke();
         Close();
-    }
-
-    public bool IsRecording { get; private set; }
-
-    private void RecButton_Click(object sender, RoutedEventArgs e)
-    {
-        IsRecording = !IsRecording;
-
-        if (IsRecording)
-        {
-            RecButton.Background = FindResource("DangerBrush") as System.Windows.Media.Brush;
-            RecButton.Foreground = System.Windows.Media.Brushes.White;
-        }
-        else
-        {
-            RecButton.ClearValue(System.Windows.Controls.Control.BackgroundProperty);
-            RecButton.ClearValue(System.Windows.Controls.Control.ForegroundProperty);
-        }
-
-        RecordingModeChanged?.Invoke(IsRecording);
     }
 
     public void UpdateStatus(string status)

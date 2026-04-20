@@ -13,12 +13,14 @@ public class TesseractOcrEngine(TesseractOcrOptions options, ITesseractModelMana
     private TesseractEngine? _engine;
     private string _currentLoadedLanguages = string.Empty;
 
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
     public void Dispose()
     {
         _engine?.Dispose();
         _engine = null;
     }
-    
+
     public Task<bool> IsLanguageSupportedAsync(SupportedLanguage language)
     {
         var isDownloaded = modelManager.IsModelDownloaded(language, options.ModelType);
@@ -54,8 +56,8 @@ public class TesseractOcrEngine(TesseractOcrOptions options, ITesseractModelMana
 
                 var tessDataPath = modelManager.GetModelDirectoryPath(options.ModelType);
                 _engine = new TesseractEngine(tessDataPath, combinedLanguageString, EngineMode.Default);
-                
-                _currentLoadedLanguages = combinedLanguageString; 
+
+                _currentLoadedLanguages = combinedLanguageString;
             }
 
             _engine.DefaultPageSegMode = PageSegMode.SparseText;
@@ -73,7 +75,7 @@ public class TesseractOcrEngine(TesseractOcrOptions options, ITesseractModelMana
             do
             {
                 if (!iter.TryGetBoundingBox(PageIteratorLevel.TextLine, out var rect)) continue;
-                
+
                 var text = iter.GetText(PageIteratorLevel.TextLine)?.Trim();
 
                 if (!string.IsNullOrWhiteSpace(text))

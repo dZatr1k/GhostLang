@@ -1,6 +1,6 @@
 using GhostLang.Core.Pipelines.Models;
 
-namespace GhostLang.Core.Services.AudioCapture;
+namespace GhostLang.WPF.Services;
 
 public class AudioTranslationSessionEventArgs : EventArgs
 {

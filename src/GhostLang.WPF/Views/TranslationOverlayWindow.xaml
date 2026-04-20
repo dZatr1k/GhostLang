@@ -7,5 +7,8 @@
         Topmost="True"
         ShowInTaskbar="False"
         IsHitTestVisible="False">
-    <Canvas x:Name="OverlayCanvas" />
+    <Grid>
+        <Canvas x:Name="OverlayCanvasA" />
+        <Canvas x:Name="OverlayCanvasB" Visibility="Hidden" />
+    </Grid>
 </Window>

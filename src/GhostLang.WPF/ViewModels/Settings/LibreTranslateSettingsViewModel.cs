@@ -36,7 +36,7 @@ public partial class LibreTranslateSettingsViewModel : ObservableObject, IEngine
     public void ApplyOptions(object options)
     {
         if (options is not LibreTranslateOptions opt) return;
-        
+
         InstanceUrl = opt.InstanceUrl;
         ApiKey = opt.ApiKey;
     }

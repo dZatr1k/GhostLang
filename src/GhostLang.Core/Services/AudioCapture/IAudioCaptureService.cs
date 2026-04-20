@@ -10,6 +10,8 @@ public interface IAudioCaptureService : IDisposable
 
     event EventHandler<AudioChunkCapturedEventArgs>? ChunkCaptured;
 
+    event EventHandler<int>? SamplesDropped;
+
     Task StartAsync(CancellationToken ct = default);
 
     Task StopAsync();

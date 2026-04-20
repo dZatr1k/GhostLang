@@ -6,7 +6,7 @@ namespace GhostLang.WPF.ViewModels.Settings;
 
 public partial class GTranslateSettingsViewModel : ObservableObject, IEngineSettingsViewModel
 {
-    [ObservableProperty] 
+    [ObservableProperty]
     private GTranslateProvider _selectedProvider = GTranslateProvider.Google;
 
     public Dictionary<GTranslateProvider, string> AvailableProviders { get; } = BuildProviders();
@@ -22,7 +22,7 @@ public partial class GTranslateSettingsViewModel : ObservableObject, IEngineSett
             { GTranslateProvider.Microsoft, l?["Engine_ProviderMicrosoft"] ?? "Microsoft Translator" }
         };
     }
-    
+
     public string EngineName => "GTranslate (Free)";
 
     public Type OptionsType => typeof(GTranslateOptions);
@@ -38,7 +38,7 @@ public partial class GTranslateSettingsViewModel : ObservableObject, IEngineSett
     public void ApplyOptions(object options)
     {
         if (options is not GTranslateOptions opt) return;
-            
+
         SelectedProvider = opt.Provider;
     }
 }

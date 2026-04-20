@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace GhostLang.WPF.Services;
 
@@ -24,5 +25,12 @@ public static class WindowCaptureExclusion
         var hwnd = new WindowInteropHelper(window).Handle;
         if (hwnd != IntPtr.Zero)
             SetWindowDisplayAffinity(hwnd, WDA_NONE);
+    }
+
+    public static bool ExcludeFromCapture(Visual visual)
+    {
+        if (PresentationSource.FromVisual(visual) is not HwndSource source) return false;
+        if (source.Handle == IntPtr.Zero) return false;
+        return SetWindowDisplayAffinity(source.Handle, WDA_EXCLUDEFROMCAPTURE);
     }
 }

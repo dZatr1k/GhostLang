@@ -22,6 +22,7 @@ public partial class TranslationOverlayWindow : Window
     private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
 
     private CaptureRegion _region;
+    private bool _usingCanvasA = true;
 
     public TranslationOverlayWindow(CaptureRegion region)
     {
@@ -61,45 +62,70 @@ public partial class TranslationOverlayWindow : Window
 
     public void RenderFrame(TranslationContext context)
     {
-        OverlayCanvas.Children.Clear();
 
-        if (context.TextFragments == null || context.TextFragments.Count == 0)
-            return;
+        var back = _usingCanvasA ? OverlayCanvasB : OverlayCanvasA;
+        var front = _usingCanvasA ? OverlayCanvasA : OverlayCanvasB;
 
-        var (scaleX, scaleY) = DpiHelper.GetDpiScale(this);
+        back.Children.Clear();
 
-        foreach (var fragment in context.TextFragments)
+        if (context.TextFragments is { Count: > 0 })
         {
-            if (fragment.RenderedPatch is not { Length: > 0 })
-                continue;
+            var (scaleX, scaleY) = DpiHelper.GetDpiScale(this);
 
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.StreamSource = new MemoryStream(fragment.RenderedPatch);
-            bitmap.EndInit();
-            bitmap.Freeze();
-
-            var image = new Image
+            foreach (var fragment in context.TextFragments)
             {
-                Source = bitmap,
-                Width = fragment.Bounds.Width / scaleX,
-                Height = fragment.Bounds.Height / scaleY,
-                Stretch = System.Windows.Media.Stretch.Fill
-            };
+                if (fragment.RenderedPatch is not { Length: > 0 })
+                    continue;
 
-            Canvas.SetLeft(image, fragment.Bounds.X / scaleX);
-            Canvas.SetTop(image, fragment.Bounds.Y / scaleY);
-            OverlayCanvas.Children.Add(image);
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = new MemoryStream(fragment.RenderedPatch);
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                var image = new Image
+                {
+                    Source = bitmap,
+                    Width = fragment.Bounds.Width / scaleX,
+                    Height = fragment.Bounds.Height / scaleY,
+                    Stretch = System.Windows.Media.Stretch.Fill
+                };
+
+                Canvas.SetLeft(image, fragment.Bounds.X / scaleX);
+                Canvas.SetTop(image, fragment.Bounds.Y / scaleY);
+                back.Children.Add(image);
+            }
         }
+
+        back.Visibility = Visibility.Visible;
+        front.Visibility = Visibility.Hidden;
+        front.Children.Clear();
+
+        _usingCanvasA = !_usingCanvasA;
     }
+
+    private bool _isUserHidden;
+
+    public bool IsUserHidden => _isUserHidden;
 
     public void HideOverlay() => Opacity = 0;
 
-    public void ShowOverlay() => Opacity = 1;
+    public void ShowOverlay()
+    {
+        if (_isUserHidden) return;
+        Opacity = 1;
+    }
+
+    public void ToggleUserVisibility()
+    {
+        _isUserHidden = !_isUserHidden;
+        Opacity = _isUserHidden ? 0 : 1;
+    }
 
     public void ClearOverlay()
     {
-        OverlayCanvas.Children.Clear();
+        OverlayCanvasA.Children.Clear();
+        OverlayCanvasB.Children.Clear();
     }
 }

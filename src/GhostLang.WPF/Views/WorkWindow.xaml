@@ -19,11 +19,25 @@
                 Opacity="0.95" MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
             <DockPanel Margin="8,0">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <Button x:Name="StartButton" Content="{svc:Localize Work_Start}" Click="StartButton_Click"
+                    <Button x:Name="StartButton" Click="StartButton_Click"
                             Style="{StaticResource ButtonPrimary}"
-                            Width="80" Height="26" FontSize="12" Margin="0,0,4,0" />
-                    <Button x:Name="StopButton" Content="{svc:Localize Work_Stop}" Click="StopButton_Click"
-                            Width="80" Height="26" FontSize="12" IsEnabled="False" />
+                            Width="80" Height="26" FontSize="12" Margin="0,0,4,0" Padding="0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Path Data="M8,5V19L19,12L8,5Z" Fill="White"
+                                  Width="10" Height="10" Stretch="Uniform"
+                                  VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="{svc:Localize Work_Start}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="StopButton" Click="StopButton_Click"
+                            Width="80" Height="26" FontSize="12" IsEnabled="False" Padding="0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Path Data="M6,6H18V18H6V6Z" Fill="{DynamicResource PrimaryTextBrush}"
+                                  Width="10" Height="10" Stretch="Uniform"
+                                  VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBlock Text="{svc:Localize Work_Stop}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
                 <Button Content="✕" Click="CloseButton_Click" DockPanel.Dock="Right"
@@ -31,9 +45,34 @@
                         Width="26" Height="26" FontSize="14" Padding="0"
                         HorizontalAlignment="Right" />
 
-                <Button x:Name="RecButton" Content="REC" Click="RecButton_Click" DockPanel.Dock="Right"
-                        Width="42" Height="26" FontSize="10" FontWeight="Bold"
-                        HorizontalAlignment="Right" Margin="0,0,4,0" />
+                <Button x:Name="OverflowButton" Click="OverflowButton_Click" DockPanel.Dock="Right"
+                        Width="26" Height="26" FontSize="16" FontWeight="Bold"
+                        HorizontalAlignment="Right" Margin="0,0,4,0"
+                        Padding="0" Content="⋮">
+                    <Button.ToolTip>
+                        <ToolTip x:Name="OverflowTooltip" Placement="Top"
+                                 Content="{Binding [Work_MoreMenu], Source={x:Static svc:LocalizationService.Instance}}" />
+                    </Button.ToolTip>
+                    <Button.ContextMenu>
+                        <ContextMenu x:Name="OverflowMenu" Placement="Top">
+                            <MenuItem x:Name="CopyMenuItem"
+                                      Header="{Binding [Work_Copy], Source={x:Static svc:LocalizationService.Instance}}"
+                                      Click="Copy_Click" />
+                            <MenuItem x:Name="SaveFrameMenuItem"
+                                      Header="{Binding [Work_SaveFrame], Source={x:Static svc:LocalizationService.Instance}}"
+                                      Click="SaveFrame_Click" />
+                            <MenuItem x:Name="RefreshMenuItem"
+                                      Header="{Binding [Work_Refresh], Source={x:Static svc:LocalizationService.Instance}}"
+                                      Click="Refresh_Click" />
+                            <Separator />
+                            <MenuItem x:Name="SwitchLangMenuItem"
+                                      Header="{Binding [Work_SwitchLanguage], Source={x:Static svc:LocalizationService.Instance}}" />
+                            <MenuItem x:Name="ToggleOriginalMenuItem" IsCheckable="True"
+                                      Header="{Binding [Work_ToggleOriginal], Source={x:Static svc:LocalizationService.Instance}}"
+                                      Click="ToggleOriginal_Click" />
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
 
                 <TextBlock x:Name="StatusLabel" Text="{svc:Localize Work_Stopped}"
                            Foreground="{DynamicResource SecondaryTextBrush}"

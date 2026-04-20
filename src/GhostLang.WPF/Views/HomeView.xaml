@@ -4,7 +4,6 @@
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
              xmlns:svc="clr-namespace:GhostLang.WPF.Services"
-             xmlns:controls="clr-namespace:GhostLang.WPF.Controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
@@ -13,17 +12,44 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,24">
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,0,0,20">
             <svgc:SvgViewbox x:Name="LogoImage" Source="/Assets/logo-full-black-theme.svg"
                              Width="180" Height="160" />
             <TextBlock Text="{svc:Localize Home_Subtitle}"
                        Foreground="{DynamicResource SecondaryTextBrush}"
-                       HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="12" />
+                       HorizontalAlignment="Center" Margin="0,6,0,0" FontSize="{StaticResource FontSizeBody}" />
         </StackPanel>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1" Text="{svc:Localize Home_TranslateFrom}"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       VerticalAlignment="Center" Margin="0,0,10,0"
+                       FontSize="{StaticResource FontSizeControl}" />
+            <ComboBox Grid.Column="2" ItemsSource="{Binding SourceLanguages}"
+                      SelectedItem="{Binding SelectedSourceLanguage}"
+                      Height="32" />
+            <TextBlock Grid.Column="4" Text="{svc:Localize Home_TranslateTo}"
+                       Foreground="{DynamicResource SecondaryTextBrush}"
+                       VerticalAlignment="Center" Margin="0,0,10,0"
+                       FontSize="{StaticResource FontSizeControl}" />
+            <ComboBox Grid.Column="5" ItemsSource="{Binding TargetLanguages}"
+                      SelectedItem="{Binding SelectedTargetLanguage}"
+                      Height="32" />
+        </Grid>
+
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="16" />
@@ -31,18 +57,16 @@
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0">
-                
-                <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="12"
+
+                <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="{StaticResource RadiusCard}"
                         Effect="{StaticResource EffectShadow2}" />
-                
+
                 <Border Background="{DynamicResource SecondaryRegionBrush}"
-                        CornerRadius="12" Padding="24">
+                        CornerRadius="{StaticResource RadiusCard}" Padding="{StaticResource SpacingXl}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -59,26 +83,51 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <TextBlock Grid.Row="1" Text="{svc:Localize Home_SourceLanguages}"
+                        <TextBlock Grid.Row="1" Text="{Binding ScreenStatusText}"
                                    Foreground="{DynamicResource SecondaryTextBrush}"
-                                   FontSize="12" Margin="0,0,0,6" />
-                        <controls:LanguageMultiSelect Grid.Row="2"
-                            ItemsSource="{Binding SourceLanguages}"
-                            Placeholder="{Binding [Home_SourceLanguagesPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
-                            Margin="0,0,0,12" />
+                                   FontSize="13" HorizontalAlignment="Center" TextAlignment="Center"
+                                   TextWrapping="Wrap" VerticalAlignment="Center" />
 
-                        <TextBlock Grid.Row="3" Text="{svc:Localize Home_TargetLanguage}"
-                                   Foreground="{DynamicResource SecondaryTextBrush}"
-                                   FontSize="12" Margin="0,0,0,6" />
-                        <ComboBox Grid.Row="4" ItemsSource="{Binding TargetLanguages}"
-                                  SelectedItem="{Binding SelectedTargetLanguage}"
-                                  Height="32" Margin="0,0,0,20" />
-
-                        <Button Grid.Row="5" Content="{svc:Localize Home_SelectRegion}"
+                        <Button Grid.Row="2" Content="{svc:Localize Home_SelectRegion}"
                                 Command="{Binding SelectScreenRegionCommand}"
                                 Style="{StaticResource ButtonPrimary}"
                                 Height="38" FontSize="14" HorizontalAlignment="Stretch" />
-                        <TextBlock Grid.Row="6" Text="{Binding SelectRegionHotKeyHint}"
+
+                        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ScreenValidationIssues.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <ItemsControl ItemsSource="{Binding ScreenValidationIssues}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,0,0,6">
+                                            <Path DockPanel.Dock="Left"
+                                                  Data="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"
+                                                  Fill="{DynamicResource DangerBrush}"
+                                                  Width="14" Height="14" Stretch="Uniform"
+                                                  VerticalAlignment="Top" Margin="0,2,8,0" />
+                                            <TextBlock Text="{Binding}"
+                                                       Foreground="{DynamicResource DangerBrush}"
+                                                       TextWrapping="Wrap" FontSize="12" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button Content="{svc:Localize Validation_OpenSettings}"
+                                    Command="{Binding OpenSettingsFromValidationCommand}"
+                                    CommandParameter="screen"
+                                    Height="28" FontSize="12" HorizontalAlignment="Stretch"
+                                    Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="4" Text="{Binding SelectRegionHotKeyHint}"
                                    Foreground="{DynamicResource ThirdlyTextBrush}"
                                    FontSize="11" HorizontalAlignment="Center"
                                    Margin="0,6,0,0" />
@@ -87,16 +136,18 @@
             </Grid>
 
             <Grid Grid.Column="2">
-                
-                <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="12"
+
+                <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="{StaticResource RadiusCard}"
                         Effect="{StaticResource EffectShadow2}" />
-                
+
                 <Border Background="{DynamicResource SecondaryRegionBrush}"
-                        CornerRadius="12" Padding="24">
+                        CornerRadius="{StaticResource RadiusCard}" Padding="{StaticResource SpacingXl}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
@@ -111,17 +162,10 @@
                                        VerticalAlignment="Center" />
                         </StackPanel>
 
-                        <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding AudioStatusText}"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"
-                                       FontSize="13" HorizontalAlignment="Center" TextAlignment="Center"
-                                       TextWrapping="Wrap" Margin="0,0,0,12" />
-                            <ProgressBar Minimum="-60" Maximum="0"
-                                         Value="{Binding AudioLevelDb, Mode=OneWay}"
-                                         Height="6" Width="180" HorizontalAlignment="Center"
-                                         Foreground="{DynamicResource PrimaryBrush}"
-                                         Background="{DynamicResource BorderBrush}" />
-                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding AudioStatusText}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="13" HorizontalAlignment="Center" TextAlignment="Center"
+                                   TextWrapping="Wrap" VerticalAlignment="Center" />
 
                         <Grid Grid.Row="2">
                             <Button Command="{Binding ToggleAudioTranslationCommand}"
@@ -159,6 +203,45 @@
                                 </StackPanel>
                             </Button>
                         </Grid>
+
+                        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AudioValidationIssues.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <ItemsControl ItemsSource="{Binding AudioValidationIssues}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,0,0,6">
+                                            <Path DockPanel.Dock="Left"
+                                                  Data="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"
+                                                  Fill="{DynamicResource DangerBrush}"
+                                                  Width="14" Height="14" Stretch="Uniform"
+                                                  VerticalAlignment="Top" Margin="0,2,8,0" />
+                                            <TextBlock Text="{Binding}"
+                                                       Foreground="{DynamicResource DangerBrush}"
+                                                       TextWrapping="Wrap" FontSize="12" />
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button Content="{svc:Localize Validation_OpenSettings}"
+                                    Command="{Binding OpenSettingsFromValidationCommand}"
+                                    CommandParameter="audio"
+                                    Height="28" FontSize="12" HorizontalAlignment="Stretch"
+                                    Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Row="4" Text="{Binding AudioToggleHotKeyHint}"
+                                   Foreground="{DynamicResource ThirdlyTextBrush}"
+                                   FontSize="11" HorizontalAlignment="Center"
+                                   Margin="0,6,0,0" />
                     </Grid>
                 </Border>
             </Grid>

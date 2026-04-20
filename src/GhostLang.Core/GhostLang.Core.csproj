@@ -10,6 +10,7 @@
       <PackageReference Include="Azure.AI.Vision.ImageAnalysis" Version="1.0.0" />
       <PackageReference Include="GTranslate" Version="2.3.1" />
       <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.49.1" />
+      <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
       <PackageReference Include="NAudio" Version="2.2.1" />
       <PackageReference Include="Vosk" Version="0.3.38" />
       <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260330" />
@@ -19,6 +20,15 @@
       <PackageReference Include="Tesseract" Version="5.2.0" />
       <PackageReference Include="Whisper.net" Version="1.9.0" />
       <PackageReference Include="Whisper.net.Runtime" Version="1.9.0" />
+      <!--
+      Vulkan runtime: GPU-accelerated inference on NVIDIA, AMD, Intel (any GPU with
+      a working Vulkan driver — Windows 10+ usually has one). Adds ~200MB native
+      binaries. Whisper.net auto-selects at load time: Vulkan if a compatible GPU
+      is present, CPU fallback otherwise. User can force a choice in Settings.
+      CUDA package is deliberately NOT included — it's ~1GB download and doesn't
+      cover non-NVIDIA GPUs; Vulkan handles NVIDIA equally well for this workload.
+      -->
+      <PackageReference Include="Whisper.net.Runtime.Vulkan" Version="1.9.0" />
     </ItemGroup>
 
 </Project>

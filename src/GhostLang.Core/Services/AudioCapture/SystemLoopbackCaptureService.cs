@@ -13,11 +13,19 @@ public class SystemLoopbackCaptureService : IAudioCaptureService
 
     public event EventHandler<AudioChunkCapturedEventArgs>? ChunkCaptured;
 
+    public event EventHandler<int>? SamplesDropped;
+
+    private readonly int _resamplerQuality;
     private WasapiLoopbackCapture? _capture;
     private MediaFoundationResampler? _resampler;
     private BufferedWaveProvider? _buffer;
     private readonly WaveFormat _targetFormat = new(16000, 16, 1);
     private readonly Stopwatch _stopwatch = new();
+
+    public SystemLoopbackCaptureService(int resamplerQuality = 60)
+    {
+        _resamplerQuality = Math.Clamp(resamplerQuality, 1, 60);
+    }
 
     public Task StartAsync(CancellationToken ct = default)
     {
@@ -35,7 +43,7 @@ public class SystemLoopbackCaptureService : IAudioCaptureService
 
         _resampler = new MediaFoundationResampler(_buffer, _targetFormat)
         {
-            ResamplerQuality = 60
+            ResamplerQuality = _resamplerQuality
         };
 
         _capture.DataAvailable += OnDataAvailable;
@@ -69,6 +77,13 @@ public class SystemLoopbackCaptureService : IAudioCaptureService
     {
         if (_buffer is null || _resampler is null)
             return;
+
+        var freeBytes = _buffer.BufferLength - _buffer.BufferedBytes;
+        if (freeBytes < e.BytesRecorded)
+        {
+            var droppedBytes = e.BytesRecorded - freeBytes;
+            SamplesDropped?.Invoke(this, droppedBytes);
+        }
 
         _buffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
 

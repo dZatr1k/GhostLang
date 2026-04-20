@@ -13,19 +13,25 @@ public partial class HotKeyBindingViewModel : ObservableObject
     [ObservableProperty] private bool _isRecording;
     [ObservableProperty] private string _groupDisplayName = string.Empty;
     [ObservableProperty] private bool _hasBinding;
+    [ObservableProperty] private bool _hasConflict;
 
     public string DisplayNameKey { get; private set; } = string.Empty;
+    public string DescriptionKey { get; private set; } = string.Empty;
     public string GroupKey { get; private set; } = string.Empty;
     public uint Modifiers { get; set; }
     public uint VirtualKey { get; set; }
+
+    [ObservableProperty] private string _description = string.Empty;
 
     public void LoadFrom(HotKeyBinding binding)
     {
         ActionId = binding.ActionId;
         DisplayNameKey = binding.DisplayName;
+        DescriptionKey = binding.DisplayName.Replace("HotKey_", "HotKeyHelp_");
         GroupKey = binding.GroupKey;
         var loc = Services.LocalizationService.Instance;
         DisplayName = loc != null ? loc[DisplayNameKey] : DisplayNameKey;
+        Description = loc != null ? loc[DescriptionKey] : DescriptionKey;
         GroupDisplayName = loc != null && !string.IsNullOrEmpty(GroupKey) ? loc[GroupKey] : GroupKey;
         Modifiers = binding.Modifiers;
         VirtualKey = binding.Key;

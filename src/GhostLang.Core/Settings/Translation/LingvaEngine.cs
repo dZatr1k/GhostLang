@@ -9,6 +9,8 @@ public class LingvaEngine(LingvaOptions options) : ITranslationEngine
 {
     private static readonly HttpClient HttpClient = new();
 
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
     public async Task<string> TranslateAsync(string text, SupportedLanguage targetLanguage,
         List<SupportedLanguage> sourceLanguages)
     {

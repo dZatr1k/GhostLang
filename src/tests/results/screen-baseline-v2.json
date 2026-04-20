@@ -1,0 +1,173 @@
+{
+  "name": "Screen benchmark",
+  "timestampUtc": "2026-04-20T02:11:16.7494939Z",
+  "pipeline": "Screen",
+  "samples": [
+    {
+      "sampleName": "Manga Test #1",
+      "totalLatencyMs": 2622,
+      "characterErrorRate": 1.1770334928229664,
+      "wordErrorRate": 3.5,
+      "bleu": 0.005587028145593606,
+      "chrF": 0.08680136933155755,
+      "averageBoundIoU": 0,
+      "predictedFragmentCount": 67,
+      "expectedFragmentCount": 0,
+      "predictedText": "川四\nhi\nいい\n/のW\nNM時\nぶ |太\nで    必 9\nAN /\nで 偽\nNe\n【u\n独MWZrmm\n+こ\nじ描\nな / 2湖\nジス\nアク\nNM\n「o1\nゃれ\nジー\n人だ\nねて\nN1\nMT\nー(\n耐:最  狗\nかれ 造$の\nだき 構3式\nンーへ、\nぐてA\nらて で\nぬ/)\nバ、\nNN\nーー    1\nな本\nな 【\nプリ\n| いひ\nな不\n/で 理?せ\nき 想#っ\n震3キ\nて れ度\nっ 揺>震\nだに\nん6\nた郷:か\nて の\nる 手\n話をを 6\n] ろ大\nう丈\nだ移:コ\nん が\nじ で\nな夫\nに約\n住ネ\nをな\nト』因\nンー\nAl\nの二あ\nNN\nレク)",
+      "expectedText": "そうね……\nフフ…\n……\nカタ\nカタ\n揺れてる…\n地震だって？\nそれはないよ\n最新式の耐震構造で設計されてるんだから\n震度6までなら揺れを感じないって話だ\nキミの手が震えてるんだろ\nせっかくコネで理想郷に移住できたんだ\n不安にさせないでくれよ\nごめーん\nズズーーン\nグラグラ\nキャー\n揺れてるじゃねーか!!!\nワー\nなんで!?\nうわあああ\nデカイぞ!!\nゴゴゴゴ\nギギギギ\n崩れないか!?\n本当に大丈夫なんだろうな!?",
+      "stepMetrics": [
+        {
+          "stepName": "MotionDetectionStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "ImagePreProcessStep",
+          "elapsedMilliseconds": 2
+        },
+        {
+          "stepName": "OcrStep",
+          "elapsedMilliseconds": 593
+        },
+        {
+          "stepName": "TextErasureStep",
+          "elapsedMilliseconds": 388
+        },
+        {
+          "stepName": "TranslationCacheCheckStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "GlossaryTokenizationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TranslationStep",
+          "elapsedMilliseconds": 957
+        },
+        {
+          "stepName": "GlossaryRestorationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TextRenderingStep",
+          "elapsedMilliseconds": 676
+        }
+      ],
+      "hasError": false,
+      "errorMessage": null
+    },
+    {
+      "sampleName": "Game Test #1",
+      "totalLatencyMs": 780,
+      "characterErrorRate": 0.3046875,
+      "wordErrorRate": 0.68,
+      "bleu": 0.06866738382204819,
+      "chrF": 0.5524779143147321,
+      "averageBoundIoU": 0,
+      "predictedFragmentCount": 4,
+      "expectedFragmentCount": 0,
+      "predictedText": "“They say there i5 2 person) who will fell you How fo,\nSurvive in| this land... ohj wait. That’s me.\nGoo teh Gating Gerri!\nSian",
+      "expectedText": "Ryan\nThey say there is a person who will tell you how to\nsurvive in this land... oh wait. That's me.\nClose\nHelp\nCrafting\nHousing",
+      "stepMetrics": [
+        {
+          "stepName": "MotionDetectionStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "ImagePreProcessStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "OcrStep",
+          "elapsedMilliseconds": 93
+        },
+        {
+          "stepName": "TextErasureStep",
+          "elapsedMilliseconds": 34
+        },
+        {
+          "stepName": "TranslationCacheCheckStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "GlossaryTokenizationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TranslationStep",
+          "elapsedMilliseconds": 589
+        },
+        {
+          "stepName": "GlossaryRestorationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TextRenderingStep",
+          "elapsedMilliseconds": 62
+        }
+      ],
+      "hasError": false,
+      "errorMessage": null
+    },
+    {
+      "sampleName": "Site #1",
+      "totalLatencyMs": 1200,
+      "characterErrorRate": 0.036101083032490974,
+      "wordErrorRate": 0.06578947368421052,
+      "bleu": 0.8930323529877988,
+      "chrF": 0.9352921723983296,
+      "averageBoundIoU": 0,
+      "predictedFragmentCount": 17,
+      "expectedFragmentCount": 0,
+      "predictedText": "мк»: | <= лендинг: простыми\nсловами о главном\nВсе статьи\nСерверы\nДиза\nСайты\nБезопасность\nДомены\nРНР.\nКейсы клиентов\nИнтернет-пользователь сегодня окружен сотнями сайтов, баннеров, писем и объявлений.\nЗа его внимание приходится бороться — выигрывает тот бизнес, который может быстро и\nпонятно донести суть своего предложения. Именно для этого и появился лендинг. Он\nрешает конкретные маркетинговые задачи и помогает превратить случайного посетителя\nв клиента.\nВ статье рассказываем, почему лендинг важен и как его создать, чтобы получать максимум\nвыгоды.",
+      "expectedText": "Что такое лендинг: простыми\nсловами о главном\nВсе статьи\nСерверы\nДизайн\nСайты\nБезопасность\nДомены\nPHP\nКейсы клиентов\nИнтернет-пользователь сегодня окружен сотнями сайтов, баннеров, писем и объявлений. За его внимание приходится бороться — выигрывает тот бизнес, который может быстро и понятно донести суть своего предложения. Именно для этого и появился лендинг. Он решает конкретные маркетинговые задачи и помогает превратить случайного посетителя в клиента.\nВ статье рассказываем, почему лендинг важен и как его создать, чтобы получать максимум выгоды.",
+      "stepMetrics": [
+        {
+          "stepName": "MotionDetectionStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "ImagePreProcessStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "OcrStep",
+          "elapsedMilliseconds": 225
+        },
+        {
+          "stepName": "TextErasureStep",
+          "elapsedMilliseconds": 99
+        },
+        {
+          "stepName": "TranslationCacheCheckStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "GlossaryTokenizationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TranslationStep",
+          "elapsedMilliseconds": 687
+        },
+        {
+          "stepName": "GlossaryRestorationStep",
+          "elapsedMilliseconds": 0
+        },
+        {
+          "stepName": "TextRenderingStep",
+          "elapsedMilliseconds": 188
+        }
+      ],
+      "hasError": false,
+      "errorMessage": null
+    }
+  ],
+  "averageCer": 0.5059406919518191,
+  "averageWer": 1.4152631578947368,
+  "averageBleu": 0.3224289216518135,
+  "averageChrF": 0.5248571520148732,
+  "averageLatencyMs": 1534,
+  "passedCount": 3,
+  "failedCount": 0
+}

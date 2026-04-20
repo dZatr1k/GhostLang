@@ -21,6 +21,7 @@
         <Geometry x:Key="HomeGeometry">M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z</Geometry>
         <Geometry x:Key="GearGeometry">M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.04 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z</Geometry>
         <Geometry x:Key="BugGeometry">M14,12H10V10H14M14,16H10V14H14M20,8H17.19C16.74,7.22 16.12,6.55 15.37,6.04L17,4.41L15.59,3L13.42,5.17C12.96,5.06 12.5,5 12,5C11.5,5 11.04,5.06 10.59,5.17L8.41,3L7,4.41L8.62,6.04C7.88,6.55 7.26,7.22 6.81,8H4V10H6.09C6.04,10.33 6,10.66 6,11V12H4V14H6V15C6,15.34 6.04,15.67 6.09,16H4V18H6.81C7.85,19.79 9.78,21 12,21C14.22,21 16.15,19.79 17.19,18H20V16H17.91C17.96,15.67 18,15.34 18,15V14H20V12H18V11C18,10.66 17.96,10.33 17.91,10H20V8Z</Geometry>
+        <Geometry x:Key="BenchmarkGeometry">M3,22V8H7V22H3M10,22V2H14V22H10M17,22V14H21V22H17Z</Geometry>
         <Geometry x:Key="CloseXGeometry">M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z</Geometry>
         <Geometry x:Key="MinimizeGeometry">M4,12H20</Geometry>
 
@@ -148,21 +149,10 @@
                                           Width="18" Height="18" Stretch="Uniform"
                                           HorizontalAlignment="Left" VerticalAlignment="Center" />
                                     <TextBlock x:Name="LabelSettings" Grid.Column="1"
+                                               Text="{Binding [Nav_Settings], Source={x:Static svc:LocalizationService.Instance}}"
                                                Foreground="{DynamicResource PrimaryTextBrush}"
                                                VerticalAlignment="Center" FontSize="14"
-                                               Opacity="0" Margin="12,0,0,0">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="{Binding [Nav_Settings], Source={x:Static svc:LocalizationService.Instance}}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding HasUnsavedSettings}" Value="True">
-                                                        <Setter Property="Text" Value="{Binding [Nav_SettingsUnsaved], Source={x:Static svc:LocalizationService.Instance}}" />
-                                                        <Setter Property="FontWeight" Value="Bold" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
+                                               Opacity="0" Margin="12,0,0,0" />
                                 </Grid>
                             </Button>
 
@@ -175,8 +165,25 @@
                                     <Path Grid.Column="0" Data="{StaticResource BugGeometry}"
                                           Fill="{DynamicResource PrimaryTextBrush}"
                                           Width="18" Height="18" Stretch="Uniform"
-                                          HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     <TextBlock x:Name="LabelDebug" Grid.Column="1" Text="{svc:Localize Nav_Debug}"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" FontSize="14"
+                                               Opacity="0" Margin="12,0,0,0" />
+                                </Grid>
+                            </Button>
+
+                            <Button Click="NavBenchmark_Click" Style="{StaticResource NavButton}">
+                                <Grid Margin="14,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Path Grid.Column="0" Data="{StaticResource BenchmarkGeometry}"
+                                          Fill="{DynamicResource PrimaryTextBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="LabelBenchmark" Grid.Column="1" Text="{svc:Localize Nav_Benchmark}"
                                                Foreground="{DynamicResource PrimaryTextBrush}"
                                                VerticalAlignment="Center" FontSize="14"
                                                Opacity="0" Margin="12,0,0,0" />

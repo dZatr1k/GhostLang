@@ -2,5 +2,5 @@
 
 public class SolidColorErasureOptions : ErasureEngineOptions
 {
-    public string ColorHex { get; set; } = "#000000"; 
+    public string ColorHex { get; set; } = "#000000";
 }

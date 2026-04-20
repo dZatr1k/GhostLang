@@ -19,8 +19,17 @@ public class TextRenderingStep(TextRenderingOptions options) : IMandatoryPipelin
         if (context.IsAborted || context.OriginalImage == null || context.TextFragments.Count == 0)
             return;
 
-        using var msIn = new MemoryStream(context.OriginalImage);
-        using var originalImage = await Image.LoadAsync<Rgba32>(msIn);
+        Image<Rgba32>? decodedLocally = null;
+        var originalImage = context.OriginalPixels;
+        if (originalImage is null)
+        {
+            using var msIn = new MemoryStream(context.OriginalImage);
+            decodedLocally = await Image.LoadAsync<Rgba32>(msIn);
+            originalImage = decodedLocally;
+        }
+
+        try
+        {
 
         if (!SystemFonts.TryGet(options.SelectedFontFamily, out var fontFamily))
         {
@@ -34,12 +43,21 @@ public class TextRenderingStep(TextRenderingOptions options) : IMandatoryPipelin
 
             if (options.UseOriginalColor)
             {
-                var cropRect = new Rectangle(
-                    fragment.Bounds.X, fragment.Bounds.Y,
-                    fragment.Bounds.Width, fragment.Bounds.Height);
 
-                cropRect.Intersect(originalImage.Bounds);
-                fragment.TextColorHex = ExtractDominantTextColor(originalImage, cropRect);
+                var diffColor = await ExtractTextColorByDiffAsync(fragment.OriginalPatch, fragment.CleanedPatch);
+                if (diffColor is not null)
+                {
+                    fragment.TextColorHex = diffColor;
+                }
+                else
+                {
+                    var cropRect = new Rectangle(
+                        fragment.Bounds.X, fragment.Bounds.Y,
+                        fragment.Bounds.Width, fragment.Bounds.Height);
+
+                    cropRect.Intersect(originalImage.Bounds);
+                    fragment.TextColorHex = ExtractDominantTextColor(originalImage, cropRect);
+                }
             }
             else
             {
@@ -63,8 +81,13 @@ public class TextRenderingStep(TextRenderingOptions options) : IMandatoryPipelin
 
             if (actualBounds is { Width: > 0, Height: > 0 })
             {
-                float targetHeight = patchImage.Height;
-                float targetWidth = patchImage.Width;
+
+                float targetHeight = fragment.OriginalTextBounds?.Height > 0
+                    ? fragment.OriginalTextBounds.Height
+                    : patchImage.Height;
+                float targetWidth = fragment.OriginalTextBounds?.Width > 0
+                    ? fragment.OriginalTextBounds.Width
+                    : patchImage.Width;
 
                 var scaleY = targetHeight / actualBounds.Height;
                 var scaleX = scaleY;
@@ -96,6 +119,13 @@ public class TextRenderingStep(TextRenderingOptions options) : IMandatoryPipelin
                 var matrix = Matrix3x2.CreateTranslation(-actualBounds.X, -actualBounds.Y) *
                              Matrix3x2.CreateScale(scaleX, scaleY);
 
+                if (fragment.OriginalTextBounds is { } origBounds)
+                {
+                    var offsetX = origBounds.X - fragment.Bounds.X;
+                    var offsetY = origBounds.Y - fragment.Bounds.Y;
+                    matrix *= Matrix3x2.CreateTranslation(offsetX, offsetY);
+                }
+
                 textGlyphs = textGlyphs.Transform(matrix);
 
                 var renderWidth = (int)Math.Ceiling(targetWidth);
@@ -122,10 +152,87 @@ public class TextRenderingStep(TextRenderingOptions options) : IMandatoryPipelin
                 ctx.Fill(textColor, textGlyphs);
             });
 
+            if (fragment.OriginalTextBounds is { } finalOrig)
+            {
+                var cropX = Math.Max(0, finalOrig.X - fragment.Bounds.X);
+                var cropY = Math.Max(0, finalOrig.Y - fragment.Bounds.Y);
+                var cropW = Math.Min(patchImage.Width - cropX, Math.Max(finalOrig.Width, fragment.Bounds.Width - cropX));
+                var cropH = Math.Min(patchImage.Height - cropY, finalOrig.Height);
+
+                if (cropW > 0 && cropH > 0 && (cropW < patchImage.Width || cropH < patchImage.Height))
+                {
+                    patchImage.Mutate(ctx => ctx.Crop(new Rectangle(cropX, cropY, cropW, cropH)));
+
+                    fragment.Bounds.X = finalOrig.X;
+                    fragment.Bounds.Y = finalOrig.Y;
+                    fragment.Bounds.Width = cropW;
+                    fragment.Bounds.Height = cropH;
+                }
+            }
+
             using var outMs = new MemoryStream();
             await patchImage.SaveAsPngAsync(outMs);
             fragment.RenderedPatch = outMs.ToArray();
         }
+
+        }
+        finally
+        {
+            decodedLocally?.Dispose();
+        }
+    }
+
+    private static async Task<string?> ExtractTextColorByDiffAsync(byte[]? originalPatch, byte[]? cleanedPatch)
+    {
+        if (originalPatch is null || cleanedPatch is null ||
+            originalPatch.Length == 0 || cleanedPatch.Length == 0)
+            return null;
+
+        using var origMs = new MemoryStream(originalPatch);
+        using var cleanedMs = new MemoryStream(cleanedPatch);
+        using var origImage = await Image.LoadAsync<Rgba32>(origMs);
+        using var cleanedImage = await Image.LoadAsync<Rgba32>(cleanedMs);
+
+        if (origImage.Width != cleanedImage.Width || origImage.Height != cleanedImage.Height)
+            return null;
+
+        var candidates = new List<(int distance, byte r, byte g, byte b)>(origImage.Width * origImage.Height);
+
+        for (var y = 0; y < origImage.Height; y++)
+        {
+            for (var x = 0; x < origImage.Width; x++)
+            {
+                var origPx = origImage[x, y];
+                var cleanedPx = cleanedImage[x, y];
+                var distance = Math.Abs(origPx.R - cleanedPx.R)
+                             + Math.Abs(origPx.G - cleanedPx.G)
+                             + Math.Abs(origPx.B - cleanedPx.B);
+                if (distance > 30)
+                    candidates.Add((distance, origPx.R, origPx.G, origPx.B));
+            }
+        }
+
+        var minPixelCount = Math.Max(5, origImage.Width * origImage.Height / 200);
+        if (candidates.Count < minPixelCount)
+            return null;
+
+        candidates.Sort((a, b) => b.distance.CompareTo(a.distance));
+
+        var bodyCount = Math.Max(minPixelCount, candidates.Count / 4);
+
+        long sumR = 0, sumG = 0, sumB = 0;
+        for (var i = 0; i < bodyCount; i++)
+        {
+            sumR += candidates[i].r;
+            sumG += candidates[i].g;
+            sumB += candidates[i].b;
+        }
+
+        var meanR = (byte)(sumR / bodyCount);
+        var meanG = (byte)(sumG / bodyCount);
+        var meanB = (byte)(sumB / bodyCount);
+
+        return $"#{meanR:X2}{meanG:X2}{meanB:X2}";
     }
 
     private static Color ExtractBackgroundColor(Image<Rgba32> image)

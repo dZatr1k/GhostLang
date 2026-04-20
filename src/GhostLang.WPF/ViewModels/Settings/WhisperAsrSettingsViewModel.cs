@@ -14,6 +14,10 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
 
     [ObservableProperty] private WhisperModelItemViewModel? _selectedModel;
 
+    [ObservableProperty] private WhisperGpuRuntime _selectedGpuRuntime = WhisperGpuRuntime.Auto;
+
+    public Array GpuRuntimes => Enum.GetValues(typeof(WhisperGpuRuntime));
+
     public ObservableCollection<WhisperModelItemViewModel> Models { get; } = new();
 
     private static readonly string[] KnownModels = { "ggml-tiny", "ggml-base", "ggml-small", "ggml-medium", "ggml-large-v3" };
@@ -60,14 +64,22 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
         if (item is null || item.IsDownloading || item.IsDownloaded)
             return;
 
+        var cts = new CancellationTokenSource();
+        item.DownloadCts = cts;
+
         item.IsDownloading = true;
         item.StatusText = Services.LocalizationService.Instance?["Engine_Downloading"] ?? "Downloading...";
 
         try
         {
-            await _modelManager.EnsureModelAsync(item.ModelName, ModelsPath);
+            await _modelManager.EnsureModelAsync(item.ModelName, ModelsPath, cts.Token);
             item.IsDownloaded = true;
             item.StatusText = Services.LocalizationService.Instance?["Engine_Downloaded"] ?? "Downloaded";
+        }
+        catch (OperationCanceledException)
+        {
+            item.StatusText = Services.LocalizationService.Instance?["Misc_Cancelled"] ?? "Cancelled";
+            TryDeletePartialFile(item.ModelName);
         }
         catch (Exception ex)
         {
@@ -76,7 +88,25 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
         finally
         {
             item.IsDownloading = false;
+            item.DownloadCts = null;
+            cts.Dispose();
         }
+    }
+
+    private void TryDeletePartialFile(string modelName)
+    {
+        try
+        {
+            var path = _modelManager.GetModelFilePath(modelName, ModelsPath);
+            if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private void CancelDownload(WhisperModelItemViewModel? item)
+    {
+        item?.DownloadCts?.Cancel();
     }
 
     [RelayCommand]
@@ -103,7 +133,8 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
     public object GetOptions() => new WhisperAsrOptions
     {
         ModelName = SelectedModel?.ModelName ?? "ggml-base",
-        ModelsPath = ModelsPath
+        ModelsPath = ModelsPath,
+        GpuRuntime = SelectedGpuRuntime
     };
 
     public void ApplyOptions(object options)
@@ -111,6 +142,7 @@ public partial class WhisperAsrSettingsViewModel : ObservableObject, IEngineSett
         if (options is not WhisperAsrOptions opt) return;
 
         ModelsPath = opt.ModelsPath;
+        SelectedGpuRuntime = opt.GpuRuntime;
         InitializeModels();
         SelectedModel = Models.FirstOrDefault(m => m.ModelName == opt.ModelName) ?? Models.FirstOrDefault();
     }

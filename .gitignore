@@ -56,3 +56,12 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Benchmark samples — corpus is WIP, only the placeholder README is tracked.
+# Contributors drop samples here locally; release workflow zips whatever's present.
+src/tests/samples/*
+!src/tests/samples/README.md
+
+# User-local runtime files
+src/**/appsettings.user.json
+src/**/translation-cache.json

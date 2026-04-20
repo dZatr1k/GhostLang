@@ -4,7 +4,9 @@ namespace GhostLang.Core.Pipelines;
 
 public interface IPipelineBuilder
 {
-    string GetPipelineDescription(AppConfig config);
+    IReadOnlyList<PipelineStepInfo> DescribeImagePipeline(AppConfig config);
+
+    IReadOnlyList<PipelineStepInfo> DescribeAudioPipeline(AppConfig config);
 
     IImageTranslationPipeline BuildImagePipeline(AppConfig config);
 

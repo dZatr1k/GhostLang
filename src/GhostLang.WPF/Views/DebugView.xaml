@@ -3,13 +3,138 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:svc="clr-namespace:GhostLang.WPF.Services"
-             xmlns:controls="clr-namespace:GhostLang.WPF.Controls"
              xmlns:conv="clr-namespace:GhostLang.WPF.Converters"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d">
-    <TabControl BorderThickness="0">
-        <TabItem Header="{svc:Localize Debug_PipelineOcr}">
+    <UserControl.Resources>
+        <Style x:Key="FlatTabItem" TargetType="TabItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid x:Name="Root">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="2" />
+                            </Grid.RowDefinitions>
+                            <ContentPresenter Grid.Row="0" ContentSource="Header"
+                                              x:Name="HeaderPresenter"
+                                              Margin="14,10"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextBlock.Foreground="{DynamicResource SecondaryTextBrush}"
+                                              TextBlock.FontSize="12" />
+                            <Border Grid.Row="1" x:Name="Underline"
+                                    Background="Transparent" Height="2" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderPresenter" Property="TextBlock.Foreground"
+                                        Value="{DynamicResource PrimaryTextBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="HeaderPresenter" Property="TextBlock.Foreground"
+                                        Value="{DynamicResource PrimaryBrush}" />
+                                <Setter TargetName="HeaderPresenter" Property="TextBlock.FontWeight"
+                                        Value="SemiBold" />
+                                <Setter TargetName="Underline" Property="Background"
+                                        Value="{DynamicResource PrimaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FlatTabControl" TargetType="TabControl">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource FlatTabItem}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="0,0,0,1">
+                                <TabPanel IsItemsHost="True"
+                                          Margin="8,0,8,0"
+                                          Background="Transparent" />
+                            </Border>
+                            <ContentPresenter Grid.Row="1" ContentSource="SelectedContent" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="StepMetricTemplate">
+            <Grid Margin="0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="28" />
+                    <ColumnDefinition Width="170" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="74" />
+                    <ColumnDefinition Width="55" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Order, StringFormat={}{0}.}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                           FontFamily="Consolas" FontSize="12" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding StepName}"
+                           FontFamily="Consolas" FontSize="12"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsZero}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource ThirdlyTextBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <Grid Grid.Column="2" Height="14" Margin="10,0" VerticalAlignment="Center">
+                    <Border Background="{DynamicResource BorderBrush}" CornerRadius="3" Opacity="0.25" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding FilledColumn}" />
+                            <ColumnDefinition Width="{Binding EmptyColumn}" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Background="{DynamicResource PrimaryBrush}" CornerRadius="3" />
+                    </Grid>
+                </Grid>
+                <TextBlock Grid.Column="3" Text="{Binding ElapsedMilliseconds, StringFormat={}{0} ms}"
+                           FontFamily="Consolas" FontSize="12" FontWeight="Bold"
+                           HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsZero}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource ThirdlyTextBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Grid.Column="4" Text="{Binding Percentage, StringFormat={}{0:F1}%}"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           FontFamily="Consolas" FontSize="11"
+                           HorizontalAlignment="Right" VerticalAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <TabControl BorderThickness="0" SelectedIndex="{Binding SelectedDebugTabIndex}">
+        <TabItem Header="{svc:Localize Debug_PipelineScreen}">
             <Grid Margin="10">
                 <Grid.Resources>
                     <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -17,21 +142,21 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" Margin="0,0,0,10"
                         Background="{DynamicResource SecondaryRegionBrush}"
                         CornerRadius="6" Padding="10,8">
-                    <DockPanel>
-                        
-                        <hc:ButtonGroup DockPanel.Dock="Left" Margin="0,0,8,0">
+                    <StackPanel>
+                        <hc:ButtonGroup HorizontalAlignment="Left" Margin="0,0,0,8">
                             <Button Content="{svc:Localize Debug_LoadImage}"
-                                    Command="{Binding LoadImageCommand}" Padding="8,0" />
+                                    Command="{Binding LoadImageCommand}" Padding="10,0"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
                             <Button Content="{svc:Localize Debug_SelectRegion}"
-                                    Command="{Binding CaptureRegionCommand}" Padding="8,0" />
+                                    Command="{Binding CaptureRegionCommand}" Padding="10,0"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
                             <Button Command="{Binding ProcessImageCommand}"
-                                    Style="{StaticResource ButtonPrimary}" Padding="8,0">
+                                    Style="{StaticResource ButtonPrimary}" Padding="10,0">
                                 <StackPanel Orientation="Horizontal">
                                     <hc:LoadingCircle Width="14" Height="14" Margin="0,0,6,0"
                                                       Visibility="{Binding IsProcessing, Converter={StaticResource BoolToVis}}"
@@ -39,28 +164,29 @@
                                     <TextBlock Text="{svc:Localize Debug_Process}" />
                                 </StackPanel>
                             </Button>
-                            <Button Content="{svc:Localize Debug_RefreshConfig}"
-                                    Command="{Binding LoadCurrentConfigurationCommand}" Padding="8,0" />
                         </hc:ButtonGroup>
 
-                        <hc:Divider Orientation="Vertical" Margin="4,0,8,0" />
-
-                        <controls:LanguageMultiSelect DockPanel.Dock="Left"
-                            ItemsSource="{Binding SourceLanguages}"
-                            Placeholder="{Binding [Home_SourceLanguagesPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
-                            Width="150" Margin="0,0,8,0" />
-
-                        <ComboBox DockPanel.Dock="Left"
-                                  ItemsSource="{Binding TargetLanguages}"
-                                  SelectedItem="{Binding SelectedTargetLanguage}" Width="145"
-                                  hc:InfoElement.Title="{Binding [Debug_TargetLanguage], Source={x:Static svc:LocalizationService.Instance}}"
-                                  hc:InfoElement.TitlePlacement="Left" />
-                    </DockPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <TextBlock Text="{svc:Localize Debug_SourceLanguages}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox ItemsSource="{Binding SourceLanguages}"
+                                      SelectedItem="{Binding SelectedSourceLanguage}"
+                                      Width="160" Height="28" Margin="0,0,14,0" />
+                            <TextBlock Text="{svc:Localize Debug_TargetLanguage}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox ItemsSource="{Binding TargetLanguages}"
+                                      SelectedItem="{Binding SelectedTargetLanguage}" Width="140" />
+                        </StackPanel>
+                    </StackPanel>
                 </Border>
 
-                <Grid Grid.Row="1" Margin="0,0,0,10">
-                    <TabControl BorderThickness="0">
-                        
+                <Border Grid.Row="1"
+                        Background="{DynamicResource SecondaryRegionBrush}"
+                        CornerRadius="6">
+                    <TabControl Style="{StaticResource FlatTabControl}">
+
                         <TabItem Header="{svc:Localize Debug_TabOriginal}">
                             <hc:ImageViewer ImageSource="{Binding OriginalImageSource, Mode=OneWay}"
                                             ShowImgMap="True" ShowToolBar="False" />
@@ -75,369 +201,255 @@
                             <hc:ImageViewer ImageSource="{Binding ResultImageSource, Mode=OneWay}"
                                             ShowImgMap="True" ShowToolBar="False" />
                         </TabItem>
-                    </TabControl>
 
-                    <Button HorizontalAlignment="Right" VerticalAlignment="Top"
-                            Margin="0,4,8,0"
-                            Command="{Binding ToggleImageExpandedCommand}"
-                            Padding="6,3" FontSize="12" Cursor="Hand"
-                            Style="{StaticResource ButtonDefault}">
-                        <TextBlock Text="⛶" />
-                    </Button>
-                </Grid>
-
-                <Grid Grid.Row="2" Height="190">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="10" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border Grid.Column="0" Background="{DynamicResource SecondaryRegionBrush}"
-                            CornerRadius="8" Padding="12">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0" Margin="0,0,0,8">
-                                <TextBlock Text="{svc:Localize Debug_Metrics}"
-                                           Foreground="{DynamicResource PrimaryTextBrush}"
-                                           FontWeight="SemiBold" FontSize="14"
-                                           VerticalAlignment="Center" />
-                                <Button DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                        Command="{Binding ToggleMetricsExpandedCommand}"
-                                        Padding="6,3" FontSize="12" Cursor="Hand"
-                                        Style="{StaticResource ButtonDefault}">
-                                    <hc:StatusSwitchElement.CheckedElement>
-                                        <TextBlock Text="⮌" />
-                                    </hc:StatusSwitchElement.CheckedElement>
-                                    <TextBlock Text="⛶" />
-                                </Button>
-                            </DockPanel>
-                            <DataGrid Grid.Row="1"
-                                      ItemsSource="{Binding PipelineMetrics}"
-                                      AutoGenerateColumns="False"
-                                      IsReadOnly="True"
-                                      HeadersVisibility="Column"
-                                      CanUserResizeColumns="False"
-                                      CanUserReorderColumns="False"
-                                      CanUserSortColumns="False"
-                                      GridLinesVisibility="Horizontal"
-                                      HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-                                      BorderThickness="0"
-                                      Background="Transparent"
-                                      RowBackground="Transparent"
-                                      FontSize="12"
-                                      ScrollViewer.CanContentScroll="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{Binding [Debug_StepLabel], Source={x:Static svc:LocalizationService.Instance}}"
-                                                        Binding="{Binding StepName}" Width="*" />
-                                    <DataGridTextColumn Header="{Binding [Debug_TimeLabel], Source={x:Static svc:LocalizationService.Instance}}"
-                                                        Binding="{Binding ElapsedMilliseconds, StringFormat='{}{0} ms'}" Width="90">
-                                        <DataGridTextColumn.ElementStyle>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="HorizontalAlignment" Value="Right" />
-                                                <Setter Property="FontWeight" Value="Bold" />
-                                                <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElapsedMilliseconds}" Value="0">
-                                                        <Setter Property="Foreground" Value="{DynamicResource ThirdlyTextBrush}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </DataGridTextColumn.ElementStyle>
-                                    </DataGridTextColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Column="2" Background="{DynamicResource SecondaryRegionBrush}"
-                            CornerRadius="8" Padding="12">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <DockPanel Grid.Row="0" Margin="0,0,0,8">
-                                <TextBlock Text="{svc:Localize Debug_Configuration}"
-                                           Foreground="{DynamicResource PrimaryTextBrush}"
-                                           FontWeight="SemiBold" FontSize="14"
-                                           VerticalAlignment="Center" />
-                                <Button DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                        Command="{Binding ToggleConfigExpandedCommand}"
-                                        Padding="6,3" FontSize="12" Cursor="Hand"
-                                        Style="{StaticResource ButtonDefault}">
-                                    <TextBlock Text="⛶" />
-                                </Button>
-                            </DockPanel>
-                            <TextBox Grid.Row="1" Text="{Binding PipelineInfo, Mode=OneWay}"
-                                     IsReadOnly="True" TextWrapping="Wrap"
-                                     VerticalScrollBarVisibility="Auto"
-                                     FontFamily="Consolas" FontSize="11"
-                                     Background="Transparent"
-                                     BorderThickness="0" Padding="4" />
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <Grid Grid.Row="0" Grid.RowSpan="3"
-                      Visibility="{Binding IsImageExpanded, Converter={StaticResource BoolToVis}}">
-                    <TabControl BorderThickness="0">
-                        
-                        <TabItem Header="{svc:Localize Debug_TabOriginal}">
-                            <hc:ImageViewer ImageSource="{Binding OriginalImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="False" />
-                        </TabItem>
-
-                        <TabItem Header="{svc:Localize Debug_TabPreprocessed}">
-                            <hc:ImageViewer ImageSource="{Binding PreprocessedImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="False" />
-                        </TabItem>
-
-                        <TabItem Header="{svc:Localize Debug_TabResult}">
-                            <hc:ImageViewer ImageSource="{Binding ResultImageSource, Mode=OneWay}"
-                                            ShowImgMap="True" ShowToolBar="False" />
+                        <TabItem Header="{svc:Localize Debug_Metrics}">
+                            <Grid Margin="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl ItemsSource="{Binding ScreenMetricsView}"
+                                                  ItemTemplate="{StaticResource StepMetricTemplate}" />
+                                </ScrollViewer>
+                                <Border Grid.Row="1" BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="0,1,0,0"
+                                        Margin="0,10,0,0" Padding="0,10,0,0">
+                                    <Grid>
+                                        <TextBlock Text="{svc:Localize Debug_Total}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontFamily="Consolas" FontSize="13" FontWeight="SemiBold"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding ScreenPipelineTotalMs, StringFormat={}{0} ms}"
+                                                   Foreground="{DynamicResource PrimaryBrush}"
+                                                   FontFamily="Consolas" FontSize="13" FontWeight="Bold"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
                         </TabItem>
                     </TabControl>
-
-                    <Button HorizontalAlignment="Right" VerticalAlignment="Top"
-                            Margin="0,4,8,0"
-                            Command="{Binding ToggleImageExpandedCommand}"
-                            Padding="8,4" FontSize="12" Cursor="Hand"
-                            Style="{StaticResource ButtonDefault}">
-                        <TextBlock Text="⮌" />
-                    </Button>
-                </Grid>
-
-                <Border Grid.Row="0" Grid.RowSpan="3"
-                        Background="{DynamicResource SecondaryRegionBrush}"
-                        CornerRadius="8" Padding="16"
-                        Visibility="{Binding IsMetricsExpanded, Converter={StaticResource BoolToVis}}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                            <TextBlock Text="{svc:Localize Debug_Metrics}"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                       FontWeight="SemiBold" FontSize="16"
-                                       VerticalAlignment="Center" />
-                            <Button DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                    Command="{Binding ToggleMetricsExpandedCommand}"
-                                    Padding="8,4" FontSize="12" Cursor="Hand"
-                                    Style="{StaticResource ButtonDefault}">
-                                <TextBlock Text="⮌" />
-                            </Button>
-                        </DockPanel>
-                        <DataGrid Grid.Row="1"
-                                  ItemsSource="{Binding PipelineMetrics}"
-                                  AutoGenerateColumns="False"
-                                  IsReadOnly="True"
-                                  HeadersVisibility="Column"
-                                  CanUserResizeColumns="False"
-                                  CanUserReorderColumns="False"
-                                  CanUserSortColumns="False"
-                                  GridLinesVisibility="Horizontal"
-                                  HorizontalGridLinesBrush="{DynamicResource BorderBrush}"
-                                  BorderThickness="0"
-                                  Background="Transparent"
-                                  RowBackground="Transparent"
-                                  FontSize="13"
-                                  ScrollViewer.CanContentScroll="False">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="{Binding [Debug_StepLabel], Source={x:Static svc:LocalizationService.Instance}}"
-                                                    Binding="{Binding StepName}" Width="*" />
-                                <DataGridTextColumn Header="{Binding [Debug_TimeLabel], Source={x:Static svc:LocalizationService.Instance}}"
-                                                    Binding="{Binding ElapsedMilliseconds, StringFormat='{}{0} ms'}" Width="120">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="HorizontalAlignment" Value="Right" />
-                                            <Setter Property="FontWeight" Value="Bold" />
-                                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElapsedMilliseconds}" Value="0">
-                                                    <Setter Property="Foreground" Value="{DynamicResource ThirdlyTextBrush}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
                 </Border>
 
-                <Border Grid.Row="0" Grid.RowSpan="3"
+            </Grid>
+        </TabItem>
+
+        <TabItem Header="{svc:Localize Debug_PipelineAudio}">
+            <Grid Margin="10">
+                <Grid.Resources>
+                    <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Margin="0,0,0,10"
                         Background="{DynamicResource SecondaryRegionBrush}"
-                        CornerRadius="8" Padding="16"
-                        Visibility="{Binding IsConfigExpanded, Converter={StaticResource BoolToVis}}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                            <TextBlock Text="{svc:Localize Debug_Configuration}"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                       FontWeight="SemiBold" FontSize="16"
-                                       VerticalAlignment="Center" />
-                            <Button DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                    Command="{Binding ToggleConfigExpandedCommand}"
-                                    Padding="8,4" FontSize="12" Cursor="Hand"
-                                    Style="{StaticResource ButtonDefault}">
-                                <TextBlock Text="⮌" />
+                        CornerRadius="6" Padding="10,8">
+                    <StackPanel>
+                        <hc:ButtonGroup HorizontalAlignment="Left" Margin="0,0,0,8">
+                            <Button Command="{Binding RecordAudioTestCommand}"
+                                    Style="{StaticResource ButtonPrimary}" Padding="10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <hc:LoadingCircle Width="14" Height="14" Margin="0,0,6,0"
+                                                      Visibility="{Binding IsAudioRecording, Converter={StaticResource BoolToVis}}"
+                                                      Foreground="White" />
+                                    <TextBlock Text="{svc:Localize Debug_AudioRecord}" />
+                                </StackPanel>
                             </Button>
-                        </DockPanel>
-                        <TextBox Grid.Row="1" Text="{Binding PipelineInfo, Mode=OneWay}"
-                                 IsReadOnly="True" TextWrapping="Wrap"
+                            <Button Content="{svc:Localize Debug_LoadAudioFile}"
+                                    Command="{Binding LoadAudioFileCommand}" Padding="10,0"
+                                    Foreground="{DynamicResource PrimaryTextBrush}" />
+                        </hc:ButtonGroup>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <TextBlock Text="{svc:Localize Debug_SourceLanguages}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox ItemsSource="{Binding SourceLanguages}"
+                                      SelectedItem="{Binding SelectedSourceLanguage}"
+                                      Width="150" Height="28" Margin="0,0,12,0" />
+                            <TextBlock Text="{svc:Localize Debug_TargetLanguage}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox ItemsSource="{Binding TargetLanguages}"
+                                      SelectedItem="{Binding SelectedTargetLanguage}" Width="130"
+                                      Margin="0,0,12,0" />
+                            <TextBlock Text="{svc:Localize Debug_AudioSource}"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       FontSize="12" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <ComboBox ItemsSource="{Binding AudioSources}"
+                                      SelectedItem="{Binding SelectedAudioSource}" Width="130" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1"
+                        Background="{DynamicResource SecondaryRegionBrush}"
+                        CornerRadius="6">
+                <TabControl Style="{StaticResource FlatTabControl}">
+                    <TabItem Header="{svc:Localize Debug_TabTranscript}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="8">
+                                <TextBlock Text="{Binding AudioInfoText}"
+                                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                                           FontSize="11" FontFamily="Consolas" Margin="0,0,0,10"
+                                           Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
+                                <ItemsControl ItemsSource="{Binding AudioPipelineFragments}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                                    CornerRadius="6" Padding="10" Margin="0,0,0,8">
+                                                <StackPanel>
+                                                    <TextBlock FontSize="10" Foreground="{DynamicResource ThirdlyTextBrush}">
+                                                        <Run Text="["/><Run Text="{Binding StartMs, Mode=OneWay}"/><Run Text=" ms → "/><Run Text="{Binding EndMs, Mode=OneWay}"/><Run Text=" ms]"/>
+                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding OriginalText}"
+                                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                                               FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0" />
+                                                    <TextBlock Text="{Binding TranslatedText}"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                                               FontSize="13" FontWeight="SemiBold"
+                                                               TextWrapping="Wrap" Margin="0,2,0,0" />
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="{svc:Localize Debug_TabRawAsr}">
+                        <TextBox Text="{Binding AudioRawAsrText, Mode=OneWay}"
+                                 IsReadOnly="True" TextWrapping="NoWrap"
                                  VerticalScrollBarVisibility="Auto"
-                                 FontFamily="Consolas" FontSize="12"
-                                 Background="Transparent"
-                                 BorderThickness="0" Padding="6" />
-                    </Grid>
+                                 HorizontalScrollBarVisibility="Auto"
+                                 FontFamily="Consolas" FontSize="11"
+                                 Background="Transparent" BorderThickness="0" Padding="8" />
+                    </TabItem>
+
+                    <TabItem Header="{svc:Localize Debug_Metrics}">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding AudioMetricsView}"
+                                              ItemTemplate="{StaticResource StepMetricTemplate}" />
+                            </ScrollViewer>
+                            <Border Grid.Row="1" BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="0,1,0,0"
+                                    Margin="0,10,0,0" Padding="0,10,0,0">
+                                <Grid>
+                                    <TextBlock Text="{svc:Localize Debug_Total}"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               FontFamily="Consolas" FontSize="13" FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding AudioPipelineTotalMs, StringFormat={}{0} ms}"
+                                               Foreground="{DynamicResource PrimaryBrush}"
+                                               FontFamily="Consolas" FontSize="13" FontWeight="Bold"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
                 </Border>
             </Grid>
         </TabItem>
 
-        <TabItem Header="{svc:Localize Settings_TabAudio}">
-            <Grid Margin="20">
-                <Grid.Resources>
-                    <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
-                </Grid.Resources>
+        <TabItem Header="{svc:Localize Debug_TabConfiguration}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
+                        <Style TargetType="{x:Type TextBlock}" x:Key="StepNameStyle">
+                            <Setter Property="FontFamily" Value="Consolas" />
+                            <Setter Property="FontSize" Value="12" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMandatory}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource MandatoryStepBrush}" />
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMandatory}" Value="False" />
+                                        <Condition Binding="{Binding IsActive}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="{DynamicResource ThirdlyTextBrush}" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
 
-                <Border Background="{DynamicResource SecondaryRegionBrush}" CornerRadius="8" Padding="24"
-                        VerticalAlignment="Top" HorizontalAlignment="Center" MaxWidth="560">
-                    <StackPanel>
-                        <TextBlock Text="{svc:Localize Debug_AudioSmokeTestTitle}"
-                                   FontSize="16" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                   Margin="0,0,0,8" />
-                        <TextBlock Text="{svc:Localize Debug_AudioSmokeTestHint}"
-                                   Foreground="{DynamicResource SecondaryTextBrush}"
-                                   FontSize="12" TextWrapping="Wrap" Margin="0,0,0,16" />
+                    <Expander Header="{svc:Localize Debug_ConfigAppTitle}"
+                              IsExpanded="{Binding IsAppConfigExpanded}"
+                              Margin="0,0,0,10">
+                        <RichTextBox svc:RichTextBoxHelpers.Document="{Binding AppConfigDocument}"
+                                     IsReadOnly="True" IsDocumentEnabled="False"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     Background="{DynamicResource SecondaryRegionBrush}"
+                                     BorderThickness="0" Padding="10"
+                                     MaxHeight="360" />
+                    </Expander>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Text="{svc:Localize Home_SourceLanguages}"
-                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
-                                       Foreground="{DynamicResource SecondaryTextBrush}" />
-                            <controls:LanguageMultiSelect
-                                ItemsSource="{Binding SourceLanguages}"
-                                Placeholder="{Binding [Home_SourceLanguagesPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
-                                Width="220" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Text="{svc:Localize Home_TargetLanguage}"
-                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
-                                       Foreground="{DynamicResource SecondaryTextBrush}" />
-                            <ComboBox ItemsSource="{Binding TargetLanguages}"
-                                      SelectedItem="{Binding SelectedTargetLanguage}"
-                                      Width="220" Height="30" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <TextBlock Text="{svc:Localize Debug_AudioSource}"
-                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
-                                       Foreground="{DynamicResource SecondaryTextBrush}" />
-                            <ComboBox ItemsSource="{Binding AudioSources}"
-                                      SelectedItem="{Binding SelectedAudioSource}"
-                                      Width="220" Height="30" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                            <TextBlock Text="{svc:Localize Debug_AsrEngine}"
-                                       VerticalAlignment="Center" Margin="0,0,10,0" Width="100"
-                                       Foreground="{DynamicResource SecondaryTextBrush}" />
-                            <ComboBox ItemsSource="{Binding AsrEngines}"
-                                      SelectedItem="{Binding SelectedAsrEngine}"
-                                      Width="220" Height="30" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button Command="{Binding RecordAudioTestCommand}"
-                                    Style="{StaticResource ButtonPrimary}"
-                                    Height="36" Padding="16,0" Margin="0,0,8,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <hc:LoadingCircle Width="14" Height="14" Margin="0,0,8,0"
-                                                      Visibility="{Binding IsAudioRecording, Converter={StaticResource BoolToVis}}"
-                                                      Foreground="White" />
-                                    <TextBlock Text="{svc:Localize Debug_AudioRecord}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-
-                            <Button Command="{Binding LoadAudioFileCommand}"
-                                    Content="{svc:Localize Debug_LoadAudioFile}"
-                                    Height="36" Padding="16,0" />
-                        </StackPanel>
-
-                        <TextBlock Text="{Binding AudioInfoText}"
-                                   Foreground="{DynamicResource ThirdlyTextBrush}"
-                                   FontSize="11" FontFamily="Consolas" Margin="0,8,0,0"
-                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
-
-                        <TextBlock Text="{Binding AudioTestResultText}"
-                                   Foreground="{DynamicResource SecondaryTextBrush}"
-                                   FontSize="12" TextWrapping="Wrap" Margin="0,16,0,0"
-                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
-
-                        <TextBlock Text="{svc:Localize Debug_AudioPipelineFragments}"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,16,0,8"
-                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
-
-                        <ItemsControl ItemsSource="{Binding AudioPipelineFragments}"
-                                      Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}">
+                    <Expander Header="{svc:Localize Debug_ConfigScreenPipelineTitle}"
+                              IsExpanded="{Binding IsScreenPipelineExpanded}"
+                              Margin="0,0,0,10">
+                        <ItemsControl ItemsSource="{Binding ScreenPipelineStepsInfo}"
+                                      Background="{DynamicResource SecondaryRegionBrush}"
+                                      Padding="10">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{DynamicResource RegionBrush}"
-                                            CornerRadius="6" Padding="10" Margin="0,0,0,8">
-                                        <StackPanel>
-                                            <TextBlock FontSize="10" Foreground="{DynamicResource ThirdlyTextBrush}">
-                                                <Run Text="["/><Run Text="{Binding StartMs, Mode=OneWay}"/><Run Text=" ms → "/><Run Text="{Binding EndMs, Mode=OneWay}"/><Run Text=" ms]"/>
-                                            </TextBlock>
-                                            <TextBlock Text="{Binding OriginalText}"
-                                                       Foreground="{DynamicResource SecondaryTextBrush}"
-                                                       FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0" />
-                                            <TextBlock Text="{Binding TranslatedText}"
-                                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                                       FontSize="13" FontWeight="SemiBold"
-                                                       TextWrapping="Wrap" Margin="0,2,0,0" />
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <TextBlock Text="{svc:Localize Debug_AudioPipelineMetrics}"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                   FontSize="13" FontWeight="SemiBold" Margin="0,12,0,8"
-                                   Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}" />
-
-                        <ItemsControl ItemsSource="{Binding AudioPipelineMetrics}"
-                                      Visibility="{Binding HasAudioTestResult, Converter={StaticResource BoolToVis}}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,1,0,1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding StepName}"
-                                                   Foreground="{DynamicResource SecondaryTextBrush}" FontSize="11" />
-                                        <TextBlock Grid.Column="1" FontFamily="Consolas" FontSize="11"
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Consolas" FontSize="12" Margin="0,0,8,0"
                                                    Foreground="{DynamicResource ThirdlyTextBrush}">
-                                            <Run Text="{Binding ElapsedMilliseconds, Mode=OneWay}" /><Run Text=" ms" />
+                                            <Run Text="{Binding Order, Mode=OneWay}" /><Run Text=":" />
                                         </TextBlock>
-                                    </Grid>
+                                        <TextBlock Text="{Binding Name}"
+                                                   Style="{StaticResource StepNameStyle}" />
+                                        <TextBlock FontFamily="Consolas" FontSize="12" Margin="8,0,0,0"
+                                                   Foreground="{DynamicResource PrimaryBrush}"
+                                                   Visibility="{Binding HasEngine, Converter={StaticResource BoolToVis}}">
+                                            <Run Text="— " /><Run Text="{Binding Engine, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </StackPanel>
-                </Border>
-            </Grid>
+                    </Expander>
+
+                    <Expander Header="{svc:Localize Debug_ConfigAudioPipelineTitle}"
+                              IsExpanded="{Binding IsAudioPipelineExpanded}">
+                        <ItemsControl ItemsSource="{Binding AudioPipelineStepsInfo}"
+                                      Background="{DynamicResource SecondaryRegionBrush}"
+                                      Padding="10">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Consolas" FontSize="12" Margin="0,0,8,0"
+                                                   Foreground="{DynamicResource ThirdlyTextBrush}">
+                                            <Run Text="{Binding Order, Mode=OneWay}" /><Run Text=":" />
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Name}"
+                                                   Style="{StaticResource StepNameStyle}" />
+                                        <TextBlock FontFamily="Consolas" FontSize="12" Margin="8,0,0,0"
+                                                   Foreground="{DynamicResource PrimaryBrush}"
+                                                   Visibility="{Binding HasEngine, Converter={StaticResource BoolToVis}}">
+                                            <Run Text="— " /><Run Text="{Binding Engine, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Expander>
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
     </TabControl>
 </UserControl>

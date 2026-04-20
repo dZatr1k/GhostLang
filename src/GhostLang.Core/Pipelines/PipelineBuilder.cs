@@ -5,6 +5,7 @@ using GhostLang.Core.Pipelines.Steps.Audio.Implementations;
 using GhostLang.Core.Pipelines.Steps.Implementations;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.Erasure;
+using GhostLang.Core.Services.Vad;
 using GhostLang.Core.Settings;
 using GhostLang.Core.Settings.Asr;
 using GhostLang.Core.Settings.Erasure;
@@ -19,30 +20,63 @@ public class PipelineBuilder(
     ITranslationCacheService cacheService,
     ITextErasureEngineFactory erasureEngineFactory,
     ITranslationEngineFactory translationEngineFactory,
-    IAsrEngineFactory asrEngineFactory) : IPipelineBuilder
+    IAsrEngineFactory asrEngineFactory,
+    ISileroVadEngine sileroVadEngine,
+    ISileroVadModelManager sileroVadModelManager,
+    MotionDetectionStep motionDetectionStep) : IPipelineBuilder
 {
-    public string GetPipelineDescription(AppConfig config)
+    public IReadOnlyList<PipelineStepInfo> DescribeImagePipeline(AppConfig config)
     {
-        var steps = registry.GetImagePipelineSteps();
+        return registry.GetImagePipelineSteps()
+            .OrderBy(s => s.Order)
+            .Select(s => BuildStepInfo(s.Order, s.Name, s.IsOptional, s.StepId, GetImageEngineName(s.StepId, config), config))
+            .ToList();
+    }
 
-        return string.Join("\n", steps.Select(s =>
-        {
-            var status = "";
-            if (s.IsOptional)
-            {
-                var isEnabled = config.OptionalStepStates.TryGetValue(s.StepId, out var state) && state;
-                status = isEnabled ? "(Active)" : "(Disabled)";
-            }
+    public IReadOnlyList<PipelineStepInfo> DescribeAudioPipeline(AppConfig config)
+    {
+        return registry.GetAudioPipelineSteps()
+            .OrderBy(s => s.Order)
+            .Select(s => BuildStepInfo(s.Order, s.Name, s.IsOptional, s.StepId, GetAudioEngineName(s.StepId, config), config))
+            .ToList();
+    }
 
-            return $"{s.Order}: {s.Name} {status}".Trim();
-        }));
+    private static string? GetImageEngineName(string stepId, AppConfig config) => stepId switch
+    {
+        "step.image.ocr" => FormatEngine(config.ActiveOcrEngine),
+        "step.image.text_erasure" => FormatEngine(config.ActiveErasureEngine),
+        "step.image.translation" => FormatEngine(config.ActiveTranslationEngine),
+        _ => null
+    };
+
+    private static string? GetAudioEngineName(string stepId, AppConfig config) => stepId switch
+    {
+        "step.audio.asr" => FormatEngine(config.ActiveAsrEngine),
+        "step.audio.translation" => FormatEngine(config.ActiveTranslationEngine),
+        _ => null
+    };
+
+    private static PipelineStepInfo BuildStepInfo(int order, string name, bool isOptional, string stepId,
+        string? engine, AppConfig config)
+    {
+        var isActive = !isOptional ||
+                       (config.OptionalStepStates.TryGetValue(stepId, out var state) && state);
+        return new PipelineStepInfo(order, name, engine, !isOptional, isActive);
+    }
+
+    private static string? FormatEngine(object? options)
+    {
+        if (options == null) return null;
+        var typeName = options.GetType().Name;
+        return typeName.EndsWith("Options") ? typeName[..^"Options".Length] : typeName;
     }
 
     public IImageTranslationPipeline BuildImagePipeline(AppConfig config)
     {
         var steps = new List<IPipelineStep>();
 
-        steps.Add(new MotionDetectionStep { IsEnabled = IsStepEnabled(config, "step.image.motion") });
+        motionDetectionStep.IsEnabled = IsStepEnabled(config, "step.image.motion");
+        steps.Add(motionDetectionStep);
 
         steps.Add(new ImagePreProcessStep(config.PreProcessOptions)
             { IsEnabled = IsStepEnabled(config, "step.image.preprocess") });
@@ -60,7 +94,7 @@ public class PipelineBuilder(
         {
             textErasureStep.IsEnabled = isErasureEnabled;
         }
-        
+
         steps.Add(new TextErasureStep(erasureEngine) { IsEnabled = IsStepEnabled(config, "step.image.text_erasure") });
 
         cacheService.Configure(config.CacheTtlMinutes, config.CacheMaxCharacters);
@@ -76,14 +110,15 @@ public class PipelineBuilder(
 
         steps.Add(new TextRenderingStep(config.TextRendering));
 
-        return new ImageTranslationPipeline(steps);
+        return new ImageTranslationPipeline(steps, config.TranslationDeduplicationEnabled);
     }
 
     public IAudioTranslationPipeline BuildAudioPipeline(AppConfig config)
     {
         var steps = new List<IAudioPipelineStep>
         {
-            new VoiceActivityDetectionStep(config.VadOptions) { IsEnabled = IsStepEnabled(config, "step.audio.vad") },
+            new VoiceActivityDetectionStep(config.VadOptions, sileroVadEngine, sileroVadModelManager)
+                { IsEnabled = IsStepEnabled(config, "step.audio.vad") },
             new AudioPreProcessStep(config.AudioPreProcessOptions) { IsEnabled = IsStepEnabled(config, "step.audio.preprocess") }
         };
 
@@ -105,7 +140,7 @@ public class PipelineBuilder(
 
         steps.Add(new SubtitleRenderingStep());
 
-        return new AudioTranslationPipeline(steps);
+        return new AudioTranslationPipeline(steps, config.TranslationDeduplicationEnabled);
     }
 
     private bool IsStepEnabled(AppConfig config, string stepId)

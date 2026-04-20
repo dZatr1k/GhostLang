@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Windows.Threading;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Pipelines.Enums;
+using GhostLang.Core.Pipelines.Steps.Implementations;
 using GhostLang.Core.Services;
 using GhostLang.Core.Settings;
 
@@ -11,9 +12,11 @@ namespace GhostLang.WPF.Services;
 public class ScreenTranslationManager(
     IScreenCaptureService captureService,
     IPipelineBuilder pipelineBuilder,
-    IConfigurationService configService) : IScreenTranslationManager
+    IConfigurationService configService,
+    MotionDetectionStep motionDetectionStep) : IScreenTranslationManager
 {
     private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(500) };
+    private IImageTranslationPipeline? _pipeline;
     private CaptureRegion? _region;
     private SupportedLanguage _targetLanguage;
     private List<SupportedLanguage> _sourceLanguages = [];
@@ -24,15 +27,31 @@ public class ScreenTranslationManager(
     private int _unchangedCount;
     private volatile bool _skipNextNewFrame;
 
-    private const double MajorChangeThreshold = 0.30;
+    private bool _adaptiveFpsEnabled;
+    private int _fastIntervalMs;
+    private int _slowIntervalMs;
+    private int _stableFramesToSlowDown;
+    private bool _inSlowMode;
+
+    private const int MajorChangeHysteresis = 2;
+
+    private int _consecutiveMajorChanges;
 
     public event Action<TranslationContext>? FrameProcessed;
-    public event Action<string>? StatusChanged;
+    public event Action<PipelineStatus>? StatusChanged;
     public event Action? BeforeCapture;
     public event Action? AfterCapture;
     public event Action? MajorContentChanged;
 
     public bool RecordingMode { get; set; }
+
+    public bool IsActive => _timer.IsEnabled;
+
+    public void TriggerImmediateProcess()
+    {
+        if (!_timer.IsEnabled) return;
+        OnTick(this, EventArgs.Empty);
+    }
 
     public void Start(CaptureRegion region, SupportedLanguage targetLanguage, List<SupportedLanguage> sourceLanguages)
     {
@@ -44,11 +63,29 @@ public class ScreenTranslationManager(
         _lastFrameBytes = null;
         _unchangedCount = 0;
 
+        _skipNextNewFrame = false;
+
+        motionDetectionStep.Reset();
+
+        var config = configService.Load();
+
+        _pipeline?.Dispose();
+        _pipeline = pipelineBuilder.BuildImagePipeline(config);
+
+        _adaptiveFpsEnabled = config.AdaptiveFpsEnabled;
+        _fastIntervalMs = Math.Clamp(config.ScreenFastIntervalMs, 100, 2000);
+        _slowIntervalMs = Math.Clamp(config.ScreenSlowIntervalMs, 500, 5000);
+        if (_slowIntervalMs < _fastIntervalMs) _slowIntervalMs = _fastIntervalMs;
+        _stableFramesToSlowDown = Math.Clamp(config.ScreenStableFramesToSlowDown, 1, 20);
+        _inSlowMode = false;
+        _timer.Interval = TimeSpan.FromMilliseconds(_fastIntervalMs);
+
         _timer.Tick -= OnTick;
         _timer.Tick += OnTick;
         _timer.Start();
 
-        StatusChanged?.Invoke("Started, waiting for first frame...");
+        _consecutiveMajorChanges = 0;
+        StatusChanged?.Invoke(new PipelineStatus.Started());
     }
 
     public void Stop()
@@ -58,7 +95,12 @@ public class ScreenTranslationManager(
         _isProcessing = false;
         _lastFrameHash = null;
         _lastFrameBytes = null;
-        StatusChanged?.Invoke("Stopped");
+        _skipNextNewFrame = false;
+        _consecutiveMajorChanges = 0;
+
+        _pipeline?.Dispose();
+        _pipeline = null;
+        StatusChanged?.Invoke(new PipelineStatus.Stopped());
     }
 
     public void UpdateRegion(CaptureRegion region)
@@ -66,6 +108,21 @@ public class ScreenTranslationManager(
         _region = region;
         _lastFrameHash = null;
         _lastFrameBytes = null;
+
+        if (_adaptiveFpsEnabled && _inSlowMode)
+            SwitchToFastMode();
+    }
+
+    private void SwitchToSlowMode()
+    {
+        _inSlowMode = true;
+        _timer.Interval = TimeSpan.FromMilliseconds(_slowIntervalMs);
+    }
+
+    private void SwitchToFastMode()
+    {
+        _inSlowMode = false;
+        _timer.Interval = TimeSpan.FromMilliseconds(_fastIntervalMs);
     }
 
     private async void OnTick(object? sender, EventArgs e)
@@ -99,7 +156,7 @@ public class ScreenTranslationManager(
 
             if (imageBytes.Length == 0)
             {
-                StatusChanged?.Invoke("Empty frame");
+                StatusChanged?.Invoke(new PipelineStatus.FrameEmpty());
                 return;
             }
 
@@ -107,7 +164,10 @@ public class ScreenTranslationManager(
             if (_lastFrameHash != null && currentHash.AsSpan().SequenceEqual(_lastFrameHash))
             {
                 _unchangedCount++;
-                StatusChanged?.Invoke($"Frame #{_frameCount}: unchanged (x{_unchangedCount})");
+
+                if (_adaptiveFpsEnabled && !_inSlowMode && _unchangedCount >= _stableFramesToSlowDown)
+                    SwitchToSlowMode();
+                StatusChanged?.Invoke(new PipelineStatus.FrameUnchanged(_frameCount, _unchangedCount));
                 return;
             }
 
@@ -117,18 +177,32 @@ public class ScreenTranslationManager(
                 _lastFrameHash = currentHash;
                 _lastFrameBytes = imageBytes;
                 _unchangedCount = 0;
-                StatusChanged?.Invoke($"Frame #{_frameCount}: baseline (post-render)");
+                StatusChanged?.Invoke(new PipelineStatus.FrameBaseline(_frameCount));
                 return;
             }
 
             if (_lastFrameBytes != null)
             {
                 var changeRatio = CalculateChangeRatio(_lastFrameBytes, imageBytes);
+                var threshold = Math.Clamp(configService.Load().MajorContentChangeThreshold, 0.05, 0.80);
 
-                if (changeRatio > MajorChangeThreshold)
+                if (changeRatio > threshold)
                 {
-                    MajorContentChanged?.Invoke();
-                    StatusChanged?.Invoke($"Major change ({changeRatio:P0}), clearing...");
+                    _consecutiveMajorChanges++;
+                    if (_consecutiveMajorChanges >= MajorChangeHysteresis)
+                    {
+                        MajorContentChanged?.Invoke();
+                        StatusChanged?.Invoke(new PipelineStatus.MajorContentChanged(changeRatio, _consecutiveMajorChanges));
+                        _consecutiveMajorChanges = 0;
+                    }
+                    else
+                    {
+                        StatusChanged?.Invoke(new PipelineStatus.PossibleChange(changeRatio));
+                    }
+                }
+                else
+                {
+                    _consecutiveMajorChanges = 0;
                 }
             }
 
@@ -136,10 +210,13 @@ public class ScreenTranslationManager(
             _lastFrameBytes = imageBytes;
             _unchangedCount = 0;
 
-            StatusChanged?.Invoke($"Processing ({imageBytes.Length / 1024} KB)...");
+            if (_adaptiveFpsEnabled && _inSlowMode)
+                SwitchToFastMode();
 
-            var config = configService.Load();
-            var pipeline = pipelineBuilder.BuildImagePipeline(config);
+            StatusChanged?.Invoke(new PipelineStatus.FrameProcessing(imageBytes.Length / 1024));
+
+            var pipeline = _pipeline;
+            if (pipeline is null) return;
 
             var sw = Stopwatch.StartNew();
 
@@ -160,7 +237,7 @@ public class ScreenTranslationManager(
                     var verifyHash = MD5.HashData(verifyBytes);
                     if (!verifyHash.AsSpan().SequenceEqual(currentHash))
                     {
-                        StatusChanged?.Invoke($"Frame #{_frameCount}: stale ({sw.ElapsedMilliseconds}ms), skip");
+                        StatusChanged?.Invoke(new PipelineStatus.FrameStale(_frameCount, sw.ElapsedMilliseconds));
                         _lastFrameHash = null;
                         return;
                     }
@@ -169,15 +246,14 @@ public class ScreenTranslationManager(
 
             var fragments = context.TextFragments?.Count ?? 0;
             var rendered = context.TextFragments?.Count(f => f.RenderedPatch is { Length: > 0 }) ?? 0;
-            var mode = RecordingMode ? " [REC]" : "";
-            StatusChanged?.Invoke($"Frame #{_frameCount}: {sw.ElapsedMilliseconds}ms, fragments: {fragments}, rendered: {rendered}{mode}");
+            StatusChanged?.Invoke(new PipelineStatus.FrameProcessed(_frameCount, sw.ElapsedMilliseconds, fragments, rendered, RecordingMode));
 
             FrameProcessed?.Invoke(context);
             _skipNextNewFrame = true;
         }
         catch (Exception ex)
         {
-            StatusChanged?.Invoke($"Error: {ex.Message}");
+            StatusChanged?.Invoke(new PipelineStatus.Error(ex.Message, ex));
         }
         finally
         {

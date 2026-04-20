@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text.Json;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -8,6 +9,7 @@ using GhostLang.Core.Pipelines;
 using GhostLang.Core.Services;
 using GhostLang.Core.Services.Asr;
 using GhostLang.Core.Services.Ocr;
+using GhostLang.Core.Services.Vad;
 using GhostLang.Core.Pipelines.Models;
 using GhostLang.Core.Settings;
 using GhostLang.Core.Settings.Asr;
@@ -26,14 +28,65 @@ public partial class SettingsViewModel : ObservableObject
 {
     private readonly IConfigurationService _configService;
     private readonly IPipelineRegistry _registry;
-    private string _savedConfigSnapshot = string.Empty;
+    private readonly LanguageCapabilityService? _capabilityService;
 
     private readonly Dictionary<Type, Func<IEngineSettingsViewModel>> _engineViewModelFactories;
-    private readonly System.Windows.Threading.DispatcherTimer _changeTracker;
+    private readonly System.Windows.Threading.DispatcherTimer _autosaveTimer;
     private bool _isRefreshingLanguage;
+    private bool _isBulkLoading = true;
 
-    [ObservableProperty] private bool _hasUnsavedChanges;
+    private Type? _lastOcrOptionsType;
+    private Type? _lastAsrOptionsType;
+    private Type? _lastTranslationOptionsType;
 
+    [ObservableProperty] private int _selectedTabIndex;
+
+    [ObservableProperty] private int _selectedPipelineSubTabIndex;
+
+    [ObservableProperty] private bool _isShowingSavedIndicator;
+
+    private System.Windows.Threading.DispatcherTimer? _savedIndicatorTimer;
+
+    [RelayCommand]
+    private void SelectPipelineTab(string target)
+    {
+        SelectedPipelineSubTabIndex = target switch
+        {
+            "screen" => 0,
+            "audio" => 1,
+            _ => SelectedPipelineSubTabIndex
+        };
+    }
+
+    public void NavigateToTab(string target)
+    {
+        switch (target)
+        {
+            case "overlay":
+                SelectedTabIndex = 0;
+                break;
+            case "pipelines":
+                SelectedTabIndex = 1;
+                break;
+            case "screen":
+                SelectedTabIndex = 1;
+                SelectedPipelineSubTabIndex = 0;
+                break;
+            case "audio":
+                SelectedTabIndex = 1;
+                SelectedPipelineSubTabIndex = 1;
+                break;
+            case "capture":
+                SelectedTabIndex = 2;
+                break;
+            case "hotkeys":
+                SelectedTabIndex = 3;
+                break;
+            case "appearance":
+                SelectedTabIndex = 4;
+                break;
+        }
+    }
 
     public ObservableCollection<PipelineStepViewModel> ImagePipelineSteps { get; } = [];
 
@@ -59,10 +112,44 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty] private double _silenceThresholdDb = -40.0;
     [ObservableProperty] private int _minSilenceDurationMs = 500;
+    [ObservableProperty] private int _loopbackResamplerQuality = 60;
+    [ObservableProperty] private Core.Settings.Audio.VadProvider _selectedVadProvider = Core.Settings.Audio.VadProvider.Rms;
+    [ObservableProperty] private float _speechProbabilityThreshold = 0.5f;
+    [ObservableProperty] private bool _isSileroModelDownloaded;
+    [ObservableProperty] private bool _isSileroDownloading;
+    [ObservableProperty] private double _sileroDownloadProgress;
+    [ObservableProperty] private string _sileroDownloadStatus = string.Empty;
+
+    public Array VadProviders => Enum.GetValues(typeof(Core.Settings.Audio.VadProvider));
 
     [ObservableProperty] private bool _showOriginalSubtitle = true;
     [ObservableProperty] private string _subtitlePosition = "Bottom";
     [ObservableProperty] private int _subtitleMonitorIndex = -1;
+    [ObservableProperty] private int _subtitleMinDurationMs = 1500;
+    [ObservableProperty] private int _subtitleMaxDurationMs = 8000;
+    [ObservableProperty] private int _subtitleMaxChars = 400;
+    [ObservableProperty] private bool _recordingMode;
+    [ObservableProperty] private double _majorContentChangeThreshold = 0.30;
+    [ObservableProperty] private bool _adaptiveFpsEnabled = true;
+    [ObservableProperty] private int _screenFastIntervalMs = 200;
+    [ObservableProperty] private int _screenSlowIntervalMs = 2000;
+
+    [ObservableProperty] private VerticalAlignment _subtitlePreviewVAlign = VerticalAlignment.Bottom;
+    [ObservableProperty] private HorizontalAlignment _subtitlePreviewHAlign = HorizontalAlignment.Center;
+
+    partial void OnSubtitlePositionChanged(string value)
+    {
+        SubtitlePreviewVAlign = (value ?? string.Empty).StartsWith("Top")
+            ? VerticalAlignment.Top
+            : VerticalAlignment.Bottom;
+
+        SubtitlePreviewHAlign = value switch
+        {
+            "TopLeft" or "BottomLeft" => HorizontalAlignment.Left,
+            "TopRight" or "BottomRight" => HorizontalAlignment.Right,
+            _ => HorizontalAlignment.Center
+        };
+    }
 
     public Dictionary<string, string> AvailableSubtitlePositions { get; private set; } = BuildSubtitlePositions();
 
@@ -73,8 +160,12 @@ public partial class SettingsViewModel : ObservableObject
         var l = LocalizationService.Instance;
         return new Dictionary<string, string>
         {
+            { "TopLeft", l?["Audio_SubtitlePositionTopLeft"] ?? "Top-Left" },
             { "Top", l?["Audio_SubtitlePositionTop"] ?? "Top" },
-            { "Bottom", l?["Audio_SubtitlePositionBottom"] ?? "Bottom" }
+            { "TopRight", l?["Audio_SubtitlePositionTopRight"] ?? "Top-Right" },
+            { "BottomLeft", l?["Audio_SubtitlePositionBottomLeft"] ?? "Bottom-Left" },
+            { "Bottom", l?["Audio_SubtitlePositionBottom"] ?? "Bottom" },
+            { "BottomRight", l?["Audio_SubtitlePositionBottomRight"] ?? "Bottom-Right" }
         };
     }
 
@@ -128,13 +219,7 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnSelectedThemeChanged(string value)
     {
         if (_isRefreshingLanguage) return;
-
         _themeService?.Apply(value);
-
-        var config = _configService.Load();
-        config.Theme = value;
-        _configService.Save(config);
-        UpdateSavedSnapshot();
     }
 
     public Dictionary<string, string> AvailableThemes { get; private set; } = BuildThemes();
@@ -145,21 +230,18 @@ public partial class SettingsViewModel : ObservableObject
         return new Dictionary<string, string>
         {
             { "Dark", l?["General_ThemeDark"] ?? "Dark" },
-            { "Light", l?["General_ThemeLight"] ?? "Light" }
+            { "Light", l?["General_ThemeLight"] ?? "Light" },
+            { "System", l?["General_ThemeSystem"] ?? "Match system" }
         };
     }
 
-    [ObservableProperty] private string _selectedLanguage = "ru";
+    [ObservableProperty] private string _selectedLanguage = "en";
 
     partial void OnSelectedLanguageChanged(string value)
     {
         if (_isRefreshingLanguage) return;
 
         _localizationService?.Apply(value);
-
-        var config = BuildCurrentConfig();
-        config.Language = value;
-        _configService.Save(config);
 
         _isRefreshingLanguage = true;
         try
@@ -170,23 +252,58 @@ public partial class SettingsViewModel : ObservableObject
         {
             _isRefreshingLanguage = false;
         }
-
-        UpdateSavedSnapshot();
     }
 
     private void RefreshLocalizedContent()
     {
-        AvailableThemes = BuildThemes();
-        OnPropertyChanged(nameof(AvailableThemes));
+        DetachAll();
+        _isBulkLoading = true;
+        try
+        {
+            var savedTheme = SelectedTheme;
+            var savedTokenMode = GlossaryTokenMode;
+            var savedCaptureSource = SelectedAudioCaptureSource;
+            var savedPosition = SubtitlePosition;
+            var savedMonitor = SubtitleMonitorIndex;
 
-        AvailableTokenModes = BuildTokenModes();
-        OnPropertyChanged(nameof(AvailableTokenModes));
+            AvailableThemes = BuildThemes();
+            OnPropertyChanged(nameof(AvailableThemes));
 
-        CreatePipelineStructure();
+            AvailableTokenModes = BuildTokenModes();
+            OnPropertyChanged(nameof(AvailableTokenModes));
 
-        LoadAndApplySettings();
+            AvailableAudioCaptureSources = BuildAudioCaptureSources();
+            OnPropertyChanged(nameof(AvailableAudioCaptureSources));
 
-        LoadGlossary();
+            AvailableSubtitlePositions = BuildSubtitlePositions();
+            OnPropertyChanged(nameof(AvailableSubtitlePositions));
+
+            AvailableMonitors = BuildMonitors();
+            OnPropertyChanged(nameof(AvailableMonitors));
+
+            SelectedTheme = savedTheme;
+            GlossaryTokenMode = savedTokenMode;
+            SelectedAudioCaptureSource = savedCaptureSource;
+            SubtitlePosition = savedPosition;
+            SubtitleMonitorIndex = savedMonitor;
+
+            CreatePipelineStructure();
+
+            LoadAndApplySettings();
+
+            LoadGlossary();
+
+            OnPropertyChanged(nameof(SelectedTheme));
+            OnPropertyChanged(nameof(GlossaryTokenMode));
+            OnPropertyChanged(nameof(SelectedAudioCaptureSource));
+            OnPropertyChanged(nameof(SubtitlePosition));
+            OnPropertyChanged(nameof(SubtitleMonitorIndex));
+        }
+        finally
+        {
+            _isBulkLoading = false;
+            AttachSubscriptions();
+        }
     }
 
     public Dictionary<string, string> AvailableLanguages { get; } = new()
@@ -198,17 +315,23 @@ public partial class SettingsViewModel : ObservableObject
     private readonly GlobalHotKeyService? _hotKeyService;
     private readonly ThemeService? _themeService;
     private readonly LocalizationService? _localizationService;
+    private readonly ISileroVadModelManager? _sileroVadModelManager;
 
     public SettingsViewModel(IConfigurationService configService, IPipelineRegistry registry,
         ITesseractModelManager modelManager, IWhisperModelManager whisperModelManager,
         GlobalHotKeyService hotKeyService, ThemeService themeService,
-        LocalizationService localizationService)
+        LocalizationService localizationService,
+        LanguageCapabilityService capabilityService,
+        ISileroVadModelManager sileroVadModelManager,
+        IVoskModelManager voskModelManager)
     {
+        _sileroVadModelManager = sileroVadModelManager;
         _configService = configService;
         _hotKeyService = hotKeyService;
         _themeService = themeService;
         _localizationService = localizationService;
         _registry = registry;
+        _capabilityService = capabilityService;
 
         _engineViewModelFactories = new Dictionary<Type, Func<IEngineSettingsViewModel>>
         {
@@ -224,7 +347,7 @@ public partial class SettingsViewModel : ObservableObject
             { typeof(LingvaOptions), () => new LingvaSettingsViewModel() },
             { typeof(LibreTranslateOptions), () => new LibreTranslateSettingsViewModel() },
             { typeof(WhisperAsrOptions), () => new WhisperAsrSettingsViewModel(whisperModelManager) },
-            { typeof(VoskAsrOptions), () => new VoskAsrSettingsViewModel() },
+            { typeof(VoskAsrOptions), () => new VoskAsrSettingsViewModel(voskModelManager) },
             { typeof(AzureAsrOptions), () => new AzureAsrSettingsViewModel() }
         };
 
@@ -232,24 +355,27 @@ public partial class SettingsViewModel : ObservableObject
         _selectedLanguage = initialConfig.Language;
         _selectedTheme = initialConfig.Theme;
 
+        _autosaveTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(400)
+        };
+        _autosaveTimer.Tick += (_, _) =>
+        {
+            _autosaveTimer.Stop();
+            SaveSilently();
+        };
+
         CreatePipelineStructure();
         LoadAndApplySettings();
         LoadGlossary();
-        UpdateSavedSnapshot();
 
-        _changeTracker = new System.Windows.Threading.DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(500)
-        };
-        _changeTracker.Tick += (_, _) => CheckForChanges();
-    }
+        _isBulkLoading = false;
+        AttachSubscriptions();
 
-    public void StartChangeTracking() => _changeTracker.Start();
+        if (_hotKeyService != null)
+            _hotKeyService.BindingsReloaded += UpdateHotKeyConflicts;
 
-    public void StopChangeTracking()
-    {
-        _changeTracker.Stop();
-        CheckForChanges();
+        SaveSilently(flashIndicator: false);
     }
 
     private void LoadGlossary()
@@ -267,7 +393,7 @@ public partial class SettingsViewModel : ObservableObject
             var vm = new HotKeyBindingViewModel();
             vm.LoadFrom(hk);
             HotKeyBindings.Add(vm);
-            if (hk.GroupKey == "HotKeyGroup_AudioPipeline")
+            if (hk.GroupKey == "HotKeyGroup_Audio")
                 AudioPipelineHotKeys.Add(vm);
             else
                 ImagePipelineHotKeys.Add(vm);
@@ -283,9 +409,6 @@ public partial class SettingsViewModel : ObservableObject
                 SourceVariants = string.Join(", ", rule.SourceVariants)
             });
         }
-
-        SelectedTheme = config.Theme;
-        SelectedLanguage = config.Language;
     }
 
     [RelayCommand]
@@ -300,7 +423,6 @@ public partial class SettingsViewModel : ObservableObject
         if (rule != null)
             GlossaryRules.Remove(rule);
     }
-
 
     private void CreatePipelineStructure()
     {
@@ -396,8 +518,6 @@ public partial class SettingsViewModel : ObservableObject
 
         AudioPreProcessFilters.Clear();
         AudioPreProcessFilters.Add(new FilterViewModel
-            { DisplayName = l["Filter_Audio_Resample"], Description = l["Filter_Audio_ResampleDesc"], Option = config.AudioPreProcessOptions.Resample16kHz, HasParameter = false });
-        AudioPreProcessFilters.Add(new FilterViewModel
             { DisplayName = l["Filter_Audio_Normalize"], Description = l["Filter_Audio_NormalizeDesc"], Option = config.AudioPreProcessOptions.NormalizeLoudness, HasParameter = false });
         AudioPreProcessFilters.Add(new FilterViewModel
             { DisplayName = l["Filter_Audio_HighPass"], Description = l["Filter_Audio_HighPassDesc"], Option = config.AudioPreProcessOptions.HighPassFilter, HasParameter = true });
@@ -445,7 +565,7 @@ public partial class SettingsViewModel : ObservableObject
                     step.SelectedEngineViewModel = targetEngineVm;
                 }
             }
-            
+
             if (step.StepId == "step.image.translation" && config.ActiveTranslationEngine != null)
             {
                 var activeOptionsType = config.ActiveTranslationEngine.GetType();
@@ -479,9 +599,21 @@ public partial class SettingsViewModel : ObservableObject
         SelectedAudioCaptureSource = config.ActiveAudioCaptureSource;
         SilenceThresholdDb = config.VadOptions.SilenceThresholdDb;
         MinSilenceDurationMs = config.VadOptions.MinSilenceDurationMs;
+        SelectedVadProvider = config.VadOptions.Provider;
+        SpeechProbabilityThreshold = config.VadOptions.SpeechProbabilityThreshold;
+        IsSileroModelDownloaded = _sileroVadModelManager?.IsModelDownloaded ?? false;
+        LoopbackResamplerQuality = config.LoopbackResamplerQuality;
         ShowOriginalSubtitle = config.SubtitleOptions.ShowOriginal;
         SubtitlePosition = string.IsNullOrWhiteSpace(config.SubtitleOptions.Position) ? "Bottom" : config.SubtitleOptions.Position;
         SubtitleMonitorIndex = config.SubtitleOptions.MonitorIndex;
+        SubtitleMinDurationMs = config.SubtitleOptions.MinDurationMs;
+        SubtitleMaxDurationMs = config.SubtitleOptions.MaxDurationMs;
+        SubtitleMaxChars = config.SubtitleOptions.MaxCharsBeforeEarlyHide;
+        RecordingMode = config.RecordingMode;
+        MajorContentChangeThreshold = config.MajorContentChangeThreshold;
+        AdaptiveFpsEnabled = config.AdaptiveFpsEnabled;
+        ScreenFastIntervalMs = config.ScreenFastIntervalMs;
+        ScreenSlowIntervalMs = config.ScreenSlowIntervalMs;
     }
 
     private AppConfig BuildCurrentConfig()
@@ -523,12 +655,11 @@ public partial class SettingsViewModel : ObservableObject
             config.PreProcessOptions.Invert = PreProcessFilters[8].Option;
         }
 
-        if (AudioPreProcessFilters.Count >= 4)
+        if (AudioPreProcessFilters.Count >= 3)
         {
-            config.AudioPreProcessOptions.Resample16kHz = AudioPreProcessFilters[0].Option;
-            config.AudioPreProcessOptions.NormalizeLoudness = AudioPreProcessFilters[1].Option;
-            config.AudioPreProcessOptions.HighPassFilter = AudioPreProcessFilters[2].Option;
-            config.AudioPreProcessOptions.NoiseSuppression = AudioPreProcessFilters[3].Option;
+            config.AudioPreProcessOptions.NormalizeLoudness = AudioPreProcessFilters[0].Option;
+            config.AudioPreProcessOptions.HighPassFilter = AudioPreProcessFilters[1].Option;
+            config.AudioPreProcessOptions.NoiseSuppression = AudioPreProcessFilters[2].Option;
         }
 
         foreach (var step in AudioPipelineSteps)
@@ -548,14 +679,25 @@ public partial class SettingsViewModel : ObservableObject
         config.VadOptions = new VadOptions
         {
             SilenceThresholdDb = SilenceThresholdDb,
-            MinSilenceDurationMs = MinSilenceDurationMs
+            MinSilenceDurationMs = MinSilenceDurationMs,
+            Provider = SelectedVadProvider,
+            SpeechProbabilityThreshold = SpeechProbabilityThreshold
         };
+        config.LoopbackResamplerQuality = LoopbackResamplerQuality;
         config.SubtitleOptions = new SubtitleOptions
         {
             ShowOriginal = ShowOriginalSubtitle,
             Position = SubtitlePosition,
-            MonitorIndex = SubtitleMonitorIndex
+            MonitorIndex = SubtitleMonitorIndex,
+            MinDurationMs = SubtitleMinDurationMs,
+            MaxDurationMs = SubtitleMaxDurationMs,
+            MaxCharsBeforeEarlyHide = SubtitleMaxChars
         };
+        config.RecordingMode = RecordingMode;
+        config.MajorContentChangeThreshold = MajorContentChangeThreshold;
+        config.AdaptiveFpsEnabled = AdaptiveFpsEnabled;
+        config.ScreenFastIntervalMs = ScreenFastIntervalMs;
+        config.ScreenSlowIntervalMs = ScreenSlowIntervalMs;
 
         config.GlossaryTokenMode = GlossaryTokenMode;
         config.Theme = SelectedTheme;
@@ -580,47 +722,31 @@ public partial class SettingsViewModel : ObservableObject
         return config;
     }
 
-    private static string SerializeConfig(AppConfig config)
-    {
-        return JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = false });
-    }
-
-    private void UpdateSavedSnapshot()
-    {
-        _savedConfigSnapshot = SerializeConfig(BuildCurrentConfig());
-        HasUnsavedChanges = false;
-    }
-
-    public void CheckForChanges()
-    {
-        try
-        {
-            var currentJson = SerializeConfig(BuildCurrentConfig());
-            HasUnsavedChanges = currentJson != _savedConfigSnapshot;
-        }
-        catch
-        {
-        }
-    }
-
     [RelayCommand]
     private void SaveSettings()
     {
+        _autosaveTimer.Stop();
         try
         {
             var config = BuildCurrentConfig();
             _configService.Save(config);
-            _hotKeyService?.ReloadBindings();
+            var reload = _hotKeyService?.ReloadBindings();
             _themeService?.Apply(config.Theme);
-            UpdateSavedSnapshot();
 
-            HandyControl.Controls.Growl.Success(new HandyControl.Data.GrowlInfo
+            if (reload is { HasConflicts: true })
             {
-                Message = LocalizationService.Instance?["Settings_SavedSuccess"] ?? "Saved!",
-                WaitTime = 3,
-                StaysOpen = false,
-                Token = "MainGrowl"
-            });
+                ShowHotKeyConflictGrowl(reload);
+            }
+            else
+            {
+                HandyControl.Controls.Growl.Success(new HandyControl.Data.GrowlInfo
+                {
+                    Message = LocalizationService.Instance?["Settings_SavedSuccess"] ?? "Saved!",
+                    WaitTime = 3,
+                    StaysOpen = false,
+                    Token = "MainGrowl"
+                });
+            }
         }
         catch (Exception ex)
         {
@@ -632,5 +758,261 @@ public partial class SettingsViewModel : ObservableObject
                 Token = "MainGrowl"
             });
         }
+    }
+
+    private void SaveSilently(bool flashIndicator = true)
+    {
+        if (_isBulkLoading) return;
+        try
+        {
+            var config = BuildCurrentConfig();
+            _configService.Save(config);
+            NotifyCapabilitiesIfEngineTypeChanged(config);
+            var reload = _hotKeyService?.ReloadBindings();
+            if (!_isShuttingDown && reload is { HasConflicts: true })
+                ShowHotKeyConflictGrowl(reload);
+            if (!_isShuttingDown && flashIndicator)
+                FlashSavedIndicator();
+        }
+        catch (Exception ex)
+        {
+            if (_isShuttingDown) return;
+            HandyControl.Controls.Growl.Error(new HandyControl.Data.GrowlInfo
+            {
+                Message = $"{LocalizationService.Instance?["Settings_SaveError"]} {ex.Message}",
+                WaitTime = 5,
+                StaysOpen = false,
+                Token = "MainGrowl"
+            });
+        }
+    }
+
+    private void NotifyCapabilitiesIfEngineTypeChanged(AppConfig config)
+    {
+        if (_capabilityService is null) return;
+
+        var ocrType = config.ActiveOcrEngine?.GetType();
+        var asrType = config.ActiveAsrEngine?.GetType();
+        var trType = config.ActiveTranslationEngine?.GetType();
+
+        var changed = ocrType != _lastOcrOptionsType
+                   || asrType != _lastAsrOptionsType
+                   || trType != _lastTranslationOptionsType;
+
+        _lastOcrOptionsType = ocrType;
+        _lastAsrOptionsType = asrType;
+        _lastTranslationOptionsType = trType;
+
+        if (changed)
+            _capabilityService.NotifyChanged();
+    }
+
+    [RelayCommand]
+    private async Task DownloadSileroModelAsync()
+    {
+        if (_sileroVadModelManager is null || IsSileroDownloading) return;
+
+        IsSileroDownloading = true;
+        SileroDownloadProgress = 0;
+        SileroDownloadStatus = LocalizationService.Instance?["Engine_Downloading"] ?? "Downloading...";
+
+        try
+        {
+            var progress = new Progress<double>(p => SileroDownloadProgress = p);
+            await _sileroVadModelManager.DownloadAsync(progress);
+            IsSileroModelDownloaded = _sileroVadModelManager.IsModelDownloaded;
+            SileroDownloadStatus = LocalizationService.Instance?["Engine_Downloaded"] ?? "Downloaded";
+        }
+        catch (Exception ex)
+        {
+            SileroDownloadStatus = $"{LocalizationService.Instance?["Misc_Error"]} {ex.Message}";
+        }
+        finally
+        {
+            IsSileroDownloading = false;
+        }
+    }
+
+    [RelayCommand]
+    private void DeleteSileroModel()
+    {
+        if (_sileroVadModelManager is null) return;
+        _sileroVadModelManager.Delete();
+        IsSileroModelDownloaded = false;
+        SileroDownloadStatus = LocalizationService.Instance?["Engine_NotDownloaded"] ?? "Not downloaded";
+    }
+
+    private void FlashSavedIndicator()
+    {
+        if (_savedIndicatorTimer == null)
+        {
+            _savedIndicatorTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(1500)
+            };
+            _savedIndicatorTimer.Tick += (_, _) =>
+            {
+                _savedIndicatorTimer!.Stop();
+                IsShowingSavedIndicator = false;
+            };
+        }
+
+        _savedIndicatorTimer.Stop();
+        IsShowingSavedIndicator = true;
+        _savedIndicatorTimer.Start();
+    }
+
+    private void UpdateHotKeyConflicts(HotKeyReloadResult result)
+    {
+        var wasBulk = _isBulkLoading;
+        _isBulkLoading = true;
+        try
+        {
+            foreach (var vm in HotKeyBindings)
+            {
+                var conflict = result.Conflicts.FirstOrDefault(c => c.ActionId == vm.ActionId);
+                vm.HasConflict = conflict != null;
+            }
+        }
+        finally
+        {
+            _isBulkLoading = wasBulk;
+        }
+    }
+
+    public void SuspendHotKeys() => _hotKeyService?.SuspendBindings();
+
+    public void ResumeHotKeys() => _hotKeyService?.ResumeBindings();
+
+    public void FlushPendingAutosave()
+    {
+        if (!_autosaveTimer.IsEnabled) return;
+        _autosaveTimer.Stop();
+        _isShuttingDown = true;
+        try { SaveSilently(); }
+        finally { _isShuttingDown = false; }
+    }
+
+    private bool _isShuttingDown;
+
+    private static void ShowHotKeyConflictGrowl(HotKeyReloadResult result)
+    {
+        var loc = LocalizationService.Instance;
+        var combos = string.Join(", ", result.Conflicts.Select(c => c.Combination).Distinct());
+        var template = loc?["Settings_HotKeyConflict"] ?? "Hotkey conflict: {0}";
+        HandyControl.Controls.Growl.Warning(new HandyControl.Data.GrowlInfo
+        {
+            Message = string.Format(template, combos),
+            WaitTime = 5,
+            StaysOpen = false,
+            Token = "MainGrowl"
+        });
+    }
+
+    private void TriggerAutosave()
+    {
+        if (_isBulkLoading) return;
+        _autosaveTimer.Stop();
+        _autosaveTimer.Start();
+    }
+
+    private static readonly HashSet<string> NonPersistedProperties = new()
+    {
+        nameof(SelectedTabIndex),
+        nameof(SelectedPipelineSubTabIndex),
+        nameof(IsShowingSavedIndicator),
+        nameof(SelectedImagePipelineStep),
+        nameof(SelectedAudioPipelineStep),
+        nameof(SubtitlePreviewVAlign),
+        nameof(SubtitlePreviewHAlign),
+        nameof(HotKeyBindingViewModel.IsRecording),
+        nameof(HotKeyBindingViewModel.HasConflict)
+    };
+
+    private void OnDeepChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != null && NonPersistedProperties.Contains(e.PropertyName)) return;
+        TriggerAutosave();
+    }
+
+    private void OnDeepCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+            foreach (var item in e.OldItems) DetachItem(item);
+        if (e.NewItems != null)
+            foreach (var item in e.NewItems) AttachItem(item);
+        TriggerAutosave();
+    }
+
+    private void AttachSubscriptions()
+    {
+        PropertyChanged += OnDeepChanged;
+
+        ImagePipelineSteps.CollectionChanged += OnDeepCollectionChanged;
+        foreach (var step in ImagePipelineSteps) AttachStep(step);
+
+        AudioPipelineSteps.CollectionChanged += OnDeepCollectionChanged;
+        foreach (var step in AudioPipelineSteps) AttachStep(step);
+
+        PreProcessFilters.CollectionChanged += OnDeepCollectionChanged;
+        foreach (var f in PreProcessFilters) f.PropertyChanged += OnDeepChanged;
+
+        AudioPreProcessFilters.CollectionChanged += OnDeepCollectionChanged;
+        foreach (var f in AudioPreProcessFilters) f.PropertyChanged += OnDeepChanged;
+
+        GlossaryRules.CollectionChanged += OnDeepCollectionChanged;
+        foreach (var g in GlossaryRules) g.PropertyChanged += OnDeepChanged;
+
+        HotKeyBindings.CollectionChanged += OnDeepCollectionChanged;
+        foreach (var h in HotKeyBindings) h.PropertyChanged += OnDeepChanged;
+    }
+
+    private void DetachAll()
+    {
+        PropertyChanged -= OnDeepChanged;
+
+        ImagePipelineSteps.CollectionChanged -= OnDeepCollectionChanged;
+        foreach (var step in ImagePipelineSteps) DetachStep(step);
+
+        AudioPipelineSteps.CollectionChanged -= OnDeepCollectionChanged;
+        foreach (var step in AudioPipelineSteps) DetachStep(step);
+
+        PreProcessFilters.CollectionChanged -= OnDeepCollectionChanged;
+        foreach (var f in PreProcessFilters) f.PropertyChanged -= OnDeepChanged;
+
+        AudioPreProcessFilters.CollectionChanged -= OnDeepCollectionChanged;
+        foreach (var f in AudioPreProcessFilters) f.PropertyChanged -= OnDeepChanged;
+
+        GlossaryRules.CollectionChanged -= OnDeepCollectionChanged;
+        foreach (var g in GlossaryRules) g.PropertyChanged -= OnDeepChanged;
+
+        HotKeyBindings.CollectionChanged -= OnDeepCollectionChanged;
+        foreach (var h in HotKeyBindings) h.PropertyChanged -= OnDeepChanged;
+    }
+
+    private void AttachItem(object? obj)
+    {
+        if (obj is PipelineStepViewModel step) AttachStep(step);
+        else if (obj is INotifyPropertyChanged inpc) inpc.PropertyChanged += OnDeepChanged;
+    }
+
+    private void DetachItem(object? obj)
+    {
+        if (obj is PipelineStepViewModel step) DetachStep(step);
+        else if (obj is INotifyPropertyChanged inpc) inpc.PropertyChanged -= OnDeepChanged;
+    }
+
+    private void AttachStep(PipelineStepViewModel step)
+    {
+        step.PropertyChanged += OnDeepChanged;
+        foreach (var engine in step.AvailableEngines)
+            if (engine is INotifyPropertyChanged inpc) inpc.PropertyChanged += OnDeepChanged;
+    }
+
+    private void DetachStep(PipelineStepViewModel step)
+    {
+        step.PropertyChanged -= OnDeepChanged;
+        foreach (var engine in step.AvailableEngines)
+            if (engine is INotifyPropertyChanged inpc) inpc.PropertyChanged -= OnDeepChanged;
     }
 }

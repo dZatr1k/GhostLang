@@ -22,7 +22,7 @@ public class SolidColorErasureEngine(SolidColorErasureOptions options) : ITextEr
 
         using var msOut = new MemoryStream();
         await image.SaveAsPngAsync(msOut);
-            
+
         return msOut.ToArray();
     }
 }

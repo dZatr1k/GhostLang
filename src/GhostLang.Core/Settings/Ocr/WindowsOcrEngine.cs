@@ -9,6 +9,9 @@ namespace GhostLang.Core.Settings.Ocr;
 
 public class WindowsOcrEngine : IOcrEngine
 {
+
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
     public Task<bool> IsLanguageSupportedAsync(SupportedLanguage language)
     {
         var tag = language.ToWindowsLanguageTag();

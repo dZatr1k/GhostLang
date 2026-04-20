@@ -33,13 +33,13 @@
   <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Nav_SettingsUnsaved" xml:space="preserve"><value>Settings *</value></data>
   <data name="Nav_Debug" xml:space="preserve"><value>Debug</value></data>
+  <data name="Nav_Benchmark" xml:space="preserve"><value>Benchmark</value></data>
   <data name="Nav_ExpandPanel" xml:space="preserve"><value>Expand panel</value></data>
   <data name="Nav_CollapsePanel" xml:space="preserve"><value>Collapse panel</value></data>
 
   <data name="Home_Subtitle" xml:space="preserve"><value>Multimodal streaming translator</value></data>
   <data name="Home_CaptureTitle" xml:space="preserve"><value>Screen Region Capture</value></data>
-  <data name="Home_SourceLanguages" xml:space="preserve"><value>Source languages</value></data>
-  <data name="Home_SourceLanguagesPlaceholder" xml:space="preserve"><value>Select languages...</value></data>
+  <data name="Home_SourceLanguage" xml:space="preserve"><value>Source language</value></data>
   <data name="Home_TargetLanguage" xml:space="preserve"><value>Target translation language</value></data>
   <data name="Home_SelectRegion" xml:space="preserve"><value>Select screen region</value></data>
   <data name="Home_Status" xml:space="preserve"><value>Status:</value></data>
@@ -47,25 +47,74 @@
 
   <data name="Home_ScreenTranslation" xml:space="preserve"><value>Screen Translation</value></data>
   <data name="Home_AudioTranslation" xml:space="preserve"><value>Audio Translation</value></data>
+  <data name="Home_AudioDriftWarning" xml:space="preserve"><value> · ⚠ Lag {0:F0}s</value></data>
+  <data name="Home_AudioDriftCritical" xml:space="preserve"><value> · 🔴 Lag {0:F0}s</value></data>
+  <data name="Home_AudioDriftCriticalGrowl" xml:space="preserve"><value>Translation lagging by {0:F0}s, oldest audio being dropped</value></data>
   <data name="Home_CaptureAudio" xml:space="preserve"><value>Capture Audio</value></data>
   <data name="Home_AudioComingSoon" xml:space="preserve"><value>Coming soon</value></data>
 
-  <data name="Work_Start" xml:space="preserve"><value>▶ Start</value></data>
-  <data name="Work_Stop" xml:space="preserve"><value>■ Stop</value></data>
+  <data name="Work_Start" xml:space="preserve"><value>Start</value></data>
+  <data name="Work_Stop" xml:space="preserve"><value>Stop</value></data>
   <data name="Work_Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="Work_MoreMenu" xml:space="preserve"><value>More</value></data>
+  <data name="Work_Copy" xml:space="preserve"><value>Copy translation</value></data>
+  <data name="Work_SaveFrame" xml:space="preserve"><value>Save frame...</value></data>
+  <data name="Work_Refresh" xml:space="preserve"><value>Refresh now</value></data>
+  <data name="Work_SwitchLanguage" xml:space="preserve"><value>Switch target language</value></data>
+  <data name="Work_ToggleOriginal" xml:space="preserve"><value>Show original</value></data>
   <data name="Work_Running" xml:space="preserve"><value>Running...</value></data>
 
-  <data name="Region_Hint" xml:space="preserve"><value>Select a screen region for translation.  ESC — cancel.</value></data>
+  <data name="Region_Hint" xml:space="preserve"><value>Select a screen region for translation.  ESC - cancel.</value></data>
 
-  <data name="Settings_TabGeneral" xml:space="preserve"><value>General</value></data>
-  <data name="Settings_TabImagePipeline" xml:space="preserve"><value>Image Pipeline</value></data>
+  <data name="Settings_TabAppearance" xml:space="preserve"><value>Appearance</value></data>
+  <data name="Settings_TabScreen" xml:space="preserve"><value>Screen</value></data>
+  <data name="Settings_TabPipelines" xml:space="preserve"><value>Pipelines</value></data>
   <data name="Settings_TabHotKeys" xml:space="preserve"><value>Hotkeys</value></data>
-  <data name="Settings_TabAudio" xml:space="preserve"><value>Audio Pipeline</value></data>
+  <data name="Settings_TabCaptureAudio" xml:space="preserve"><value>Capture &amp; Audio</value></data>
+  <data name="Settings_TabOverlay" xml:space="preserve"><value>Overlay</value></data>
+  <data name="Audio_SubtitlePositionTopLeft" xml:space="preserve"><value>Top-Left</value></data>
+  <data name="Audio_SubtitlePositionTopRight" xml:space="preserve"><value>Top-Right</value></data>
+  <data name="Audio_SubtitlePositionBottomLeft" xml:space="preserve"><value>Bottom-Left</value></data>
+  <data name="Audio_SubtitlePositionBottomRight" xml:space="preserve"><value>Bottom-Right</value></data>
+  <data name="Settings_TabAudio" xml:space="preserve"><value>Audio</value></data>
   <data name="Settings_AudioPlaceholder" xml:space="preserve"><value>Audio settings (Coming soon)</value></data>
   <data name="Settings_Save" xml:space="preserve"><value>Save</value></data>
   <data name="Settings_SaveUnsaved" xml:space="preserve"><value>Save *</value></data>
   <data name="Settings_SavedSuccess" xml:space="preserve"><value>Settings saved!</value></data>
+  <data name="Settings_AutosaveSaved" xml:space="preserve"><value>Saved</value></data>
   <data name="Settings_SaveError" xml:space="preserve"><value>Save error:</value></data>
+  <data name="Settings_HotKeyConflict" xml:space="preserve"><value>Hotkey conflict: {0}</value></data>
+  <data name="Settings_SharedNote" xml:space="preserve"><value>Shared settings - applied to both pipelines (Screen and Audio). Enabling/disabling the step is per-pipeline.</value></data>
+  <data name="HotKey_ScreenStart" xml:space="preserve"><value>Start translation</value></data>
+  <data name="HotKey_ScreenStop" xml:space="preserve"><value>Stop translation</value></data>
+  <data name="HotKeyHelp_SelectRegion" xml:space="preserve"><value>Opens the screen region selector - cross cursor, drag to outline the translation area.</value></data>
+  <data name="HotKeyHelp_ScreenStart" xml:space="preserve"><value>Starts translation of the already-selected region (same as Start button in the floating window).</value></data>
+  <data name="HotKeyHelp_ScreenStop" xml:space="preserve"><value>Stops active screen translation (window stays open - can be started again).</value></data>
+  <data name="HotKeyHelp_ToggleVisibility" xml:space="preserve"><value>Hides/shows the floating frame over the region (translation keeps running).</value></data>
+  <data name="HotKeyHelp_MoveUp" xml:space="preserve"><value>Shifts the translation region 10 pixels up.</value></data>
+  <data name="HotKeyHelp_MoveDown" xml:space="preserve"><value>Shifts the translation region 10 pixels down.</value></data>
+  <data name="HotKeyHelp_MoveLeft" xml:space="preserve"><value>Shifts the translation region 10 pixels left.</value></data>
+  <data name="HotKeyHelp_MoveRight" xml:space="preserve"><value>Shifts the translation region 10 pixels right.</value></data>
+  <data name="HotKeyHelp_ResizeUp" xml:space="preserve"><value>Decreases translation region height by 10 pixels.</value></data>
+  <data name="HotKeyHelp_ResizeDown" xml:space="preserve"><value>Increases translation region height by 10 pixels.</value></data>
+  <data name="HotKeyHelp_ResizeLeft" xml:space="preserve"><value>Decreases translation region width by 10 pixels.</value></data>
+  <data name="HotKeyHelp_ResizeRight" xml:space="preserve"><value>Increases translation region width by 10 pixels.</value></data>
+  <data name="HotKeyHelp_StartStopAudio" xml:space="preserve"><value>Starts or stops audio translation depending on the current state.</value></data>
+  <data name="HotKeyHelp_ToggleSubtitleVisibility" xml:space="preserve"><value>Hides or shows the floating subtitles (translation keeps running in background).</value></data>
+  <data name="Settings_HotKeyConflictTooltip" xml:space="preserve"><value>This combination is already used by another action or the OS.</value></data>
+  <data name="Shutdown_Title" xml:space="preserve"><value>Confirm exit</value></data>
+  <data name="Shutdown_ActivePipelineMessage" xml:space="preserve"><value>Translation is active. Exiting will stop it. Continue?</value></data>
+  <data name="Shutdown_ExitButton" xml:space="preserve"><value>Exit</value></data>
+  <data name="Shutdown_CancelButton" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Home_TranslateFrom" xml:space="preserve"><value>Translate from:</value></data>
+  <data name="Home_TranslateTo" xml:space="preserve"><value>to:</value></data>
+  <data name="Validation_NoAsrEngine" xml:space="preserve"><value>Speech recognition engine is not configured.</value></data>
+  <data name="Validation_WhisperNoModel" xml:space="preserve"><value>Whisper model is not selected.</value></data>
+  <data name="Validation_WhisperModelNotDownloaded" xml:space="preserve"><value>Whisper model not downloaded: {0}</value></data>
+  <data name="Validation_VoskNoPath" xml:space="preserve"><value>Vosk model path is not set.</value></data>
+  <data name="Validation_VoskPathMissing" xml:space="preserve"><value>Vosk model folder does not exist: {0}</value></data>
+  <data name="Validation_AzureAsrNoApiKey" xml:space="preserve"><value>Azure Speech API key is not set.</value></data>
+  <data name="Validation_AzureAsrNoRegion" xml:space="preserve"><value>Azure Speech region is not set.</value></data>
   <data name="Settings_SelectEngine" xml:space="preserve"><value>Select processing engine:</value></data>
 
   <data name="General_Appearance" xml:space="preserve"><value>Appearance</value></data>
@@ -76,7 +125,7 @@
   <data name="General_Language" xml:space="preserve"><value>Interface language:</value></data>
 
   <data name="Engine_TranslationProvider" xml:space="preserve"><value>Translation provider:</value></data>
-  <data name="Engine_GTranslateHint" xml:space="preserve"><value>Google — universal. Yandex — good for ru↔en. Bing/Microsoft — alternative.</value></data>
+  <data name="Engine_GTranslateHint" xml:space="preserve"><value>Google - universal. Yandex - good for ru↔en. Bing/Microsoft - alternative.</value></data>
   <data name="Engine_GTranslateInfo" xml:space="preserve"><value>Free web gateway without API key. Rate limiting may apply.</value></data>
   <data name="Engine_MyMemoryEmailHint" xml:space="preserve"><value>Without email: ~100 requests/day. With email: ~10,000.</value></data>
   <data name="Engine_MyMemoryKeyHint" xml:space="preserve"><value>PRO key for unlimited access.</value></data>
@@ -86,11 +135,12 @@
   <data name="Engine_WindowsOcrInfo" xml:space="preserve"><value>Uses built-in Windows OCR. No model downloads required.</value></data>
   <data name="Engine_WindowsOcrLanguageHint" xml:space="preserve"><value>To add languages: Settings → Time &amp; Language → Language &amp; Region → Add a language.</value></data>
   <data name="Engine_ModelType" xml:space="preserve"><value>Model type:</value></data>
-  <data name="Engine_ModelTypeHint" xml:space="preserve"><value>Fast (~15 MB) — faster. Best (~30 MB) — more accurate, ~2-3x slower.</value></data>
+  <data name="Engine_ModelTypeHint" xml:space="preserve"><value>Fast (~15 MB) - faster. Best (~30 MB) - more accurate, ~2-3x slower.</value></data>
   <data name="Engine_LanguagePacks" xml:space="preserve"><value>Language packs</value></data>
   <data name="Engine_Download" xml:space="preserve"><value>Download</value></data>
   <data name="Engine_Downloaded" xml:space="preserve"><value>Downloaded</value></data>
   <data name="Engine_Downloading" xml:space="preserve"><value>Downloading...</value></data>
+  <data name="Engine_Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Engine_Done" xml:space="preserve"><value>Done</value></data>
   <data name="Engine_Loading" xml:space="preserve"><value>Loading</value></data>
   <data name="Engine_UseProxy" xml:space="preserve"><value>Use proxy</value></data>
@@ -98,19 +148,19 @@
   <data name="Rendering_Font" xml:space="preserve"><value>Font:</value></data>
   <data name="Rendering_FontHint" xml:space="preserve"><value>System font for rendering translated text.</value></data>
   <data name="Rendering_FitMode" xml:space="preserve"><value>Fit mode:</value></data>
-  <data name="Rendering_FitModeHint" xml:space="preserve"><value>Compress — reduces width. Fixed height — scales by height only.</value></data>
+  <data name="Rendering_FitModeHint" xml:space="preserve"><value>Compress - reduces width. Fixed height - scales by height only.</value></data>
   <data name="Rendering_AutoColor" xml:space="preserve"><value>Auto-detect text color</value></data>
-  <data name="Rendering_AutoColorHint" xml:space="preserve"><value>Detects dominant color from original. If disabled — uses the color below.</value></data>
+  <data name="Rendering_AutoColorHint" xml:space="preserve"><value>Detects dominant color from original. If disabled - uses the color below.</value></data>
   <data name="Rendering_Compress" xml:space="preserve"><value>Compress width</value></data>
   <data name="Rendering_MatchHeight" xml:space="preserve"><value>Fixed height</value></data>
 
   <data name="Erasure_SolidColorHint" xml:space="preserve"><value>Text area is filled with the specified color. Suitable for solid backgrounds.</value></data>
   <data name="Erasure_MaskAggression" xml:space="preserve"><value>Mask aggressiveness:</value></data>
-  <data name="Erasure_MaskHint" xml:space="preserve"><value>Expands text mask. Higher — cleaner, but may affect background.</value></data>
+  <data name="Erasure_MaskHint" xml:space="preserve"><value>Expands text mask. Higher - cleaner, but may affect background.</value></data>
   <data name="Erasure_InpaintRadius" xml:space="preserve"><value>Background capture radius:</value></data>
   <data name="Erasure_InpaintHint" xml:space="preserve"><value>How many pixels around the mask are used for restoration.</value></data>
   <data name="Erasure_TeleaAlgorithm" xml:space="preserve"><value>Telea algorithm (otherwise Navier-Stokes)</value></data>
-  <data name="Erasure_TeleaHint" xml:space="preserve"><value>Telea — fast, for small text. Navier-Stokes — more accurate on complex backgrounds.</value></data>
+  <data name="Erasure_TeleaHint" xml:space="preserve"><value>Telea - fast, for small text. Navier-Stokes - more accurate on complex backgrounds.</value></data>
   <data name="Erasure_AdaptiveBlockSize" xml:space="preserve"><value>Adaptive threshold block size</value></data>
   <data name="Erasure_AdaptiveBlockSizeHint" xml:space="preserve"><value>Neighborhood size for threshold calculation. Smaller values detect fine text better, larger values suit bigger text.</value></data>
   <data name="Erasure_AdaptiveConstant" xml:space="preserve"><value>Threshold constant</value></data>
@@ -119,7 +169,7 @@
   <data name="Cache_TtlHint" xml:space="preserve"><value>Entries older than this are deleted. Default: 60 min.</value></data>
   <data name="Cache_MaxCharsHint" xml:space="preserve"><value>Total cache volume. Oldest entries are removed when exceeded. Default: 10,000.</value></data>
 
-  <data name="Glossary_Info" xml:space="preserve"><value>Glossary words are replaced with your translation. Variants — word forms separated by commas.</value></data>
+  <data name="Glossary_Info" xml:space="preserve"><value>Glossary words are replaced with your translation. Variants - word forms separated by commas.</value></data>
   <data name="Glossary_Example" xml:space="preserve"><value>Example: Slime → Green Monster  |  Slimes, Slime's</value></data>
   <data name="Glossary_TokenMode" xml:space="preserve"><value>Tokenization mode:</value></data>
   <data name="Glossary_Original" xml:space="preserve"><value>Original</value></data>
@@ -147,20 +197,38 @@
   <data name="Filter_InvertDesc" xml:space="preserve"><value>Inverts colors. Useful for light text on dark background.</value></data>
   <data name="Filter_Value" xml:space="preserve"><value>Value:</value></data>
 
-  <data name="Debug_PipelineOcr" xml:space="preserve"><value>OCR Pipeline</value></data>
+  <data name="Debug_PipelineScreen" xml:space="preserve"><value>Screen</value></data>
+  <data name="Debug_PipelineAudio" xml:space="preserve"><value>Audio</value></data>
+  <data name="Debug_TabTranscript" xml:space="preserve"><value>Transcript</value></data>
+  <data name="Debug_TabRawAsr" xml:space="preserve"><value>Raw ASR</value></data>
   <data name="Debug_LoadImage" xml:space="preserve"><value>Load image</value></data>
   <data name="Debug_SelectRegion" xml:space="preserve"><value>Select region</value></data>
   <data name="Debug_Process" xml:space="preserve"><value>Process</value></data>
   <data name="Debug_Processing" xml:space="preserve"><value>Processing...</value></data>
-  <data name="Debug_RefreshConfig" xml:space="preserve"><value>Refresh config</value></data>
-  <data name="Debug_SourceLanguages" xml:space="preserve"><value>Source languages:</value></data>
+  <data name="Debug_SourceLanguages" xml:space="preserve"><value>Source language:</value></data>
   <data name="Debug_TargetLanguage" xml:space="preserve"><value>Target language:</value></data>
   <data name="Debug_Original" xml:space="preserve"><value>Original</value></data>
   <data name="Debug_Preprocessed" xml:space="preserve"><value>After preprocessing</value></data>
   <data name="Debug_Result" xml:space="preserve"><value>Result</value></data>
   <data name="Debug_Metrics" xml:space="preserve"><value>Metrics</value></data>
-  <data name="Debug_Configuration" xml:space="preserve"><value>Configuration</value></data>
-  <data name="Debug_ConfigNotLoaded" xml:space="preserve"><value>Configuration not loaded</value></data>
+  <data name="Debug_Total" xml:space="preserve"><value>Total</value></data>
+  <data name="Debug_BenchmarkSection" xml:space="preserve"><value>Benchmark</value></data>
+  <data name="Debug_BenchmarkSelectFolder" xml:space="preserve"><value>Select folder...</value></data>
+  <data name="Debug_BenchmarkRunScreen" xml:space="preserve"><value>Run Screen</value></data>
+  <data name="Debug_BenchmarkRunAudio" xml:space="preserve"><value>Run Audio</value></data>
+  <data name="Debug_BenchmarkCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Debug_BenchmarkExport" xml:space="preserve"><value>Export JSON</value></data>
+  <data name="Debug_BenchmarkSamplesFolder" xml:space="preserve"><value>Samples folder:</value></data>
+  <data name="Debug_BenchmarkColCer" xml:space="preserve"><value>CER</value></data>
+  <data name="Debug_BenchmarkColWer" xml:space="preserve"><value>WER</value></data>
+  <data name="Debug_BenchmarkColBleu" xml:space="preserve"><value>BLEU</value></data>
+  <data name="Debug_BenchmarkColChrF" xml:space="preserve"><value>chrF</value></data>
+  <data name="Debug_BenchmarkColLatency" xml:space="preserve"><value>Latency (ms)</value></data>
+  <data name="Debug_BenchmarkColSample" xml:space="preserve"><value>Sample</value></data>
+  <data name="Debug_TabConfiguration" xml:space="preserve"><value>Configuration</value></data>
+  <data name="Debug_ConfigAppTitle" xml:space="preserve"><value>Application configuration</value></data>
+  <data name="Debug_ConfigScreenPipelineTitle" xml:space="preserve"><value>Screen pipeline</value></data>
+  <data name="Debug_ConfigAudioPipelineTitle" xml:space="preserve"><value>Audio pipeline</value></data>
   <data name="Debug_SelectSourceLang" xml:space="preserve"><value>Please select at least one source language for OCR.</value></data>
   <data name="Debug_Warning" xml:space="preserve"><value>Warning</value></data>
 
@@ -172,7 +240,7 @@
   <data name="Debug_NoImage" xml:space="preserve"><value>No image loaded</value></data>
 
   <data name="Step_MotionDetection" xml:space="preserve"><value>Motion Detection</value></data>
-  <data name="Step_MotionDetectionDesc" xml:space="preserve"><value>Compares current frame with previous. If unchanged — pipeline is aborted to save resources.</value></data>
+  <data name="Step_MotionDetectionDesc" xml:space="preserve"><value>Compares current frame with previous. If unchanged - pipeline is aborted to save resources.</value></data>
   <data name="Step_Preprocessing" xml:space="preserve"><value>Image Preprocessing</value></data>
   <data name="Step_PreprocessingDesc" xml:space="preserve"><value>Applies filters to the image before OCR to improve recognition quality.</value></data>
   <data name="Step_Ocr" xml:space="preserve"><value>Text Recognition</value></data>
@@ -190,13 +258,13 @@
   <data name="Step_Rendering" xml:space="preserve"><value>Translation Rendering</value></data>
   <data name="Step_RenderingDesc" xml:space="preserve"><value>Draws translated text over the cleaned image area.</value></data>
 
-  <data name="HotKeyGroup_ImagePipeline" xml:space="preserve"><value>Screen Translation</value></data>
-  <data name="HotKeyGroup_AudioPipeline" xml:space="preserve"><value>Audio Translation</value></data>
+  <data name="HotKeyGroup_Screen" xml:space="preserve"><value>Screen Translation</value></data>
+  <data name="HotKeyGroup_Audio" xml:space="preserve"><value>Audio Translation</value></data>
   <data name="HotKey_AudioComingSoon" xml:space="preserve"><value>Hotkeys will be available after audio pipeline implementation</value></data>
   <data name="HotKey_StartStopAudio" xml:space="preserve"><value>Start / Stop</value></data>
   <data name="HotKey_ToggleSubtitleVisibility" xml:space="preserve"><value>Hide subtitles</value></data>
 
-  <data name="Home_SelectRegionHint" xml:space="preserve"><value>Hotkey: {0}</value></data>
+  <data name="Home_HotKeyHint" xml:space="preserve"><value>Hotkey: {0}</value></data>
   <data name="HotKey_SelectRegion" xml:space="preserve"><value>Select screen region</value></data>
   <data name="HotKey_ToggleVisibility" xml:space="preserve"><value>Show/hide window</value></data>
   <data name="HotKey_MoveUp" xml:space="preserve"><value>Move up</value></data>
@@ -210,14 +278,15 @@
 
   <data name="General_ThemeDark" xml:space="preserve"><value>Dark</value></data>
   <data name="General_ThemeLight" xml:space="preserve"><value>Light</value></data>
+  <data name="General_ThemeSystem" xml:space="preserve"><value>Match system</value></data>
 
   <data name="Engine_ProviderGoogle" xml:space="preserve"><value>Google Translate</value></data>
   <data name="Engine_ProviderYandex" xml:space="preserve"><value>Yandex Translate</value></data>
   <data name="Engine_ProviderBing" xml:space="preserve"><value>Bing Translator</value></data>
   <data name="Engine_ProviderMicrosoft" xml:space="preserve"><value>Microsoft Translator</value></data>
 
-  <data name="Engine_ModelFast" xml:space="preserve"><value>Fast — lighter, faster</value></data>
-  <data name="Engine_ModelBest" xml:space="preserve"><value>Best — most accurate, slower</value></data>
+  <data name="Engine_ModelFast" xml:space="preserve"><value>Fast - lighter, faster</value></data>
+  <data name="Engine_ModelBest" xml:space="preserve"><value>Best - most accurate, slower</value></data>
 
   <data name="Glossary_ModePlaceholder" xml:space="preserve"><value>Placeholder</value></data>
   <data name="Glossary_ModeHtmlTag" xml:space="preserve"><value>HTML Tag</value></data>
@@ -225,9 +294,9 @@
   <data name="Engine_OcrSpaceInfo" xml:space="preserve"><value>Cloud OCR. Free: 25,000 requests/month. No credit card required.</value></data>
   <data name="Engine_OcrSpaceApiKeyHint" xml:space="preserve"><value>API key from ocr.space. For testing you can use the key "helloworld".</value></data>
   <data name="Engine_OcrSpaceEngineLabel" xml:space="preserve"><value>OCR engine:</value></data>
-  <data name="Engine_OcrSpaceEngineHint" xml:space="preserve"><value>Engine 1 — fast, supports CJK. Engine 2 — auto-detect language, better on complex backgrounds.</value></data>
-  <data name="Engine_OcrSpaceEngine1" xml:space="preserve"><value>Engine 1 — fast, Asian languages</value></data>
-  <data name="Engine_OcrSpaceEngine2" xml:space="preserve"><value>Engine 2 — auto-detect, Latin + Chinese</value></data>
+  <data name="Engine_OcrSpaceEngineHint" xml:space="preserve"><value>Engine 1 - fast, supports CJK. Engine 2 - auto-detect language, better on complex backgrounds.</value></data>
+  <data name="Engine_OcrSpaceEngine1" xml:space="preserve"><value>Engine 1 - fast, Asian languages</value></data>
+  <data name="Engine_OcrSpaceEngine2" xml:space="preserve"><value>Engine 2 - auto-detect, Latin + Chinese</value></data>
 
   <data name="Engine_AzureEndpointHint" xml:space="preserve"><value>Your Azure Computer Vision resource endpoint (e.g., https://myresource.cognitiveservices.azure.com).</value></data>
   <data name="Engine_AzureApiKeyHint" xml:space="preserve"><value>Access key from the "Keys and Endpoint" section in Azure Portal.</value></data>
@@ -303,28 +372,41 @@
   <data name="Audio_SubtitlePositionBottom" xml:space="preserve"><value>Bottom</value></data>
   <data name="Audio_SubtitleMonitor" xml:space="preserve"><value>Monitor</value></data>
   <data name="Audio_SubtitleMonitorPrimary" xml:space="preserve"><value>Primary (default)</value></data>
+  <data name="Audio_SubtitleDurationSection" xml:space="preserve"><value>Display duration</value></data>
+  <data name="Audio_SubtitleMinDuration" xml:space="preserve"><value>Minimum duration</value></data>
+  <data name="Audio_SubtitleMaxDuration" xml:space="preserve"><value>Maximum duration</value></data>
+  <data name="Audio_SubtitleMaxChars" xml:space="preserve"><value>Early hide at character count</value></data>
 
-  <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper — local recognition engine. Models are downloaded automatically to the folder below.</value></data>
+  <data name="Overlay_RecordingSection" xml:space="preserve"><value>Recording mode</value></data>
+  <data name="Overlay_RecordingMode" xml:space="preserve"><value>Enable screen recording mode</value></data>
+  <data name="Overlay_RecordingHint" xml:space="preserve"><value>When enabled - the translation overlay is visible during screen capture (OBS, video recording). When disabled - the overlay is excluded from capture. Note: in recording mode the translation may flicker due to screen capture specifics.</value></data>
+
+  <data name="Overlay_ScreenSection" xml:space="preserve"><value>Screen overlay</value></data>
+  <data name="Overlay_MajorChangeThreshold" xml:space="preserve"><value>Clear sensitivity</value></data>
+  <data name="Overlay_MajorChangeHint" xml:space="preserve"><value>Percentage of pixels that must change between frames to clear the overlay (scene change, scroll). Lower - clears more often (reacts to animations), higher - clears less often (stale translation may remain after small changes). 2 consecutive frames above threshold required to filter noise.</value></data>
+
+  <data name="Overlay_PreviewSection" xml:space="preserve"><value>Preview</value></data>
+  <data name="Overlay_PreviewSampleOriginal" xml:space="preserve"><value>Hello, world!</value></data>
+  <data name="Overlay_PreviewSampleTranslated" xml:space="preserve"><value>Привет, мир!</value></data>
+
+  <data name="Engine_Whisper_Intro" xml:space="preserve"><value>OpenAI Whisper - local recognition engine. Models are downloaded automatically to the folder below.</value></data>
   <data name="Engine_Whisper_ModelsPath" xml:space="preserve"><value>Models folder:</value></data>
   <data name="Engine_Whisper_ActiveModel" xml:space="preserve"><value>Active model:</value></data>
   <data name="Engine_Whisper_Models" xml:space="preserve"><value>Available models</value></data>
   <data name="Engine_NotDownloaded" xml:space="preserve"><value>Not downloaded</value></data>
 
-  <data name="Filter_Audio_Resample" xml:space="preserve"><value>Resample to 16 kHz</value></data>
-  <data name="Filter_Audio_ResampleDesc" xml:space="preserve"><value>Converts sample rate to 16 kHz (required by Whisper and most ASR engines).</value></data>
   <data name="Filter_Audio_Normalize" xml:space="preserve"><value>Loudness normalization</value></data>
   <data name="Filter_Audio_NormalizeDesc" xml:space="preserve"><value>Normalizes peak level to a target value (improves recognition of quiet speech).</value></data>
   <data name="Filter_Audio_HighPass" xml:space="preserve"><value>High-pass filter</value></data>
   <data name="Filter_Audio_HighPassDesc" xml:space="preserve"><value>Cuts low-frequency noise (fans, mains hum 50 Hz) at the specified cutoff frequency (Hz).</value></data>
   <data name="Filter_Audio_NoiseSuppress" xml:space="preserve"><value>Noise suppression</value></data>
   <data name="Filter_Audio_NoiseSuppressDesc" xml:space="preserve"><value>Suppresses background noise (keyboard, street). Requires additional CPU.</value></data>
-  <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk — local Kaldi-based engine. Models are downloaded manually from alphacephei.com — extract the zip and point to the folder.</value></data>
+  <data name="Engine_Vosk_Intro" xml:space="preserve"><value>Vosk - local Kaldi-based engine. Models are downloaded manually from alphacephei.com - extract the zip and point to the folder.</value></data>
   <data name="Engine_Vosk_ModelPath" xml:space="preserve"><value>Model folder path:</value></data>
   <data name="Engine_Vosk_OpenDownloads" xml:space="preserve"><value>Open Vosk downloads page</value></data>
-  <data name="Engine_Azure_Intro" xml:space="preserve"><value>Azure AI Speech — cloud engine. Subscription required (free tier offers 5 hours/month).</value></data>
+  <data name="Engine_Azure_Intro" xml:space="preserve"><value>Azure AI Speech - cloud engine. Subscription required (free tier offers 5 hours/month).</value></data>
   <data name="Engine_Azure_ApiKey" xml:space="preserve"><value>API key:</value></data>
   <data name="Engine_Azure_Region" xml:space="preserve"><value>Region:</value></data>
-  <data name="Engine_Download" xml:space="preserve"><value>Download</value></data>
   <data name="Engine_Delete" xml:space="preserve"><value>Delete</value></data>
   <data name="Engine_Browse" xml:space="preserve"><value>Browse</value></data>
 
@@ -353,4 +435,46 @@
   <data name="Step_Audio_Rendering" xml:space="preserve"><value>Subtitle Dispatch</value></data>
   <data name="Step_Audio_RenderingDesc" xml:space="preserve"><value>Emits final fragments to the on-screen subtitle overlay.</value></data>
   <data name="Debug_AudioTestError" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="Language_English" xml:space="preserve"><value>English</value></data>
+  <data name="Language_Russian" xml:space="preserve"><value>Russian</value></data>
+  <data name="Language_Spanish" xml:space="preserve"><value>Spanish</value></data>
+  <data name="Language_German" xml:space="preserve"><value>German</value></data>
+  <data name="Language_French" xml:space="preserve"><value>French</value></data>
+  <data name="Language_Japanese" xml:space="preserve"><value>Japanese</value></data>
+  <data name="Language_ChineseSimplified" xml:space="preserve"><value>Chinese (Simplified)</value></data>
+  <data name="Language_ChineseTraditional" xml:space="preserve"><value>Chinese (Traditional)</value></data>
+  <data name="Language_Italian" xml:space="preserve"><value>Italian</value></data>
+  <data name="Language_Portuguese" xml:space="preserve"><value>Portuguese</value></data>
+  <data name="Language_Polish" xml:space="preserve"><value>Polish</value></data>
+  <data name="Language_Korean" xml:space="preserve"><value>Korean</value></data>
+  <data name="Language_Arabic" xml:space="preserve"><value>Arabic</value></data>
+  <data name="Language_Turkish" xml:space="preserve"><value>Turkish</value></data>
+  <data name="Language_Ukrainian" xml:space="preserve"><value>Ukrainian</value></data>
+  <data name="Language_Dutch" xml:space="preserve"><value>Dutch</value></data>
+  <data name="Language_Vietnamese" xml:space="preserve"><value>Vietnamese</value></data>
+  <data name="Language_Hindi" xml:space="preserve"><value>Hindi</value></data>
+  <data name="Language_Thai" xml:space="preserve"><value>Thai</value></data>
+  <data name="Language_Hebrew" xml:space="preserve"><value>Hebrew</value></data>
+  <data name="Home_TargetUnsupportedGrowl" xml:space="preserve"><value>Target language {0} is not supported by current engines — switched to {1}.</value></data>
+  <data name="Audio_VadProvider" xml:space="preserve"><value>VAD algorithm</value></data>
+  <data name="Audio_SpeechProbabilityThreshold" xml:space="preserve"><value>Speech probability threshold (Silero)</value></data>
+  <data name="Audio_SileroModel" xml:space="preserve"><value>Silero model:</value></data>
+  <data name="Misc_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Engine_Vosk_ModelsRoot" xml:space="preserve"><value>Models root folder</value></data>
+  <data name="Engine_Vosk_OpenFolder" xml:space="preserve"><value>Open folder</value></data>
+  <data name="Engine_Vosk_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Engine_Vosk_Select" xml:space="preserve"><value>Select</value></data>
+  <data name="Engine_Vosk_RootMissing" xml:space="preserve"><value>Root folder does not exist — it will be created when you open it.</value></data>
+  <data name="Engine_Vosk_NoModels" xml:space="preserve"><value>No model subfolders found. Unpack a Vosk archive here.</value></data>
+  <data name="Engine_Vosk_DetectedSummary" xml:space="preserve"><value>Detected: {0} valid / {1} total.</value></data>
+  <data name="Validation_VoskNoModelSelected" xml:space="preserve"><value>No Vosk model selected. Open Settings → Vosk and pick one from the detected list.</value></data>
+  <data name="Validation_VoskModelIncomplete" xml:space="preserve"><value>Vosk model is incomplete (missing {0}).</value></data>
+  <data name="Overlay_AdaptiveFps" xml:space="preserve"><value>Adaptive capture rate</value></data>
+  <data name="Overlay_FastIntervalMs" xml:space="preserve"><value>Fast interval (content changing)</value></data>
+  <data name="Overlay_SlowIntervalMs" xml:space="preserve"><value>Slow interval (content stable)</value></data>
+  <data name="Overlay_AdaptiveFpsHint" xml:space="preserve"><value>Fast interval is used when the region is changing (video, games). After a few unchanged frames the timer drops to the slow interval to save CPU on static content (manga, documents).</value></data>
+  <data name="Audio_LoopbackResamplerQuality" xml:space="preserve"><value>Loopback resampler quality</value></data>
+  <data name="Audio_LoopbackResamplerQualityHint" xml:space="preserve"><value>Higher = fewer aliasing artifacts at the cost of CPU. 60 is recommended; drop to 30-40 only if capture is audibly stuttering on weak hardware.</value></data>
+  <data name="Engine_Whisper_GpuRuntime" xml:space="preserve"><value>GPU runtime</value></data>
+  <data name="Engine_Whisper_GpuRuntimeHint" xml:space="preserve"><value>Auto picks Vulkan if your GPU supports it, otherwise CPU. Force Vulkan if you have a working GPU driver and Auto still falls back to CPU. Force CPU to disable GPU (for debugging or unstable drivers). Change takes effect on the next pipeline Start.</value></data>
 </root>

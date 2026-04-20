@@ -2,7 +2,7 @@ using GhostLang.Core.Pipelines.Enums;
 
 namespace GhostLang.Core.Pipelines;
 
-public interface IAudioTranslationPipeline
+public interface IAudioTranslationPipeline : IDisposable
 {
     Task<AudioTranslationContext> ProcessAsync(
         byte[] audioPcm,
@@ -10,5 +10,6 @@ public interface IAudioTranslationPipeline
         int channelCount,
         SupportedLanguage targetLanguage,
         List<SupportedLanguage> sourceLanguage,
+        long? captureStartMs = null,
         CancellationToken ct = default);
 }

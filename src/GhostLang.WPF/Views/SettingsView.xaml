@@ -137,11 +137,21 @@
                                         <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
                                               Fill="White" Width="14" Height="14" Stretch="Uniform" />
                                     </Button>
-                                    <Button Grid.Column="3"
-                                            Command="{Binding DataContext.DownloadModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding}" Height="28" Width="110"
-                                            IsEnabled="{Binding IsDownloaded, Converter={StaticResource InverseBoolConverter}}"
-                                            Style="{StaticResource ButtonPrimary}" Padding="6,0">
+                                    <Button Grid.Column="3" CommandParameter="{Binding}"
+                                            Height="28" Width="110" Padding="6,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource ButtonPrimary}">
+                                                <Setter Property="Command" Value="{Binding DataContext.DownloadModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                                <Setter Property="IsEnabled" Value="{Binding IsDownloaded, Converter={StaticResource InverseBoolConverter}}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDownloading}" Value="True">
+                                                        <Setter Property="Command" Value="{Binding DataContext.CancelDownloadCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                                        <Setter Property="IsEnabled" Value="True" />
+                                                        <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <hc:LoadingCircle Width="12" Height="12" Margin="0,0,5,0"
                                                               Foreground="White"
@@ -155,7 +165,7 @@
                                                                 <Setter Property="Text" Value="{Binding [Engine_Done], Source={x:Static svc:LocalizationService.Instance}}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsDownloading}" Value="True">
-                                                                <Setter Property="Text" Value="" />
+                                                                <Setter Property="Text" Value="{Binding [Engine_Cancel], Source={x:Static svc:LocalizationService.Instance}}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -353,7 +363,16 @@
                 <ComboBox ItemsSource="{Binding Models}"
                           SelectedItem="{Binding SelectedModel}"
                           DisplayMemberPath="ModelName"
-                          Margin="0,0,0,16" />
+                          Margin="0,0,0,12" />
+
+                <TextBlock Text="{svc:Localize Engine_Whisper_GpuRuntime}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,5" />
+                <ComboBox ItemsSource="{Binding GpuRuntimes}"
+                          SelectedItem="{Binding SelectedGpuRuntime}"
+                          Margin="0,0,0,4" />
+                <TextBlock Text="{svc:Localize Engine_Whisper_GpuRuntimeHint}"
+                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                           FontSize="11" TextWrapping="Wrap" Margin="0,0,0,16" />
 
                 <TextBlock Text="{svc:Localize Engine_Whisper_Models}"
                            Foreground="{DynamicResource PrimaryTextBrush}"
@@ -406,11 +425,21 @@
                                           Fill="White" Width="14" Height="14" Stretch="Uniform" />
                                 </Button>
 
-                                <Button Grid.Column="3"
-                                        Command="{Binding DataContext.DownloadModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                        CommandParameter="{Binding}" Height="28" Width="110"
-                                        IsEnabled="{Binding IsDownloaded, Converter={StaticResource InverseBoolConverter}}"
-                                        Style="{StaticResource ButtonPrimary}" Padding="6,0">
+                                <Button Grid.Column="3" CommandParameter="{Binding}"
+                                        Height="28" Width="110" Padding="6,0">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource ButtonPrimary}">
+                                            <Setter Property="Command" Value="{Binding DataContext.DownloadModelCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                            <Setter Property="IsEnabled" Value="{Binding IsDownloaded, Converter={StaticResource InverseBoolConverter}}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDownloading}" Value="True">
+                                                    <Setter Property="Command" Value="{Binding DataContext.CancelDownloadCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                    <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <hc:LoadingCircle Width="12" Height="12" Margin="0,0,5,0"
                                                           Foreground="White"
@@ -424,7 +453,7 @@
                                                             <Setter Property="Text" Value="{Binding [Engine_Done], Source={x:Static svc:LocalizationService.Instance}}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding IsDownloading}" Value="True">
-                                                            <Setter Property="Text" Value="" />
+                                                            <Setter Property="Text" Value="{Binding [Engine_Cancel], Source={x:Static svc:LocalizationService.Instance}}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -445,18 +474,115 @@
                            Foreground="{DynamicResource ThirdlyTextBrush}"
                            FontSize="11" FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,10" />
 
-                <TextBlock Text="{svc:Localize Engine_Vosk_ModelPath}"
+                <TextBlock Text="{svc:Localize Engine_Vosk_ModelsRoot}"
                            Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{Binding ModelPath, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBox Grid.Column="0" Text="{Binding ModelsRootPath, UpdateSourceTrigger=PropertyChanged}" />
                     <Button Grid.Column="1" Content="{svc:Localize Engine_Browse}"
-                            Command="{Binding BrowseFolderCommand}"
+                            Command="{Binding BrowseRootCommand}"
+                            Padding="10,2" Margin="4,0,0,0" />
+                    <Button Grid.Column="2" Content="{svc:Localize Engine_Vosk_OpenFolder}"
+                            Command="{Binding OpenRootFolderCommand}"
                             Padding="10,2" Margin="4,0,0,0" />
                 </Grid>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding DetectionSummary}"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               FontSize="12" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="{svc:Localize Engine_Vosk_Refresh}"
+                            Command="{Binding RefreshModelsCommand}"
+                            Padding="10,2" />
+                </Grid>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                        CornerRadius="4" Margin="0,0,0,10" MaxHeight="220">
+                    <ItemsControl ItemsSource="{Binding DetectedModels}">
+                        <ItemsControl.Template>
+                            <ControlTemplate TargetType="ItemsControl">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="4" Padding="8" CornerRadius="4">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                                    <Setter Property="Background" Value="{DynamicResource RegionBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                            <TextBlock FontSize="11">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{DynamicResource ThirdlyTextBrush}" />
+                                                        <Setter Property="Text" Value="{Binding FullPath}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsValid}" Value="False">
+                                                                <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                                                                <Setter Property="Text" Value="{Binding InvalidReason}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Content="{svc:Localize Engine_Vosk_Select}"
+                                                Command="{Binding DataContext.SelectModelCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                Padding="10,2" VerticalAlignment="Center">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsValid}" Value="False">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                            <Setter Property="Content" Value="✓" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <TextBlock Text="{svc:Localize Engine_Vosk_ModelPath}"
+                           Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,0,0,4" />
+                <TextBox Text="{Binding ModelPath, UpdateSourceTrigger=PropertyChanged}"
+                         IsReadOnly="True" Margin="0,0,0,10" />
 
                 <Button Content="{svc:Localize Engine_Vosk_OpenDownloads}"
                         Command="{Binding OpenDownloadPageCommand}"
@@ -479,187 +605,451 @@
                 <TextBox Text="{Binding Region, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10" />
             </StackPanel>
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:HotKeyBindingViewModel}">
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock Text="{Binding DisplayName}"
+                               Foreground="{DynamicResource PrimaryTextBrush}"
+                               FontSize="13" FontWeight="SemiBold"
+                               ToolTip="{Binding Description}" />
+                    <TextBlock Text="{Binding Description}"
+                               Foreground="{DynamicResource ThirdlyTextBrush}"
+                               FontSize="11" TextWrapping="Wrap"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBox Text="{Binding KeyDisplayString, Mode=OneWay}"
+                             IsReadOnly="True" FontFamily="Consolas"
+                             MinWidth="130" MaxWidth="180" Height="30"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Center" Padding="8,0"
+                             hc:InfoElement.Placeholder="{Binding [General_HotKeyPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
+                             PreviewKeyDown="HotKeyTextBox_PreviewKeyDown"
+                             GotFocus="HotKeyTextBox_GotFocus"
+                             LostFocus="HotKeyTextBox_LostFocus">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasConflict}" Value="True">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="ToolTip" Value="{Binding [Settings_HotKeyConflictTooltip], Source={x:Static svc:LocalizationService.Instance}}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button Command="{Binding ClearBindingCommand}"
+                            Background="Transparent" BorderThickness="0"
+                            Padding="2,0" Margin="4,0,0,0" Width="20" Height="20"
+                            VerticalAlignment="Center" Cursor="Hand"
+                            ToolTip="Clear">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Visibility" Value="Hidden" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasBinding}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z"
+                              Fill="{DynamicResource ThirdlyTextBrush}"
+                              Width="10" Height="10" Stretch="Uniform" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <Border HorizontalAlignment="Right" VerticalAlignment="Top"
+                Panel.ZIndex="10" IsHitTestVisible="False"
+                Margin="0,10,18,0"
+                Background="{DynamicResource SuccessBrush}"
+                CornerRadius="10" Padding="10,4">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Opacity" Value="0" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsShowingSavedIndicator}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         From="0" To="1" Duration="0:0:0.15" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         From="1" To="0" Duration="0:0:0.5" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Orientation="Horizontal">
+                <Path Data="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"
+                      Fill="White" Width="12" Height="12" Stretch="Uniform"
+                      VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBlock Text="{svc:Localize Settings_AutosaveSaved}"
+                           Foreground="White" FontSize="11" FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
 
-        <TabControl BorderThickness="0">
-            <TabItem Header="{svc:Localize Settings_TabGeneral}">
+        <TabControl BorderThickness="0" SelectedIndex="{Binding SelectedTabIndex}">
+            <TabItem Header="{svc:Localize Settings_TabOverlay}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
                     <StackPanel>
-                        
-                        <hc:Card Padding="16" Margin="0,0,0,15">
-                            <StackPanel>
-                                <TextBlock Text="{svc:Localize General_Appearance}" FontSize="16" FontWeight="Bold"
-                                           Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,12" />
 
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <TextBlock Text="{svc:Localize General_Theme}" Foreground="{DynamicResource SecondaryTextBrush}"
-                                               VerticalAlignment="Center" Margin="0,0,10,0" />
-                                    <ComboBox ItemsSource="{Binding AvailableThemes}"
-                                              SelectedValuePath="Key" DisplayMemberPath="Value"
-                                              SelectedValue="{Binding SelectedTheme}" Width="150" />
+                        <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Path Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6Z"
+                                          Fill="{DynamicResource DangerBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize Overlay_RecordingSection}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{svc:Localize General_Language}" Foreground="{DynamicResource SecondaryTextBrush}"
-                                               VerticalAlignment="Center" Margin="0,0,10,0" />
-                                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
-                                              SelectedValuePath="Key" DisplayMemberPath="Value"
-                                              SelectedValue="{Binding SelectedLanguage}" Width="150" />
+                                <CheckBox Content="{svc:Localize Overlay_RecordingMode}"
+                                          IsChecked="{Binding RecordingMode}" Margin="0,0,0,8" />
+
+                                <TextBlock Text="{svc:Localize Overlay_RecordingHint}"
+                                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                                           FontSize="11" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Path Data="M12,2L2,7L12,12L22,7L12,2M2,17L12,22L22,17M2,12L12,17L22,12"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize Overlay_ScreenSection}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <DockPanel Margin="0,0,0,4">
+                                    <TextBlock Text="{svc:Localize Overlay_MajorChangeThreshold}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               FontSize="12" Width="280" />
+                                    <TextBlock DockPanel.Dock="Right"
+                                               Text="{Binding MajorContentChangeThreshold, StringFormat={}{0:P0}}"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               FontSize="12" FontFamily="Consolas"
+                                               HorizontalAlignment="Right" />
+                                </DockPanel>
+                                <Slider Minimum="0.05" Maximum="0.80" TickFrequency="0.05"
+                                        IsSnapToTickEnabled="True"
+                                        Value="{Binding MajorContentChangeThreshold}" />
+
+                                <TextBlock Text="{svc:Localize Overlay_MajorChangeHint}"
+                                           Foreground="{DynamicResource ThirdlyTextBrush}"
+                                           FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0" />
+
+                                <Separator Margin="0,14,0,12" />
+
+                                <CheckBox Content="{svc:Localize Overlay_AdaptiveFps}"
+                                          IsChecked="{Binding AdaptiveFpsEnabled}"
+                                          Margin="0,0,0,10" />
+
+                                <StackPanel>
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding AdaptiveFpsEnabled}" Value="False">
+                                                    <Setter Property="IsEnabled" Value="False" />
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Overlay_FastIntervalMs}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Width="280" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding ScreenFastIntervalMs, StringFormat={}{0} ms}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontSize="12" FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                    <Slider Minimum="100" Maximum="2000" TickFrequency="100"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding ScreenFastIntervalMs}" Margin="0,0,0,10" />
+
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Overlay_SlowIntervalMs}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Width="280" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding ScreenSlowIntervalMs, StringFormat={}{0} ms}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontSize="12" FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                    <Slider Minimum="500" Maximum="5000" TickFrequency="250"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding ScreenSlowIntervalMs}" />
+
+                                    <TextBlock Text="{svc:Localize Overlay_AdaptiveFpsHint}"
+                                               Foreground="{DynamicResource ThirdlyTextBrush}"
+                                               FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0" />
                                 </StackPanel>
                             </StackPanel>
-                        </hc:Card>
+                        </Border>
+
+                        <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Path Data="M20,4A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4H20M4,6V18H20V6H4M6,9H10V11H8V15H6V9M12,9H18V11H14V13H18V15H12V9Z"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize Audio_SubtitleOptions}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <CheckBox Content="{svc:Localize Audio_ShowOriginalSubtitle}"
+                                          IsChecked="{Binding ShowOriginalSubtitle}" Margin="0,0,0,12" />
+
+                                <Grid HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220" />
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="220" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{svc:Localize Audio_SubtitlePosition}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Margin="0,0,0,6" />
+                                        <ComboBox ItemsSource="{Binding AvailableSubtitlePositions}"
+                                                  SelectedValuePath="Key" DisplayMemberPath="Value"
+                                                  SelectedValue="{Binding SubtitlePosition}" Height="30" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="{svc:Localize Audio_SubtitleMonitor}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Margin="0,0,0,6" />
+                                        <ComboBox ItemsSource="{Binding AvailableMonitors}"
+                                                  SelectedValuePath="Key" DisplayMemberPath="Value"
+                                                  SelectedValue="{Binding SubtitleMonitorIndex}" Height="30" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <hc:Divider Margin="0,20,0,14" />
+
+                                <TextBlock Text="{svc:Localize Audio_SubtitleDurationSection}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="0,0,0,10" />
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Audio_SubtitleMinDuration}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Width="260" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding SubtitleMinDurationMs, StringFormat={}{0} ms}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontSize="12" FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                    <Slider Minimum="500" Maximum="5000" TickFrequency="500"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding SubtitleMinDurationMs}" />
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Audio_SubtitleMaxDuration}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Width="260" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding SubtitleMaxDurationMs, StringFormat={}{0} ms}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontSize="12" FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                    <Slider Minimum="2000" Maximum="15000" TickFrequency="1000"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding SubtitleMaxDurationMs}" />
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,14">
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Audio_SubtitleMaxChars}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Width="260" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding SubtitleMaxChars}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontSize="12" FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                    <Slider Minimum="100" Maximum="2000" TickFrequency="100"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding SubtitleMaxChars}" />
+                                </StackPanel>
+
+                                <hc:Divider Margin="0,6,0,14" />
+
+                                <TextBlock Text="{svc:Localize Overlay_PreviewSection}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="0,0,0,10" />
+
+                                <Border Background="#1A1A1A" CornerRadius="6"
+                                        Width="480" Height="270" HorizontalAlignment="Left"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                    <Grid Margin="20">
+                                        <Border Background="#CC000000" CornerRadius="6" Padding="12,8"
+                                                HorizontalAlignment="{Binding SubtitlePreviewHAlign}"
+                                                VerticalAlignment="{Binding SubtitlePreviewVAlign}">
+                                            <StackPanel>
+                                                <TextBlock Text="{svc:Localize Overlay_PreviewSampleOriginal}"
+                                                           Foreground="#B0B0B0" FontSize="10"
+                                                           HorizontalAlignment="Center" TextAlignment="Center"
+                                                           Margin="0,0,0,2"
+                                                           Visibility="{Binding ShowOriginalSubtitle, Converter={StaticResource BoolToVis}}" />
+                                                <TextBlock Text="{svc:Localize Overlay_PreviewSampleTranslated}"
+                                                           Foreground="White" FontSize="14" FontWeight="SemiBold"
+                                                           HorizontalAlignment="Center" TextAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Border>
 
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="{svc:Localize Settings_TabHotKeys}">
+            <TabItem Header="{svc:Localize Settings_TabPipelines}">
                 <Grid Margin="15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="{svc:Localize General_HotKeysHint}"
-                               Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
-                               TextWrapping="Wrap" Margin="0,0,0,16" />
-
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0"
-                                Background="{DynamicResource SecondaryRegionBrush}"
-                                CornerRadius="8" Padding="20">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                                    <Path Data="M21,2H3A2,2 0 0,0 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4A2,2 0 0,0 21,2M21,16H3V4H21"
-                                          Fill="{DynamicResource PrimaryBrush}"
-                                          Width="18" Height="18" Stretch="Uniform"
-                                          VerticalAlignment="Center" Margin="0,0,8,0" />
-                                    <TextBlock Text="{svc:Localize HotKeyGroup_ImagePipeline}"
-                                               FontSize="15" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource PrimaryTextBrush}"
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
-
-                                <ItemsControl ItemsSource="{Binding HotKeyBindings}"
-                                              Grid.IsSharedSizeScope="True">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"
-                                                           Foreground="{DynamicResource PrimaryTextBrush}"
-                                                           VerticalAlignment="Center" />
-
-                                                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                                    <TextBox Text="{Binding KeyDisplayString, Mode=OneWay}"
-                                                             IsReadOnly="True" FontFamily="Consolas"
-                                                             MinWidth="130" MaxWidth="180" Height="30"
-                                                             VerticalContentAlignment="Center"
-                                                             HorizontalContentAlignment="Center" Padding="8,0"
-                                                             hc:InfoElement.Placeholder="{Binding [General_HotKeyPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
-                                                             PreviewKeyDown="HotKeyTextBox_PreviewKeyDown"
-                                                             GotFocus="HotKeyTextBox_GotFocus"
-                                                             LostFocus="HotKeyTextBox_LostFocus" />
-
-                                                    <Button Command="{Binding ClearBindingCommand}"
-                                                            Visibility="{Binding HasBinding, Converter={StaticResource BoolToVis}}"
-                                                            Background="Transparent" BorderThickness="0"
-                                                            Padding="2,0" Margin="4,0,0,0" Width="20" Height="20"
-                                                            VerticalAlignment="Center" Cursor="Hand"
-                                                            ToolTip="Clear">
-                                                        <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z"
-                                                              Fill="{DynamicResource ThirdlyTextBrush}"
-                                                              Width="10" Height="10" Stretch="Uniform" />
-                                                    </Button>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                        <Border Grid.Column="0" Cursor="Hand">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{DynamicResource SecondaryRegionBrush}" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="2" />
+                                    <Setter Property="CornerRadius" Value="8" />
+                                    <Setter Property="Padding" Value="16" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedPipelineSubTabIndex}" Value="0">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource ThirdlyRegionBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                              Command="{Binding SelectPipelineTabCommand}"
+                                              CommandParameter="screen" />
+                            </Border.InputBindings>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M21,2H3A2,2 0 0,0 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4A2,2 0 0,0 21,2M21,16H3V4H21"
+                                      Fill="{DynamicResource PrimaryBrush}"
+                                      Width="24" Height="24" Stretch="Uniform"
+                                      VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <TextBlock Text="{svc:Localize Settings_TabScreen}"
+                                           FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
 
-                        <Border Grid.Column="2"
-                                Background="{DynamicResource SecondaryRegionBrush}"
-                                CornerRadius="8" Padding="20">
-                            <StackPanel VerticalAlignment="Top">
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                                    <Path Data="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
-                                          Fill="{DynamicResource PrimaryBrush}"
-                                          Width="18" Height="18" Stretch="Uniform"
-                                          VerticalAlignment="Center" Margin="0,0,8,0" />
-                                    <TextBlock Text="{svc:Localize HotKeyGroup_AudioPipeline}"
-                                               FontSize="15" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource PrimaryTextBrush}"
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
-
-                                <ItemsControl ItemsSource="{Binding AudioPipelineHotKeys}"
-                                              Grid.IsSharedSizeScope="True">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <TextBlock Grid.Column="0" Text="{Binding DisplayName}"
-                                                           Foreground="{DynamicResource PrimaryTextBrush}"
-                                                           VerticalAlignment="Center" />
-
-                                                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                                    <TextBox Text="{Binding KeyDisplayString, Mode=OneWay}"
-                                                             IsReadOnly="True" FontFamily="Consolas"
-                                                             MinWidth="130" MaxWidth="180" Height="30"
-                                                             VerticalContentAlignment="Center"
-                                                             HorizontalContentAlignment="Center" Padding="8,0"
-                                                             hc:InfoElement.Placeholder="{Binding [General_HotKeyPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
-                                                             PreviewKeyDown="HotKeyTextBox_PreviewKeyDown"
-                                                             GotFocus="HotKeyTextBox_GotFocus"
-                                                             LostFocus="HotKeyTextBox_LostFocus" />
-
-                                                    <Button Command="{Binding ClearBindingCommand}"
-                                                            Visibility="{Binding HasBinding, Converter={StaticResource BoolToVis}}"
-                                                            Background="Transparent" BorderThickness="0"
-                                                            Padding="2,0" Margin="4,0,0,0" Width="20" Height="20"
-                                                            VerticalAlignment="Center" Cursor="Hand"
-                                                            ToolTip="Clear">
-                                                        <Path Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z"
-                                                              Fill="{DynamicResource ThirdlyTextBrush}"
-                                                              Width="10" Height="10" Stretch="Uniform" />
-                                                    </Button>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                        <Border Grid.Column="2" Cursor="Hand">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="{DynamicResource SecondaryRegionBrush}" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="2" />
+                                    <Setter Property="CornerRadius" Value="8" />
+                                    <Setter Property="Padding" Value="16" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedPipelineSubTabIndex}" Value="1">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource ThirdlyRegionBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick"
+                                              Command="{Binding SelectPipelineTabCommand}"
+                                              CommandParameter="audio" />
+                            </Border.InputBindings>
+                            <StackPanel Orientation="Horizontal">
+                                <Path Data="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
+                                      Fill="{DynamicResource PrimaryBrush}"
+                                      Width="24" Height="24" Stretch="Uniform"
+                                      VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <TextBlock Text="{svc:Localize Settings_TabAudio}"
+                                           FontSize="15" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
                     </Grid>
-                </Grid>
-            </TabItem>
 
-            <TabItem Header="{svc:Localize Settings_TabImagePipeline}">
-                <Grid Margin="15">
+                    <Grid Grid.Row="1">
+                        <Grid>
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedPipelineSubTabIndex}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="320" />
                         <ColumnDefinition Width="16" />
@@ -824,7 +1214,7 @@
                                                 <StackPanel Margin="0,5,0,10">
                                                     <CheckBox x:Name="FilterCheckBox"
                                                               Content="{Binding DisplayName}"
-                                                              IsChecked="{Binding Option.IsEnabled}"
+                                                              IsChecked="{Binding IsEnabled}"
                                                               FontSize="14" />
                                                     <TextBlock Text="{Binding Description}"
                                                                Foreground="{DynamicResource ThirdlyTextBrush}"
@@ -838,8 +1228,8 @@
                                                         <Slider Width="100" VerticalAlignment="Center" Margin="0,0,10,0"
                                                                 Minimum="0" Maximum="3" TickFrequency="0.1"
                                                                 IsSnapToTickEnabled="True"
-                                                                Value="{Binding Option.Value, UpdateSourceTrigger=PropertyChanged}" />
-                                                        <TextBox Text="{Binding Option.Value, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F2}'}"
+                                                                Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+                                                        <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F2}'}"
                                                                  Width="50" Padding="2" />
                                                     </StackPanel>
                                                 </StackPanel>
@@ -869,6 +1259,11 @@
                                             </Style>
                                         </StackPanel.Style>
 
+                                        <TextBlock Text="{svc:Localize Settings_SharedNote}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontStyle="Italic" FontSize="11"
+                                                   TextWrapping="Wrap" Margin="0,0,0,12" />
+
                                         <TextBox Text="{Binding DataContext.CacheTtlMinutes, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
                                                  hc:InfoElement.Placeholder="{Binding [Cache_TtlPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
                                                  Width="200" HorizontalAlignment="Left" Margin="0,0,0,2" />
@@ -895,6 +1290,11 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </StackPanel.Style>
+
+                                        <TextBlock Text="{svc:Localize Settings_SharedNote}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontStyle="Italic" FontSize="11"
+                                                   TextWrapping="Wrap" Margin="0,0,0,12" />
 
                                         <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
                                                    TextWrapping="Wrap" Margin="0,0,0,4"
@@ -970,16 +1370,21 @@
                         </Grid>
                     </Border>
                 </Grid>
-            </TabItem>
+                        </Grid>
 
-            <TabItem Header="{svc:Localize Settings_TabAudio}">
-                <Grid Margin="15">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0">
+                        <Grid>
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedPipelineSubTabIndex}" Value="1">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid>
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="320" />
                             <ColumnDefinition Width="16" />
@@ -1127,7 +1532,7 @@
                                                     <StackPanel Margin="0,5,0,10">
                                                         <CheckBox x:Name="FilterCheckBox"
                                                                   Content="{Binding DisplayName}"
-                                                                  IsChecked="{Binding Option.IsEnabled}"
+                                                                  IsChecked="{Binding IsEnabled}"
                                                                   FontSize="14" />
                                                         <TextBlock Text="{Binding Description}"
                                                                    Foreground="{DynamicResource ThirdlyTextBrush}"
@@ -1140,8 +1545,8 @@
                                                             <Slider Width="120" VerticalAlignment="Center" Margin="0,0,10,0"
                                                                     Minimum="0" Maximum="1000" TickFrequency="50"
                                                                     IsSnapToTickEnabled="True"
-                                                                    Value="{Binding Option.Value, UpdateSourceTrigger=PropertyChanged}" />
-                                                            <TextBox Text="{Binding Option.Value, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F0}'}"
+                                                                    Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+                                                            <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F0}'}"
                                                                      Width="60" Padding="2" />
                                                         </StackPanel>
                                                     </StackPanel>
@@ -1170,6 +1575,11 @@
                                                 </Style>
                                             </StackPanel.Style>
 
+                                            <TextBlock Text="{svc:Localize Settings_SharedNote}"
+                                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                                       FontStyle="Italic" FontSize="11"
+                                                       TextWrapping="Wrap" Margin="0,0,0,12" />
+
                                             <TextBox Text="{Binding DataContext.CacheTtlMinutes, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
                                                      hc:InfoElement.Placeholder="{Binding [Cache_TtlPlaceholder], Source={x:Static svc:LocalizationService.Instance}}"
                                                      Width="200" HorizontalAlignment="Left" Margin="0,0,0,2" />
@@ -1196,6 +1606,11 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </StackPanel.Style>
+
+                                            <TextBlock Text="{svc:Localize Settings_SharedNote}"
+                                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                                       FontStyle="Italic" FontSize="11"
+                                                       TextWrapping="Wrap" Margin="0,0,0,12" />
 
                                             <TextBlock Foreground="{DynamicResource SecondaryTextBrush}" FontStyle="Italic"
                                                        TextWrapping="Wrap" Margin="0,0,0,4"
@@ -1272,88 +1687,294 @@
                         </Border>
                     </Grid>
 
-                    <Border Grid.Row="1" Margin="0,15,0,0"
-                            Background="{DynamicResource SecondaryRegionBrush}"
-                            CornerRadius="8" Padding="20">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="20" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="20" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
 
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{svc:Localize Audio_CaptureSource}"
-                                           Foreground="{DynamicResource SecondaryTextBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
+            <TabItem Header="{svc:Localize Settings_TabCaptureAudio}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
+                    <StackPanel>
+
+                        <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Path Data="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize Audio_CaptureSource}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
                                 <ComboBox ItemsSource="{Binding AvailableAudioCaptureSources}"
                                           SelectedValuePath="Key" DisplayMemberPath="Value"
-                                          SelectedValue="{Binding SelectedAudioCaptureSource}" Height="28" />
-                            </StackPanel>
+                                          SelectedValue="{Binding SelectedAudioCaptureSource}"
+                                          Height="30" Width="300" HorizontalAlignment="Left" />
 
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="{svc:Localize Audio_VadOptions}"
-                                           Foreground="{DynamicResource SecondaryTextBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
-                                <TextBlock Text="{svc:Localize Audio_SilenceThresholdDb}"
-                                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,0,0,2" />
-                                <Grid Margin="0,0,0,6">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="70" />
-                                    </Grid.ColumnDefinitions>
-                                    <Slider Grid.Column="0" Minimum="-80" Maximum="0" TickFrequency="5"
-                                            Value="{Binding SilenceThresholdDb, UpdateSourceTrigger=PropertyChanged}"
-                                            VerticalAlignment="Center" />
-                                    <TextBox Grid.Column="1" Text="{Binding SilenceThresholdDb, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F0}'}"
-                                             Margin="4,0,0,0" />
-                                </Grid>
+                                <StackPanel Margin="0,14,0,0">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedAudioCaptureSource}" Value="SystemLoopback">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <DockPanel Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Audio_LoopbackResamplerQuality}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" Width="280" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding LoopbackResamplerQuality}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   FontSize="12" FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+                                    <Slider Minimum="20" Maximum="60" TickFrequency="10"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding LoopbackResamplerQuality}" />
+                                    <TextBlock Text="{svc:Localize Audio_LoopbackResamplerQualityHint}"
+                                               Foreground="{DynamicResource ThirdlyTextBrush}"
+                                               FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                CornerRadius="8" Padding="20">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Path Data="M3,9H5V15H3V9M7,7H9V17H7V7M11,5H13V19H11V5M15,3H17V21H15V3M19,7H21V17H19V7Z"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize Audio_VadOptions}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <TextBlock Text="{svc:Localize Audio_VadProvider}"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           FontSize="12" Margin="0,0,0,6" />
+                                <ComboBox ItemsSource="{Binding VadProviders}"
+                                          SelectedItem="{Binding SelectedVadProvider}"
+                                          Width="200" HorizontalAlignment="Left" Margin="0,0,0,14" />
+
+                                <StackPanel Margin="0,0,0,14">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedVadProvider}" Value="Silero">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="{svc:Localize Audio_SilenceThresholdDb}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               FontSize="12" Margin="0,0,0,6" />
+                                    <Grid MaxWidth="400" HorizontalAlignment="Left">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="70" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Minimum="-80" Maximum="0" TickFrequency="5"
+                                                Value="{Binding SilenceThresholdDb, UpdateSourceTrigger=PropertyChanged}"
+                                                VerticalAlignment="Center" Width="300" HorizontalAlignment="Left" />
+                                        <TextBox Grid.Column="1"
+                                                 Text="{Binding SilenceThresholdDb, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F0}'}"
+                                                 Margin="8,0,0,0" />
+                                    </Grid>
+                                </StackPanel>
+
+                                <StackPanel Margin="0,0,0,14">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedVadProvider}" Value="Silero">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="{svc:Localize Audio_SpeechProbabilityThreshold}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               FontSize="12" Margin="0,0,0,6" />
+                                    <Grid MaxWidth="400" HorizontalAlignment="Left" Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="70" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider Grid.Column="0" Minimum="0.1" Maximum="0.9" TickFrequency="0.05"
+                                                Value="{Binding SpeechProbabilityThreshold, UpdateSourceTrigger=PropertyChanged}"
+                                                VerticalAlignment="Center" Width="300" HorizontalAlignment="Left" />
+                                        <TextBox Grid.Column="1"
+                                                 Text="{Binding SpeechProbabilityThreshold, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:F2}'}"
+                                                 Margin="8,0,0,0" />
+                                    </Grid>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <TextBlock Text="{svc:Localize Audio_SileroModel}"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   FontSize="12" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        <TextBlock Text="{Binding SileroDownloadStatus}"
+                                                   Foreground="{DynamicResource ThirdlyTextBrush}"
+                                                   FontSize="12" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="{svc:Localize Engine_Download}"
+                                                Command="{Binding DownloadSileroModelCommand}"
+                                                Width="140" Height="28" Margin="0,0,8,0">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource ButtonPrimary}">
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSileroDownloading}" Value="True">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsSileroModelDownloaded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="{svc:Localize Misc_Delete}"
+                                                Command="{Binding DeleteSileroModelCommand}"
+                                                Width="140" Height="28">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSileroModelDownloaded}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </StackPanel>
+                                    <ProgressBar Value="{Binding SileroDownloadProgress}" Minimum="0" Maximum="100"
+                                                 Height="4" Margin="0,6,0,0" Width="288" HorizontalAlignment="Left">
+                                        <ProgressBar.Style>
+                                            <Style TargetType="ProgressBar">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSileroDownloading}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ProgressBar.Style>
+                                    </ProgressBar>
+                                </StackPanel>
+
                                 <TextBlock Text="{svc:Localize Audio_MinSilenceDurationMs}"
-                                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,0,0,2" />
-                                <TextBox Text="{Binding MinSilenceDurationMs, UpdateSourceTrigger=PropertyChanged}" />
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           FontSize="12" Margin="0,0,0,6" />
+                                <TextBox Text="{Binding MinSilenceDurationMs, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="150" HorizontalAlignment="Left" />
                             </StackPanel>
+                        </Border>
 
-                            <StackPanel Grid.Column="4">
-                                <TextBlock Text="{svc:Localize Audio_SubtitleOptions}"
-                                           Foreground="{DynamicResource SecondaryTextBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
-                                <CheckBox Content="{svc:Localize Audio_ShowOriginalSubtitle}"
-                                          IsChecked="{Binding ShowOriginalSubtitle}" Margin="0,0,0,8" />
-                                <TextBlock Text="{svc:Localize Audio_SubtitlePosition}"
-                                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,0,0,2" />
-                                <ComboBox ItemsSource="{Binding AvailableSubtitlePositions}"
-                                          SelectedValuePath="Key" DisplayMemberPath="Value"
-                                          SelectedValue="{Binding SubtitlePosition}" Height="28" Margin="0,0,0,8" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                                <TextBlock Text="{svc:Localize Audio_SubtitleMonitor}"
-                                           Foreground="{DynamicResource ThirdlyTextBrush}" FontSize="11" Margin="0,0,0,2" />
-                                <ComboBox ItemsSource="{Binding AvailableMonitors}"
-                                          SelectedValuePath="Key" DisplayMemberPath="Value"
-                                          SelectedValue="{Binding SubtitleMonitorIndex}" Height="28" />
+            <TabItem Header="{svc:Localize Settings_TabHotKeys}">
+                <Grid Margin="15">
+                    <Border Background="{DynamicResource SecondaryRegionBrush}"
+                            CornerRadius="8" Padding="20,20,8,20">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Grid.IsSharedSizeScope="True" Margin="0,0,12,0">
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                    <Path Data="M21,2H3A2,2 0 0,0 1,4V16A2,2 0 0,0 3,18H10V20H8V22H16V20H14V18H21A2,2 0 0,0 23,16V4A2,2 0 0,0 21,2M21,16H3V4H21"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize HotKeyGroup_Screen}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <ItemsControl ItemsSource="{Binding ImagePipelineHotKeys}" />
+
+                                <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,8,0,18" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                    <Path Data="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize HotKeyGroup_Audio}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <ItemsControl ItemsSource="{Binding AudioPipelineHotKeys}" />
+
                             </StackPanel>
-                        </Grid>
+                        </ScrollViewer>
                     </Border>
                 </Grid>
             </TabItem>
-        </TabControl>
 
-        <Border Grid.Row="1" Background="{DynamicResource SecondaryRegionBrush}"
-                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Command="{Binding SaveSettingsCommand}" Width="150" Height="32">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource ButtonPrimary}">
-                            <Setter Property="Content" Value="{Binding [Settings_Save], Source={x:Static svc:LocalizationService.Instance}}" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasUnsavedChanges}" Value="True">
-                                    <Setter Property="Content" Value="{Binding [Settings_SaveUnsaved], Source={x:Static svc:LocalizationService.Instance}}" />
-                                    <Setter Property="Background" Value="#CC7A00" />
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
-        </Border>
+            <TabItem Header="{svc:Localize Settings_TabAppearance}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="15">
+                    <StackPanel>
+
+                        <Border Background="{DynamicResource SecondaryRegionBrush}"
+                                CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Path Data="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"
+                                          Fill="{DynamicResource PrimaryBrush}"
+                                          Width="18" Height="18" Stretch="Uniform"
+                                          VerticalAlignment="Center" Margin="0,0,8,0" />
+                                    <TextBlock Text="{svc:Localize General_Appearance}"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                    <TextBlock Text="{svc:Localize General_Theme}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center" Width="120" />
+                                    <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                              SelectedValuePath="Key" DisplayMemberPath="Value"
+                                              SelectedValue="{Binding SelectedTheme}"
+                                              Width="200" Height="30" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{svc:Localize General_Language}"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               VerticalAlignment="Center" Width="120" />
+                                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                                              SelectedValuePath="Key" DisplayMemberPath="Value"
+                                              SelectedValue="{Binding SelectedLanguage}"
+                                              Width="200" Height="30" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="Themes/SkinDark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
                 <ResourceDictionary Source="Themes/Overrides.xaml"/>
+                <ResourceDictionary Source="Themes/Tokens.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
@@ -23,6 +24,10 @@
 
             <DataTemplate DataType="{x:Type viewmodels:DebugViewModel}">
                 <views:DebugView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:BenchmarkViewModel}">
+                <views:BenchmarkView />
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

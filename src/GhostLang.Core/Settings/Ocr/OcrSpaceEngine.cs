@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using GhostLang.Core.Pipelines;
 using GhostLang.Core.Pipelines.Enums;
 using GhostLang.Core.Pipelines.Models;
+using GhostLang.Core.Pipelines.Utilities;
 
 namespace GhostLang.Core.Settings.Ocr;
 
@@ -18,11 +19,24 @@ public class OcrSpaceEngine(OcrSpaceOptions options) : IOcrEngine
         { SupportedLanguage.English, "eng" },
         { SupportedLanguage.Russian, "rus" },
         { SupportedLanguage.Japanese, "jpn" },
-        { SupportedLanguage.Chinese, "chs" },
+        { SupportedLanguage.ChineseSimplified, "chs" },
+        { SupportedLanguage.ChineseTraditional, "cht" },
         { SupportedLanguage.French, "fre" },
         { SupportedLanguage.German, "ger" },
-        { SupportedLanguage.Spanish, "spa" }
+        { SupportedLanguage.Spanish, "spa" },
+        { SupportedLanguage.Italian, "ita" },
+        { SupportedLanguage.Portuguese, "por" },
+        { SupportedLanguage.Polish, "pol" },
+        { SupportedLanguage.Korean, "kor" },
+        { SupportedLanguage.Arabic, "ara" },
+        { SupportedLanguage.Turkish, "tur" },
+        { SupportedLanguage.Ukrainian, "ukr" },
+        { SupportedLanguage.Dutch, "dut" },
+        { SupportedLanguage.Vietnamese, "vnm" },
+        { SupportedLanguage.Thai, "tha" }
     };
+
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.OcrSpace;
 
     public Task<bool> IsLanguageSupportedAsync(SupportedLanguage language)
     {

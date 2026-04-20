@@ -1,0 +1,42 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <Thickness x:Key="SpacingXs">4</Thickness>
+    <Thickness x:Key="SpacingSm">8</Thickness>
+    <Thickness x:Key="SpacingMd">12</Thickness>
+    <Thickness x:Key="SpacingLg">16</Thickness>
+    <Thickness x:Key="SpacingXl">24</Thickness>
+
+    <sys:Double x:Key="FontSizeCaption">11</sys:Double>
+    <sys:Double x:Key="FontSizeBody">12</sys:Double>
+    <sys:Double x:Key="FontSizeControl">13</sys:Double>
+    <sys:Double x:Key="FontSizeHeading">14</sys:Double>
+    <sys:Double x:Key="FontSizeSection">16</sys:Double>
+    <sys:Double x:Key="FontSizeDisplay">17</sys:Double>
+    <sys:Double x:Key="FontSizeHero">18</sys:Double>
+
+    <FontFamily x:Key="MonoFontFamily">Consolas</FontFamily>
+
+    <sys:Double x:Key="ButtonHeightSm">26</sys:Double>
+    <sys:Double x:Key="ButtonHeightMd">32</sys:Double>
+    <sys:Double x:Key="ButtonHeightLg">38</sys:Double>
+    <sys:Double x:Key="ControlHeight">30</sys:Double>
+    <sys:Double x:Key="StepCircleSize">28</sys:Double>
+    <sys:Double x:Key="IconSizeSm">16</sys:Double>
+    <sys:Double x:Key="IconSizeMd">22</sys:Double>
+
+    <CornerRadius x:Key="RadiusSm">4</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">6</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">8</CornerRadius>
+    <CornerRadius x:Key="RadiusCard">12</CornerRadius>
+
+    <Duration x:Key="DurationFast">0:0:0.150</Duration>
+    <Duration x:Key="DurationNormal">0:0:0.300</Duration>
+    <Duration x:Key="FadeNotification">0:0:1.000</Duration>
+
+    <sys:TimeSpan x:Key="DebounceAutosave">0:0:0.400</sys:TimeSpan>
+
+    <QuadraticEase x:Key="DefaultEasing" EasingMode="EaseInOut" />
+
+</ResourceDictionary>

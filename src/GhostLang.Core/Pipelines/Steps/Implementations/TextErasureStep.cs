@@ -1,6 +1,7 @@
 ﻿using GhostLang.Core.Services;
 using GhostLang.Core.Services.Erasure;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace GhostLang.Core.Pipelines.Steps.Implementations;
@@ -18,17 +19,38 @@ public class TextErasureStep(ITextErasureEngine erasureEngine) : IOptionalPipeli
 
         context.IsSmartErasureEnabled = IsEnabled && erasureEngine is OpenCvErasureEngine;
 
-        using var msIn = new MemoryStream(context.OriginalImage);
-        using var originalImage = await Image.LoadAsync(msIn);
+        Image<Rgba32>? decodedLocally = null;
+        var originalImage = context.OriginalPixels;
+        if (originalImage is null)
+        {
+            using var msIn = new MemoryStream(context.OriginalImage);
+            decodedLocally = await Image.LoadAsync<Rgba32>(msIn);
+            originalImage = decodedLocally;
+        }
+
+        try
+        {
 
         foreach (var fragment in context.TextFragments)
         {
-            var padding = (int)(fragment.Bounds.Height * 0.15);
+
+            fragment.OriginalTextBounds = new Models.BoundingBox
+            {
+                X = fragment.Bounds.X,
+                Y = fragment.Bounds.Y,
+                Width = fragment.Bounds.Width,
+                Height = fragment.Bounds.Height
+            };
+
+            var padTop = Math.Max(4, (int)(fragment.Bounds.Height * 0.25));
+            var padBottom = Math.Max(6, (int)(fragment.Bounds.Height * 0.35));
+            var padH = Math.Max(3, (int)(fragment.Bounds.Height * 0.15));
+
             var cropRectangle = new Rectangle(
-                fragment.Bounds.X - padding,
-                fragment.Bounds.Y - padding,
-                fragment.Bounds.Width + padding * 2,
-                fragment.Bounds.Height + padding * 2
+                fragment.Bounds.X - padH,
+                fragment.Bounds.Y - padTop,
+                fragment.Bounds.Width + padH * 2,
+                fragment.Bounds.Height + padTop + padBottom
             );
 
             cropRectangle.Intersect(originalImage.Bounds);
@@ -47,9 +69,18 @@ public class TextErasureStep(ITextErasureEngine erasureEngine) : IOptionalPipeli
 
             var rawPatchBytes = patchStream.ToArray();
 
+            fragment.OriginalPatch = rawPatchBytes;
+
             fragment.CleanedPatch = IsEnabled
                 ? await erasureEngine.EraseTextAsync(rawPatchBytes)
                 : rawPatchBytes;
+        }
+
+        }
+        finally
+        {
+
+            decodedLocally?.Dispose();
         }
     }
 }

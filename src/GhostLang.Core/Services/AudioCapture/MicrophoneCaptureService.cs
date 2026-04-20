@@ -13,6 +13,10 @@ public class MicrophoneCaptureService : IAudioCaptureService
 
     public event EventHandler<AudioChunkCapturedEventArgs>? ChunkCaptured;
 
+#pragma warning disable CS0067
+    public event EventHandler<int>? SamplesDropped;
+#pragma warning restore CS0067
+
     private WaveInEvent? _waveIn;
     private readonly Stopwatch _stopwatch = new();
 

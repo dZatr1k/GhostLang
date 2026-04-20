@@ -15,6 +15,8 @@ public class GTranslateEngine(GTranslateOptions options) : ITranslationEngine
         _ => new GoogleTranslator()
     };
 
+    public IReadOnlySet<SupportedLanguage> SupportedLanguages => LanguageCapabilitySets.AllTwenty;
+
     public async Task<string> TranslateAsync(string text, SupportedLanguage targetLanguage,
         List<SupportedLanguage> sourceLanguages)
     {

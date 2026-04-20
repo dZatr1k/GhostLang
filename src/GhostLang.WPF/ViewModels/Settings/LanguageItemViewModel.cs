@@ -12,7 +12,9 @@ public partial class LanguageItemViewModel(SupportedLanguage language, string di
     [ObservableProperty] private bool _isDownloading;
     [ObservableProperty] private double _downloadProgress;
     [ObservableProperty] private string _statusText = string.Empty;
-    
-    [ObservableProperty] 
+
+    [ObservableProperty]
     private bool _isSelected;
+
+    public CancellationTokenSource? DownloadCts { get; set; }
 }
