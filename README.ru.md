@@ -16,22 +16,22 @@
 
 ---
 
-GhostLang захватывает регион экрана или поток аудио, распознаёт в нём текст / речь, переводит на нужный язык и отображает результат на том же месте — overlay поверх захваченного региона для экрана или субтитры на рабочем столе для звука. Построен как **pipeline из взаимозаменяемых шагов**: каждый этап (OCR, ASR, translation engine, стирание текста, VAD) подменяем, замеряем и конфигурируется независимо.
+GhostLang захватывает регион экрана или поток аудио, распознаёт в нём текст / речь, переводит на нужный язык и отображает результат на том же месте - overlay поверх захваченного региона для экрана или субтитры на рабочем столе для звука. Построен как **pipeline из взаимозаменяемых шагов**: каждый этап (OCR, ASR, translation engine, стирание текста, VAD) подменяем, замеряем и конфигурируется независимо.
 
 ## Почему GhostLang
 
 - **Мультимодальность.** Почти все десктоп-переводчики работают *или* с экраном, *или* со звуком. GhostLang стримит оба параллельно с общим кешем переводов и глоссарием.
-- **Local-first.** Можно полностью offline: Tesseract + Whisper + локальный MT-провайдер. Облачные engine'ы (Azure Vision, Azure Speech) — опциональный плагин.
-- **Встроенный бенчмарк.** Ablation-пресеты, разбивка latency по шагам, метрики CER/WER/BLEU/chrF, CSV-экспорт — в табе Debug.
-- **GPU-ускорение ASR.** Whisper с Vulkan runtime — в ~3–10× быстрее CPU на любой современной видеокарте (NVIDIA / AMD / Intel).
-- **Адаптивный захват.** Screen pipeline замедляется до 0.5 FPS на статичном контенте, ускоряется до 5 FPS при активном — экономит CPU, подстраивается под пользователя.
+- **Local-first.** Можно полностью offline: Tesseract + Whisper + локальный MT-провайдер. Облачные engine'ы (Azure Vision, Azure Speech) - опциональный плагин.
+- **Встроенный бенчмарк.** Ablation-пресеты, разбивка latency по шагам, метрики CER/WER/BLEU/chrF, CSV-экспорт - в табе Debug.
+- **GPU-ускорение ASR.** Whisper с Vulkan runtime - в ~3–10× быстрее CPU на любой современной видеокарте (NVIDIA / AMD / Intel).
+- **Адаптивный захват.** Screen pipeline замедляется до 0.5 FPS на статичном контенте, ускоряется до 5 FPS при активном - экономит CPU, подстраивается под пользователя.
 
 ## Возможности
 
 ### Перевод экрана
-- Захват региона с click-through overlay — не мешает работать с захватываемым окном.
+- Захват региона с click-through overlay - не мешает работать с захватываемым окном.
 - OCR engines: **Tesseract** (локально, 20 языков), **Windows OCR**, **Azure Vision**, **OCR.space**.
-- Умное стирание текста через **OpenCV inpainting** — или быстрый SolidColor.
+- Умное стирание текста через **OpenCV inpainting** - или быстрый SolidColor.
 - Переведённый текст рендерится на месте оригинала с сохранением цвета и размера.
 - Адаптивная частота захвата (200–5000 мс), настраивается на сессию.
 - Recording-mode: overlay исключается из захвата OBS / других recorder'ов.
@@ -39,9 +39,9 @@ GhostLang захватывает регион экрана или поток а�
 ### Перевод аудио
 - Источник: микрофон или system loopback (WASAPI).
 - VAD: RMS-gate (быстрый) или **Silero** (нейросеть, ~200 MB модель, лучше отбрасывает шум).
-- ASR engines: **Whisper** (локально, 5 размеров модели, Vulkan GPU) — **Vosk** (локально, streaming) — **Azure Speech** (облако).
+- ASR engines: **Whisper** (локально, 5 размеров модели, Vulkan GPU) - **Vosk** (локально, streaming) - **Azure Speech** (облако).
 - Overlay субтитров: настраиваемые позиция, монитор, длительность, fade-in/out.
-- Drift-индикатор — предупреждает, если перевод отстаёт от реального времени.
+- Drift-индикатор - предупреждает, если перевод отстаёт от реального времени.
 
 ### Общее
 - 20 поддерживаемых языков: английский, русский, испанский, немецкий, французский, японский, китайский (упрощённый/традиционный), итальянский, португальский, польский, корейский, арабский, турецкий, украинский, нидерландский, вьетнамский, хинди, тайский, иврит.
@@ -79,15 +79,15 @@ dotnet run --project GhostLang.WPF/GhostLang.WPF.csproj -c Release
 
 ## Конфигурация
 
-Все настройки в `appsettings.user.json` рядом с исполняемым файлом (создаётся при первом запуске). Autosave включён — Settings-страница сохраняет изменения через 400 мс debounce.
+Все настройки в `appsettings.user.json` рядом с исполняемым файлом (создаётся при первом запуске). Autosave включён - Settings-страница сохраняет изменения через 400 мс debounce.
 
 Модели лежат здесь:
 ```
 <exe>/Models/
-├── Tesseract/           — языковые паки, auto-download при запросе
-├── Whisper/             — ggml модели (base/small/medium/large-v3)
-├── Vosk/                — архивы распаковать сюда, app автоматически их найдёт
-└── Silero/              — silero_vad.onnx, скачивание из Settings
+├── Tesseract/           - языковые паки, auto-download при запросе
+├── Whisper/             - ggml модели (base/small/medium/large-v3)
+├── Vosk/                - архивы распаковать сюда, app автоматически их найдёт
+└── Silero/              - silero_vad.onnx, скачивание из Settings
 ```
 
 ## Бенчмарки (v0.1 beta)
@@ -101,15 +101,15 @@ Latency на репрезентативном screen-корпусе из 3 се�
 | Game UI | 798 мс | 129 мс | 6.2× |
 | Сайт | 897 мс | 364 мс | 2.5× |
 
-Полный корпус (60 семплов, 3 категории × 2 пайплайна) и ablation-данные прикладываются к каждому релизу как `tests-*.zip`. Воспроизвести локально — **Debug → Benchmark → Ablation**.
+Полный корпус (60 семплов, 3 категории × 2 пайплайна) и ablation-данные прикладываются к каждому релизу как `tests-*.zip`. Воспроизвести локально - **Debug → Benchmark → Ablation**.
 
 ## Архитектура
 
 Два framework-agnostic проекта:
-- **GhostLang.Core** — pipelines, engine abstractions, benchmark runner (таргетит `net8.0-windows`).
-- **GhostLang.WPF** — WPF UI, MVVM (CommunityToolkit.Mvvm), DI через Microsoft.Extensions.Hosting.
+- **GhostLang.Core** - pipelines, engine abstractions, benchmark runner (таргетит `net8.0-windows`).
+- **GhostLang.WPF** - WPF UI, MVVM (CommunityToolkit.Mvvm), DI через Microsoft.Extensions.Hosting.
 
-Шаги pipeline реализуют `IMandatoryPipelineStep` или `IOptionalPipelineStep` и выполняются последовательно через `IPipelineBuilder`. Pipeline — singleton на сессию, кеширует тяжёлые native-ресурсы (Tesseract engine handle, Whisper factory, Vosk model) между тиками — teardown только на Stop или смене engine.
+Шаги pipeline реализуют `IMandatoryPipelineStep` или `IOptionalPipelineStep` и выполняются последовательно через `IPipelineBuilder`. Pipeline - singleton на сессию, кеширует тяжёлые native-ресурсы (Tesseract engine handle, Whisper factory, Vosk model) между тиками - teardown только на Stop или смене engine.
 
 ## Сравнение с аналогами
 
@@ -117,10 +117,10 @@ Latency на репрезентативном screen-корпусе из 3 се�
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Перевод экрана | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Перевод аудио | ✅ | ❌ | ❌ | частично (text hook) | ❌ | ❌ |
-| Локальный ASR (Whisper) | ✅ | — | — | — | — | — |
+| Локальный ASR (Whisper) | ✅ | - | - | - | - | - |
 | GPU-ускорение | ✅ | ❌ | ❌ | частично | ❌ | ❌ |
 | Адаптивный FPS | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Нейросетевой VAD | ✅ | — | — | — | — | — |
+| Нейросетевой VAD | ✅ | - | - | - | - | - |
 | Персистентный кеш | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Встроенный ablation-бенчмарк | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -153,4 +153,4 @@ MIT. См. [LICENSE](LICENSE) (будет добавлен).
 
 ## Автор
 
-dZatr1k — выпускная квалификационная работа, МИРЭА, 2026.
+dZatr1k - выпускная квалификационная работа, МИРЭА, 2026.
