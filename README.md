@@ -16,32 +16,32 @@
 
 ---
 
-GhostLang captures a region of your screen or a stream of audio, recognizes the text / speech in it, translates to your target language, and renders the result back in place — an overlay on the captured region for screen, or subtitles on top of the desktop for audio. Built as a **pipeline of interchangeable steps** so every stage (OCR, ASR, translation engine, erasure, voice-activity detection) is replaceable, benchmarkable, and configurable independently.
+GhostLang captures a region of your screen or a stream of audio, recognizes the text / speech in it, translates to your target language, and renders the result back in place - an overlay on the captured region for screen, or subtitles on top of the desktop for audio. Built as a **pipeline of interchangeable steps** so every stage (OCR, ASR, translation engine, erasure, voice-activity detection) is replaceable, benchmarkable, and configurable independently.
 
 ## Why GhostLang
 
 - **Multimodal.** Almost every desktop translator handles *either* screen *or* audio. GhostLang streams both in parallel with a shared translation cache and glossary.
 - **Local-first option.** Run fully offline with Tesseract OCR + Whisper ASR + local translation providers. Cloud engines (Azure Vision, Azure Speech) are optional plug-ins.
-- **Benchmark harness built in.** Ablation presets, per-step latency breakdown, CER/WER/BLEU/chrF metrics, CSV export — shipped in the Debug tab.
-- **GPU-accelerated ASR.** Whisper with Vulkan runtime — ~3–10× faster than CPU on any modern GPU (NVIDIA / AMD / Intel).
-- **Adaptive capture.** Screen pipeline slows to 0.5 FPS on static content, speeds to 5 FPS on active content — matches user intent, saves CPU.
+- **Benchmark harness built in.** Ablation presets, per-step latency breakdown, CER/WER/BLEU/chrF metrics, CSV export - shipped in the Debug tab.
+- **GPU-accelerated ASR.** Whisper with Vulkan runtime - ~3–10× faster than CPU on any modern GPU (NVIDIA / AMD / Intel).
+- **Adaptive capture.** Screen pipeline slows to 0.5 FPS on static content, speeds to 5 FPS on active content - matches user intent, saves CPU.
 
 ## Features
 
 ### Screen translation
 - Region-based screen capture with click-through overlay that doesn't interfere with the captured window.
 - OCR engines: **Tesseract** (local, 20 languages), **Windows OCR**, **Azure Vision**, **OCR.space**.
-- Smart text erasure via **OpenCV inpainting** — or fast solid-color erase.
+- Smart text erasure via **OpenCV inpainting** - or fast solid-color erase.
 - Translated text rendered in the original location, preserving color and approximate size.
 - Adaptive capture rate (200–5000 ms), configurable per-session.
-- Recording-mode overlay-exclusion — overlay stays invisible to OBS/screen recorders.
+- Recording-mode overlay-exclusion - overlay stays invisible to OBS/screen recorders.
 
 ### Audio translation
 - Capture source: microphone or system loopback (WASAPI).
 - VAD: RMS gate (fast) or **Silero** (neural, ~200MB model, better noise rejection).
-- ASR engines: **Whisper** (local, 5 model sizes, GPU via Vulkan) — **Vosk** (local, streaming) — **Azure Speech** (cloud).
+- ASR engines: **Whisper** (local, 5 model sizes, GPU via Vulkan) - **Vosk** (local, streaming) - **Azure Speech** (cloud).
 - Subtitle overlay with configurable position, monitor, duration, fade-in/out.
-- Drift indicator — warns when translation lags real-time capture.
+- Drift indicator - warns when translation lags real-time capture.
 
 ### Shared
 - 20 supported languages: English, Russian, Spanish, German, French, Japanese, Chinese (Simplified/Traditional), Italian, Portuguese, Polish, Korean, Arabic, Turkish, Ukrainian, Dutch, Vietnamese, Hindi, Thai, Hebrew.
@@ -79,15 +79,15 @@ Download the latest `GhostLang-v*-win-x64.zip` from [Releases](https://github.co
 
 ## Configuration
 
-All settings are stored in `appsettings.user.json` next to the executable (auto-created on first launch). Autosave is enabled — the Settings page writes changes on a 400 ms debounce.
+All settings are stored in `appsettings.user.json` next to the executable (auto-created on first launch). Autosave is enabled - the Settings page writes changes on a 400 ms debounce.
 
 Model downloads live under:
 ```
 <exe>/Models/
-├── Tesseract/           — language packs, auto-download on request
-├── Whisper/             — ggml models (base/small/medium/large-v3)
-├── Vosk/                — manually unpack archives here, app auto-discovers
-└── Silero/              — silero_vad.onnx, download from Settings
+├── Tesseract/           - language packs, auto-download on request
+├── Whisper/             - ggml models (base/small/medium/large-v3)
+├── Vosk/                - manually unpack archives here, app auto-discovers
+└── Silero/              - silero_vad.onnx, download from Settings
 ```
 
 ## Benchmarks (v0.1 beta)
@@ -106,10 +106,10 @@ Full benchmark corpus (60 samples, 3 categories × 2 pipelines) and ablation dat
 ## Architecture
 
 Two framework-agnostic projects:
-- **GhostLang.Core** — pipelines, engine abstractions, benchmark runner (targets `net8.0-windows`).
-- **GhostLang.WPF** — WPF UI, MVVM (CommunityToolkit.Mvvm), DI via Microsoft.Extensions.Hosting.
+- **GhostLang.Core** - pipelines, engine abstractions, benchmark runner (targets `net8.0-windows`).
+- **GhostLang.WPF** - WPF UI, MVVM (CommunityToolkit.Mvvm), DI via Microsoft.Extensions.Hosting.
 
-Pipeline steps implement `IMandatoryPipelineStep` or `IOptionalPipelineStep` and run sequentially via `IPipelineBuilder`. Pipelines are singleton-per-session and cache expensive native resources (Tesseract engine handle, Whisper factory, Vosk model) across ticks — tear-down happens only on Stop or engine swap.
+Pipeline steps implement `IMandatoryPipelineStep` or `IOptionalPipelineStep` and run sequentially via `IPipelineBuilder`. Pipelines are singleton-per-session and cache expensive native resources (Tesseract engine handle, Whisper factory, Vosk model) across ticks - tear-down happens only on Stop or engine swap.
 
 ## Comparison to alternatives
 
@@ -117,10 +117,10 @@ Pipeline steps implement `IMandatoryPipelineStep` or `IOptionalPipelineStep` and
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Screen translation | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Audio translation | ✅ | ❌ | ❌ | partial (text hook) | ❌ | ❌ |
-| Local ASR (Whisper) | ✅ | — | — | — | — | — |
+| Local ASR (Whisper) | ✅ | - | - | - | - | - |
 | GPU acceleration | ✅ | ❌ | ❌ | partial | ❌ | ❌ |
 | Adaptive FPS | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Neural VAD | ✅ | — | — | — | — | — |
+| Neural VAD | ✅ | - | - | - | - | - |
 | Persistent cache | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Ablation benchmark | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -153,4 +153,4 @@ MIT. See [LICENSE](LICENSE) once added.
 
 ## Author
 
-dZatr1k — diploma thesis project, MIREA, 2026.
+dZatr1k - diploma thesis project, MIREA, 2026.
