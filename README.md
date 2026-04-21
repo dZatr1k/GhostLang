@@ -164,4 +164,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Author
 
-dZatr1k - diploma thesis project, MIREA, 2026.
+Zatrimaylov Daniil (dZatr1k) - diploma project, LETI, 2026.
