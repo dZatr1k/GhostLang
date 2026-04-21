@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Translate whatever's on your screen or coming out of your speakers — live, in 20 languages.</strong>
+  <strong>Translate whatever's on your screen or coming out of your speakers - live, in 20 languages.</strong>
 </p>
 
 <p align="center">
@@ -16,20 +16,20 @@
 
 ---
 
-GhostLang is a Windows app for translating your screen and the audio playing through your system. It gives you the tools to transcribe and translate pretty much any digital content you come across — manga pages, game UI, articles, podcasts, YouTube, game streams — without jumping between tabs or copying text by hand.
+GhostLang is a Windows app for translating your screen and the audio playing through your system. It gives you the tools to transcribe and translate pretty much any digital content you come across - manga pages, game UI, articles, podcasts, YouTube, game streams - without jumping between tabs or copying text by hand.
 
 You pick a region on your screen or switch on system audio capture, and the app overlays the translated text on top of the original or drops it on the desktop as subtitles. Nothing leaves your machine unless you explicitly turn on a cloud engine.
 
 ## What sets it apart
 
-Most desktop translators stop at screen OCR. GhostLang treats screen and audio as equal citizens — they share the same translation cache, the same glossary of protected terms, and the same benchmark harness. If you're translating a game stream, the dialogue subtitles and the UI tooltips both flow through the same pipeline.
+Most desktop translators stop at screen OCR. GhostLang treats screen and audio as equal citizens - they share the same translation cache, the same glossary of protected terms, and the same benchmark harness. If you're translating a game stream, the dialogue subtitles and the UI tooltips both flow through the same pipeline.
 
 It's also the only one in this space with a real **benchmark UI built in**: ablation presets, per-step latency breakdown, CER/WER/BLEU/chrF metrics, CSV export. Everything in the Debug tab, usable without touching code.
 
 A few other things people notice:
 
 - **Runs fully offline** if you want. Tesseract + Whisper + a local translation engine and you're done. Cloud engines (Azure Vision, Azure Speech) are there if you need them, not required.
-- **GPU-accelerated ASR** via Whisper's Vulkan backend. Works on NVIDIA, AMD, Intel — anything with a modern driver. Usually 3–10× faster than CPU.
+- **GPU-accelerated ASR** via Whisper's Vulkan backend. Works on NVIDIA, AMD, Intel - anything with a modern driver. Usually 3–10× faster than CPU.
 - **Adaptive capture.** Reading a manga page? The screen pipeline slows down to 0.5 FPS and goes idle. Watching a stream? It jumps to 5 FPS the moment something changes.
 
 ## Features
@@ -39,7 +39,7 @@ A few other things people notice:
 - Pick a rectangular region of your screen with the mouse. The overlay is click-through, so it doesn't get in the way of the window below.
 - OCR engines you can choose from: **Tesseract** (local, 20 languages), **Windows OCR**, **Azure Vision**, **OCR.space**.
 - Smart erasure of the original text via **OpenCV inpainting**, or a fast solid-color wipe if you'd rather save CPU.
-- Translated text gets rendered back in place — same approximate color, same size.
+- Translated text gets rendered back in place - same approximate color, same size.
 - Capture rate adapts to content (200–5000 ms), configurable per session.
 - Recording mode hides the overlay from OBS and other screen recorders, so your stream stays clean.
 
@@ -56,13 +56,13 @@ A few other things people notice:
 - 20 languages: English, Russian, Spanish, German, French, Japanese, Chinese (Simplified / Traditional), Italian, Portuguese, Polish, Korean, Arabic, Turkish, Ukrainian, Dutch, Vietnamese, Hindi, Thai, Hebrew.
 - Translation engines: **GTranslate** (Google, Yandex, Bing, Microsoft), **MyMemory**, **Lingva**, **LibreTranslate**.
 - Translation cache lives on disk and survives restarts.
-- Glossary lets you mark terms you want left alone (product names, characters, jargon) — they get protected from the MT engine.
+- Glossary lets you mark terms you want left alone (product names, characters, jargon) - they get protected from the MT engine.
 - Global hotkeys for everything: region selection, start/stop, subtitle toggle, window nudging.
 - UI language: English or Russian. Theme: dark or light.
 
 ## Screenshots
 
-> Screenshots are on the way — coming in the next release.
+> Screenshots are on the way - coming in the next release.
 
 ## Requirements
 
@@ -87,16 +87,16 @@ Download the latest `GhostLang-v*-win-x64.zip` from [Releases](https://github.co
 
 ## Configuration
 
-Settings are saved to `appsettings.user.json` next to the executable (created on first launch). The Settings page autosaves on a 400 ms debounce — no Save button.
+Settings are saved to `appsettings.user.json` next to the executable (created on first launch). The Settings page autosaves on a 400 ms debounce - no Save button.
 
 Models live here:
 
 ```
 <exe>/Models/
-├── Tesseract/           — language packs, download on demand from Settings
-├── Whisper/             — ggml models (base/small/medium/large-v3)
-├── Vosk/                — unpack archives into this folder, app picks them up
-└── Silero/              — silero_vad.onnx, download from Settings
+├── Tesseract/           - language packs, download on demand from Settings
+├── Whisper/             - ggml models (base/small/medium/large-v3)
+├── Vosk/                - unpack archives into this folder, app picks them up
+└── Silero/              - silero_vad.onnx, download from Settings
 ```
 
 ## Benchmarks (v0.1 beta)
@@ -116,8 +116,8 @@ The full corpus (60 samples, 3 categories × 2 pipelines) is being built and wil
 
 Two projects:
 
-- **GhostLang.Core** — pipelines, engine abstractions, benchmark runner. Framework-agnostic (`net8.0-windows`).
-- **GhostLang.WPF** — the UI, MVVM on CommunityToolkit.Mvvm, DI through Microsoft.Extensions.Hosting.
+- **GhostLang.Core** - pipelines, engine abstractions, benchmark runner. Framework-agnostic (`net8.0-windows`).
+- **GhostLang.WPF** - the UI, MVVM on CommunityToolkit.Mvvm, DI through Microsoft.Extensions.Hosting.
 
 Pipeline steps implement `IMandatoryPipelineStep` or `IOptionalPipelineStep` and run in order via `IPipelineBuilder`. The pipeline is built once per session and reused across ticks, so expensive native resources (Tesseract handle, Whisper factory, Vosk model) stick around instead of getting rebuilt every frame.
 
@@ -127,10 +127,10 @@ Pipeline steps implement `IMandatoryPipelineStep` or `IOptionalPipelineStep` and
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Screen translation | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Audio translation | ✅ | ❌ | ❌ | partial (text hook) | ❌ | ❌ |
-| Local ASR (Whisper) | ✅ | — | — | — | — | — |
+| Local ASR (Whisper) | ✅ | - | - | - | - | - |
 | GPU acceleration | ✅ | ❌ | ❌ | partial | ❌ | ❌ |
 | Adaptive capture rate | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Neural VAD | ✅ | — | — | — | — | — |
+| Neural VAD | ✅ | - | - | - | - | - |
 | Persistent cache | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Built-in benchmark | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -164,4 +164,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Author
 
-dZatr1k — diploma thesis project, MIREA, 2026.
+dZatr1k - diploma thesis project, MIREA, 2026.
